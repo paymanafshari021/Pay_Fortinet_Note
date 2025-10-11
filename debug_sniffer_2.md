@@ -2,21 +2,9 @@
 
 ```
 diag sniffer packet any 'host 10.0.0.1 and host 10.0.0.2 and tcp port 80' 4 0 a
-```
-
-```
-diagnose sniffer packet any "port 541 and host <FortiManager_IP>" 6 0 a 
-```
-
-```
+diagnose sniffer packet any "port 541 and host <FortiManager_IP>" 6 0 a
 diagnose sniffer packet any 'host 10.200.1.10 and host 10.200.2.10 and icmp' 4 0 a 
-```
-
-```
 diagnose sniffer packet any 'port 80 and host 172.20.120.18' 4 0 a 
-```
-
-```
 diagnose sniffer packet any 'src host 192.168.10.1 and port (80 or 443 or 8080)' 4 0 a
 ```
 
@@ -41,12 +29,12 @@ diag sniffer packet <interface|any> '\[\[src|dst\] host <IP> | <network>\] \[and
 `<verbose>` **(verbosity / level)**
 
 - Numeric level controls how much is printed and whether data hex is shown. Typical meanings (FortiOS):  
-   1 = print packet headers only  
-   2 = header + IP payload data  
-   3 = header + Ethernet data  
-   4 = header + interface name  
-   5 = IP header+data + interface name  
-   6 = Ethernet header+data + interface name.
+  1 = print packet headers only  
+  2 = header + IP payload data  
+  3 = header + Ethernet data  
+  4 = header + interface name  
+  5 = IP header+data + interface name  
+  6 = Ethernet header+data + interface name.
 - Pick a higher number (5/6) to see hex payload; 1–4 are more compact. ([docs.fortinet.com](https://docs.fortinet.com/document/fortigate/7.6.4/cli-reference/303299696/diagnose-sniffer?utm_source=chatgpt.com "diagnose sniffer | FortiGate / FortiOS 7.6.4"))
 
 `<count>`
@@ -56,7 +44,7 @@ diag sniffer packet <interface|any> '\[\[src|dst\] host <IP> | <network>\] \[and
 
 `<tsformat>` **(timestamp format)**
 
-- Common values:
+- Common values: 
   - `a` — absolute UTC timestamps (human date/time).
   - `l` — absolute LOCAL time (local unit time).
   - otherwise — relative time since the start of the sniff (delta/seconds.ms).

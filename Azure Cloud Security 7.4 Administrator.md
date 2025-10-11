@@ -191,3 +191,55 @@ When configuring the VPN Gateway, specific rules and protocols apply:
 - **VNet-to-VNet Setup:** To connect two VNets, you must create a VPN gateway in each VNet. The connection is finalized by specifying the two VPN gateways and configuring a **shared key**.
 - **Routing Protocols:** The Virtual Network Gateway is one of the two main scenarios where the **Border Gateway Protocol (BGP)** can be used, alongside ExpressRoute. BGP can be implemented to override the default routes Azure creates.
 - **FortiGate Integration:** Azure VPN Gateway can be configured on one side of a connection while a Network Virtual Appliance (NVA) like FortiGate is configured on the other side.
+
+## Network traffic filtering
+Network traffic filtering in Azure is crucial for enforcing security policies and controlling the flow of traffic within and between resources. Azure offers several native services and features to achieve this.
+
+The sources identify the following main options used to filter network traffic, particularly between subnets:
+
+### 1. Network Security Groups (NSGs)
+
+**Network Security Groups (NSGs)** are Azure's built-in layer 3 (IP) and layer 4 (TCP/UDP) **stateful firewall service**. They provide a foundational layer of network security allowing you to define fine-grained network access controls.
+
+Key features of NSGs include:
+
+*   **Rules:** NSGs are a list of access control rules that either permit or deny traffic based on various criteria. These security rules allow or deny **inbound network traffic** to, or **outbound network traffic** from, Azure resources based on criteria such as source and destination IP addresses, ports, and protocols.
+*   **Statefulness:** NSGs are stateful, meaning bidirectional policies are not required.
+*   **Application:** NSGs can be applied either at the network interface card (NIC) level or at the full subnet level.
+*   **Limitations:** NSGs only work if a resource is connected to a Virtual Network (VNet); they do not work for other resources like Platform-as-a-Service (PaaS) services.
+*   **Security Implications:** Misconfigured NSGs might inadvertently block or allow unwanted traffic. NSGs are required to restrict traffic for Basic public IP addresses, which are open by default. Standard public IP addresses, conversely, are secure by default and require NSG configuration to allow inbound traffic.
+
+### 2. Azure Firewall
+
+Azure Firewall is a **managed network security service** offering a fully stateful firewall solution.
+
+Characteristics of Azure Firewall include:
+
+*   **Functionality:** It provides centralized network traffic filtering and threat protection for Azure resources. It is designed with built-in high availability and unrestricted cloud scalability.
+*   **Management:** Administrators can create, enforce, and log application and network connectivity policies, and the service is fully integrated with Azure Monitor for logging and analytics.
+*   **SKUs:** Azure Firewall is available in Basic, Standard, and **Premium** SKUs.
+*   **Premium Features:** The Premium SKU is distinct because it offers **Advanced Threat Protection features**, such as fully managed Intrusion Detection and Prevention System (IDPS), URL filtering, and inbound/outbound TLS termination.
+
+### 3. Network Virtual Appliances (NVAs)
+
+Network virtual appliances (NVAs) are virtual machines running specialized networking software, such as FortiGate or FortiWeb, which provide advanced network functionality and services.
+
+NVAs can be used to implement network traffic filtering and enhance network security within Azure deployments. You can use an NVA to filter traffic between VNets, as well as traffic to and from the internet.
+
+NVAs can be customized for filtering by being configured to:
+
+*   Act as firewalls to filter inbound and outbound network traffic based on rules and policies.
+*   Incorporate IDS/IPS capabilities to detect and prevent network-based attacks.
+*   Include web application firewall (WAF) functionality to protect against common web-based attacks.
+*   Perform Network Address Translation (NAT).
+*   Act as load balancers or offload SSL/TLS encryption and decryption processes.
+
+NVAs, such as **FortiGate VMs**, provide advanced network security and next-generation firewall capabilities. They are typically used in conjunction with **User-defined routes (UDRs)** or Border Gateway Protocol (BGP).
+
+### Controlling Network Traffic Flow
+
+While Azure provides default routing capabilities, administrators often need to explicitly force traffic through a specific filtering resource:
+
+*   **Default Traffic:** By default, all VMs have access to the internet through an Azure-managed Source Network Address Translation (SNAT) service. If a VM has a public IP address, it connects directly to the internet using that address.
+*   **Using UDRs for Inspection:** To force traffic to a Network Virtual Appliance (such as a FortiGate VM) for inspection, an administrator must configure **User-defined routes (UDRs)**. UDRs allow custom routing tables to override the default routing behavior.
+*   **Inspection Scenarios:** UDRs can be used to force traffic destined for the internet or traffic moving between subnets to go through the security device first for inspection.

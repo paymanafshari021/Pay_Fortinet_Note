@@ -14,7 +14,7 @@ Open the WebGUI, go to “System” and then to “Settings”. Check all settin
 - Email service settings
 
 Some global settings that may be interesting to you can only be made on the CLI. Have a look at those settings:
-
+```
 config system global  
    # You can create so named "revision backups" automatically every time an administrator session ends.  
    set revision-backup-on-logout enable  
@@ -25,13 +25,13 @@ config system global
    # It may also be interesting to remove the alias, which can reveal our FGT model in use  
    unset alias  
 end
-
+```
 Ensure, that your FortiGate is allowed to use FortiGuard update servers that are located outside of the USA (this is set to “automatic” per default):
-
+```
 config system fortiguard
    set update-server-location {eu/usa/automatic}
 end
-
+```
 ## Step 2: Configuration of the log settings
 
 If your FortiGate has a harddisk, you may want to use it as log storage:
@@ -78,17 +78,17 @@ Tipp: There is also an option to notify for configuration changes. You may think
 ## Step 4: Autoupdate
 
 If you like to enable automatic firmware upgrades for your FortiGate, [you can do this following the Fortinet Admin Guide](https://docs.fortinet.com/document/fortigate/7.4.4/administration-guide/369092/enabling-automatic-firmware-upgrades). By default, entry-level FortiGates (lower than 100 series) have automatic firmware upgrades enabled. You can check the configuration status on the GUI under System -> FortiGuard or over the CLI:
-
+```
 gw01 # sh full-configuration sys fortiguard | grep auto-firmware-upgrade
-
+```
 ## Step 5: Wifi default country
 
 What you define here will be taken as default if you create any new wireless profile.
-
+```
 config wireless-controller setting
    set country CH
 end
-
+```
 ## Step 6: Administrative Management Interfaces
 
 We recommend our customers to use out-of-band (oob) management interfaces. This way you can have a clean line between traffic handling parts and management parts of your FortiGate.
@@ -106,11 +106,11 @@ I personally always enable all settings. Keep in mind: This setting does not ena
 ## Step 8: Do you need VDOMs?
 
 If you want to use VDOMs, the time has come to enable VDOM management on the FortiGate:
-
+```
 config system global
    set vdom-mode multi-vdom
 end
-
+```
 ## Step 9: Configuration of SD-WAN
 
 On FortiOS 7.2, the SD-WAN Features has got a lot of useful features. Thefore we recommend you to implement SD-WAN on a new configuration from scratch. Moving to SD-WAN afterwards needs a littlebit more time and effort even if there is a migration tool available in FortiOS 7.2.
@@ -153,11 +153,11 @@ end
 ## Step 12: Reverse path forwarding check
 
 By default, the RPF (reverse path forwarding) check on the FortiGate is set to “loose”. If you need a more restrictive spoofing filter, you may want to set the RPF check to “strict”.
-
+```
 config system settings  
    set strict-src-check enable  
 end
-
+```
 Because of the importance of this topic and since it is security relevant, Fortinet has created a dedicated KB article describing the FortiGate RPF check and its options. [You can find the KB article here.](https://community.fortinet.com/t5/FortiGate/Technical-Note-Reverse-Path-Forwarding-RPF-implementation-and/ta-p/194382)
 
 ## Step 13: Configuration of network zones
@@ -177,12 +177,12 @@ Please respect, that a lot of bigger service providers like azure, aws, cloudfla
 Please note, that the MAC addressing of you FortiGate change as soon as you enable the HA feature. Therefore, if you are experiencing problem with modems or switches, please consider to turn them off for a minute (to flush the MAC table) and plug them back in afterwards.
 
 Please do not forget to enable the session sync feature. [You can find more information in this KB article](https://community.fortinet.com/t5/FortiGate/Technical-Tip-HA-session-failover-session-pickup/ta-p/191165).
-
+```
 config system ha  
    set session-pickup enable  
    set session-pickup-connectionless enable  
 end
-
+```
 ## Step 16: Configuration of IPSec Tunnels
 
 Now it’s time to configure your IPSec Tunnels.
@@ -222,9 +222,9 @@ The same applies if you wish tho use FortiGate Cloud.
 ## Step 23: Configuration backup & reboot
 
 As the last step we recommend you to create a global configuration backup of your FortiGate and reboot the appliance once.
-
+```
 exec reboot
-
+```
 ## Step 24: Harden your FortiGate configuration
 
 Fortinet has published a FortiOS hardening guide. We recommend to work through the guide to harden your system. You can find the guide under [https://docs.fortinet.com/document/fortigate/7.4.0/best-practices/555436](https://docs.fortinet.com/document/fortigate/7.4.0/best-practices/555436) .

@@ -243,3 +243,5 @@ While Azure provides default routing capabilities, administrators often need to 
 *   **Default Traffic:** By default, all VMs have access to the internet through an Azure-managed Source Network Address Translation (SNAT) service. If a VM has a public IP address, it connects directly to the internet using that address.
 *   **Using UDRs for Inspection:** To force traffic to a Network Virtual Appliance (such as a FortiGate VM) for inspection, an administrator must configure **User-defined routes (UDRs)**. UDRs allow custom routing tables to override the default routing behavior.
 *   **Inspection Scenarios:** UDRs can be used to force traffic destined for the internet or traffic moving between subnets to go through the security device first for inspection.
+
+---

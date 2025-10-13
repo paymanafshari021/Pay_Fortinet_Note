@@ -245,3 +245,5 @@ While Azure provides default routing capabilities, administrators often need to 
 *   **Inspection Scenarios:** UDRs can be used to force traffic destined for the internet or traffic moving between subnets to go through the security device first for inspection.
 
 ---
+
+# FortiFlex

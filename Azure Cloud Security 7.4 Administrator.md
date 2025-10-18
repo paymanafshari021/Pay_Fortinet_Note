@@ -325,3 +325,21 @@ The key aspects to consider include:
 - **SR-IOV:** Accelerated networking is the term Microsoft uses for single root I/O virtualization (SR-IOV), which significantly improves network performance.
 - **Applicability:** This feature is supported by several general-purpose and compute-optimized VMs with two vCPUs without hyper-threading support, but it is **most often used in VMs with four or more vCPUs**.
 - ---
+## Understand SLAs in Azure
+
+When designing a reliable architecture in Azure, you must factor in resiliency and High Availability (HA). You can achieve different levels of availability depending on the deployment type you choose.
+The sources provide the following specific SLAs offered by Microsoft for **Virtual Machines (VMs)**:
+### SLAs for Multi-Instance Deployments
+
+The highest availability is guaranteed when deploying multiple instances across availability zones or within availability sets/dedicated host groups:
+
+- **99.99% Connectivity:** Microsoft guarantees VM connectivity to at least one instance at least **99.99%** of the time for all VMs that have **two or more instances deployed across two or more availability zones** in the same Azure region.
+- **99.95% Connectivity:** Microsoft guarantees VM connectivity to at least one instance at least **99.95%** of the time for all VMs that have **two or more instances deployed in the same availability set or in the same dedicated host group**.
+
+### SLAs for Single-Instance VMs (Based on Disk Type)
+
+For single instance VMs, the guaranteed connectivity depends on the type of managed disk used:
+
+- **99.9% Connectivity:** Guaranteed for any single instance VM using **premium SSD or ultra disk** for all operating system disks and data disks.
+- **99.5% Connectivity:** Guaranteed for any single instance VM using **standard SSD-managed disks** for operating system disk and data disks.
+- **95% Connectivity:** Guaranteed for any single instance VM using **standard HDD-managed disks** for operating system disks and data disks.

@@ -1,6 +1,5 @@
 
-
-![[attachments/Pasted image 20251018224148.png]]
+![[HA_Override_dis.png]]
 Force a failover
 ```
 diagnose sys ha reset-uptime
@@ -9,7 +8,7 @@ Check the HA uptime difference
 ```
 diag sys ha dump-by vcluster
 ```
-![[Pasted image 20251018224430.png]]
+![[HA_Override_en.png]]
 
 Shows HA mode, roles, sync status, and failover reasons.
 ```

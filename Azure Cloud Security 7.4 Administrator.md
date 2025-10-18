@@ -90,7 +90,7 @@ Azure recently introduced the Azure Route Server to simplify dynamic routing.
 
 - Function: This service allows Network Virtual Appliances (NVAs), such as a FortiGate VM, to exchange BGP routing information directly with the Azure Software Defined Network (SDN).
 
-# Azure Public IP addresses
+## Azure Public IP addresses
 
 Azure Public IP addresses are a critical component of Azure networking, allowing resources hosted in the cloud to communicate with internet resources.
 
@@ -275,22 +275,22 @@ While Azure provides default routing capabilities, administrators often need to 
 
 Here is a detailed explanation of IP forwarding settings in the context of Fortinet solutions in Azure:
 
-**Purpose and Necessity**
+### **Purpose and Necessity**
 
 - **Traffic Forwarding Requirement:** You **__must enable IP Forwarding__** for any network interface attached to a VM that is intended to forward network traffic to an address other than its own.
 - **Azure Check Bypass:** This setting is essential because it __prevents Azure from checking the source and destination for a network interface__, allowing the security appliance (like FortiGate) to operate correctly.
 - **Source IP Generation:** With IP forwarding enabled at its internal interface, a __FortiGate VM is able to generate traffic using a source IP address that is different from the IP address assigned to the virtual network interface.__
 
-**Spoofing Prevention**
+### **Spoofing Prevention**
 
 - **Disabled Status Consequence:** If IP __forwarding is disabled__, the packets are identified as **__spoofing packets__**.
 - **Action Required:** To __prevent this spoofing situation__, you must verify that IP forwarding is enabled on the appropriate network interfaces.
 
-**Deployment Status**
+### **Deployment Status**
 
 - **Default Behavior:** __IP forwarding is enabled by default__ when you deploy your Fortinet VM either __from Azure Marketplace or by using a template obtained from Fortinet GitHub.__
 
-# Before deploying a FortiGate VM in Azure
+## Before deploying a FortiGate VM in Azure
 
 Before deploying a FortiGate VM in Azure, you must consider several important aspects related to licensing, support, feature support, networking requirements, and performance.
 
@@ -303,8 +303,8 @@ The key aspects to consider include:
 
 ### 2. FortiGate Features and Support
 
-- **Virtual Domains:** Note that FortiGate using the **PAYG** license model does **not support virtual domains**. This must be considered when deciding which configuration to implement.
-  - **VDOM support** is **available only for BYOL (Bring Your Own License)** models on Azure.
+- **Virtual Domains:** Note that FortiGate using the **__PAYG__**__ license__ model does **__not support virtual domains__**. This must be considered when deciding which configuration to implement.
+  - **__VDOM support__** is **available only for __BYOL (Bring Your Own License)__** models on Azure.
   - The "V" license types such as **FG-VMxxV** (for example, VM02V) **do not include VDOM support** unless additional VDOM licenses are purchased.​
   - Default PAYG (pay-as-you-go) marketplace images usually include **one root VDOM** only.
 - **Support Level:** Verify that you will receive the **support level needed** because the support level depends on the license type. 
@@ -324,6 +324,3 @@ The key aspects to consider include:
 - **Accelerated Networking:** You should **enable accelerated networking** to increase the performance of your VMs.
 - **SR-IOV:** Accelerated networking is the term Microsoft uses for single root I/O virtualization (SR-IOV), which significantly improves network performance.
 - **Applicability:** This feature is supported by several general-purpose and compute-optimized VMs with two vCPUs without hyper-threading support, but it is **most often used in VMs with four or more vCPUs**.
-
-|  |
-|--|

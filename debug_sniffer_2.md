@@ -1,4 +1,10 @@
-## 
+---
+tags:
+  - Debug
+  - Fortinet
+---
+
+## Debug 
 
 ```
 diag sniffer packet any 'host 10.0.0.1 and host 10.0.0.2 and tcp port 80' 4 0 a

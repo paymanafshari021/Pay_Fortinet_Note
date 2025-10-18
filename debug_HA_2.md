@@ -2,6 +2,7 @@
 tags:
   - ha
   - Fortinet
+  - Debug
 ---
 # HA 
 

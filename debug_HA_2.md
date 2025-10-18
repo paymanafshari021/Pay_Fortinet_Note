@@ -1,5 +1,5 @@
+![Alt text](attachments/HA_Override_en.png)
 
-![[attachments/HA_Override_en.png]]
 Force a failover
 ```
 diagnose sys ha reset-uptime

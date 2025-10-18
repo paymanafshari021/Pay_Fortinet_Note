@@ -12,6 +12,7 @@ The Azure Virtual Network (VNet) is described as the fundamental building block 
 The ability to connect on-premises networks to Azure VNets securely is facilitated by services like the Azure VPN Gateway and Azure ExpressRoute.
 
 Azure handles Layer 2 networking concepts, including ARP traffic, differently than traditional on-premises networks, utilizing its underlying network infrastructure to manage these processes.
+
 ## Layer2 - ARP Traffic in Azure
 
 Azure does not have traditional layer 2 networking.
@@ -20,6 +21,7 @@ Azure does not have traditional layer 2 networking.
 - Azure cloud computing environments generally do not use broadcast or multicast traffic; only unicast traffic is allowed.
 - The implication of this abstraction is that there is no traditional layer 2 traffic, which affects features like FortiGate clustering protocol, gratuitous ARP, and instant IP failover.
 - Furthermore, Azure doesn't allow layer 2 modes, such as transparent mode or virtual wire.
+
 ### Management of ARP Traffic
 
 Azure manages all ARP traffic internally using a centralized service to maintain the underlying networking infrastructure.
@@ -39,6 +41,7 @@ The Azure cloud environment introduces specific networking restrictions and abst
 - No Traditional Layer 2 Networking: Azure does not have traditional layer 2 networking. Communication between Virtual Machines (VMs) or other resources within an Azure Virtual Network (VNet) is based on their IP addresses and routing, rather than on MAC addresses and Layer 2 switches.
 - Traffic Type Limitation: Cloud computing environments do not use broadcast or multicast traffic; only unicast traffic is allowed.
 - Unsupported Layer 2 Features: Since there is no traditional Layer 2 traffic, features that rely on it are restricted, including FortiGate clustering protocol, gratuitous ARP, and instant IP failover. Azure also doesn't allow layer 2 modes, such as transparent mode or virtual wire.
+
 ### ARP and Underlay Network Abstraction
 
 Azure manages low-level traffic like ARP internally through its underlying network infrastructure. Administrators lack direct access to this underlay network.
@@ -47,14 +50,17 @@ Azure manages low-level traffic like ARP internally through its underlying netwo
 - ARP Behavior: When a VM makes an ARP request (e.g., VM 10.0.1.5), the SDN virtual router receives the request and replies with its own MAC address (e.g., 12:34:56:78:9A:BC).
 - Traffic Path: This process occurs for all destinations, meaning that if you check the ARP table on the VM, you will see the same MAC address for all neighbors. Consequently, all VM traffic must first go through the SDN virtual router, which then processes the traffic and adjusts the MAC address according to the original destination.
 - ICMP Restriction: Notably, the SDN virtual router does not respond to ICMP requests.
+
 ### IP Configuration Restriction
 
 - IP Definition Requirement: An instance receives traffic only if the IP address is defined in Azure. If administrators configure static or virtual IP addresses on the VM, they must make sure that those IP addresses are also configured in Azure.
 
 Despite these restrictions, connectivity and security requirements can still be met using Azure networking components that deliver a secure and scalable network in the cloud. For instance, administrators must configure User-Defined Routes (UDRs) to override default routing behavior, often to force traffic (such as internet-bound traffic) to a Network Virtual Appliance (NVA) like a FortiGate VM for inspection.
+
 ## Routing
 
-Azure provides several routing capabilities and components to control and manage network traffic both within and between resources such as Virtual Machines (VMs) and Virtual Networks (VNets). 
+Azure provides several routing capabilities and components to control and manage network traffic both within and between resources such as Virtual Machines (VMs) and Virtual Networks (VNets).
+
 ### Routing Tables and Custom Routing
 
 - Routing Table: This feature is used to control the flow of network traffic within a VNet or between VNets.
@@ -77,14 +83,17 @@ It is crucial to understand the route priority in Azure when more than one route
 1. User-Defined Route (UDR)
 2. Border Gateway Protocol (BGP)
 3. System Routes
+
 ### Azure Route Server
 
 Azure recently introduced the Azure Route Server to simplify dynamic routing.
 
 - Function: This service allows Network Virtual Appliances (NVAs), such as a FortiGate VM, to exchange BGP routing information directly with the Azure Software Defined Network (SDN).
+
 # Azure Public IP addresses
 
 Azure Public IP addresses are a critical component of Azure networking, allowing resources hosted in the cloud to communicate with internet resources.
+
 ### Core Functionality and Mechanism
 
 - Inbound Communication: Azure public IP addresses enable resources on the internet to communicate inbound to Azure resources.
@@ -96,19 +105,22 @@ Azure Public IP addresses are a critical component of Azure networking, allowing
 Public IP addresses can be created with one of two SKUs: Basic or Standard.
 
 |                         |                                                                         |                                                                                       |
-| ----------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+|-------------------------|-------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
 | Feature                 | Basic Public IP Address                                                 | Standard Public IP Address                                                            |
 | IP Version & Type       | Can be static or dynamic for IPv4, and dynamic for IPv6.                | Can be static only.                                                                   |
 | Security Status         | Open by default.                                                        | Secure by default.                                                                    |
 | Security Implementation | Requires Network Security Groups (NSGs) to be used to restrict traffic. | Requires the configuration of NSGs to allow inbound traffic.                          |
 | Upgradeability          | Can be upgraded to Standard for IPv4.                                   | N/A                                                                                   |
 | Advanced Features       | Does not inherently support advanced features listed for Standard.      | Supports extra features like availability zones, routing preference, and global tier. |
+
 ### Integration Requirements
 
 A notable requirement is that a public IP SKU must match the SKU of the load balancer with which it is used. For instance, a public load balancer may use one or more public IP addresses.
+
 ## Azure Load Balancer
 
 The Azure Load Balancer is a key network component designed to manage incoming network traffic to achieve high availability and scalability for your services and applications.
+
 ### Core Functionality and Performance
 
 - Traffic Distribution: Azure Load Balancer helps distribute incoming network traffic across multiple back-end resources, such as Virtual Machines (VMs) or back-end services.
@@ -126,6 +138,7 @@ You can configure Azure Load Balancer to load balance various types of traffic:
 - Cross-Premises Traffic: Traffic between on-premises computers and VMs in a cross-premises virtual network.
 - Forwarding External Traffic: It can also be configured to forward external traffic to a specific VM.
 - ICMP Support: Inbound ICMPv4 pings are supported on front ends, which allows for troubleshooting network traffic between the Load Balancer and the client device.
+
 ### Load Balancer SKUs (Basic vs. Standard)
 
 Azure provides different types of load balancers:
@@ -137,29 +150,36 @@ Azure provides different types of load balancers:
 - Basic Load Balancer: This SKU can only load balance traffic inside the availability zone.
 
 A public load balancer uses one or more public IP addresses, and a crucial requirement is that a public IP SKU must match the SKU of the load balancer with which it is used.
+
 ### Advanced Features
 
 - Direct Server Returns (Floating IP): This is an Azure feature that prevents Destination NAT (DNAT) from being translated. When this feature is used, traffic received by the destination VM must reply directly to the source IP address; the destination VM does not send the reply traffic back to the load balancer, as the load balancer only redirects traffic.
 - Back-End Pool Members: For back-end pool members, you can add individual VMs, a scale set, or an availability set. Any devices added to the availability set are automatically included as target members of the load balancer.
-## Virtual Machine Scale Sets (VMSS) 
+
+## Virtual Machine Scale Sets (VMSS)
 
 Virtual Machine Scale Sets (VMSS) are a powerful Azure resource designed to manage and scale groups of identical virtual machines.
+
 ### Definition and Purpose
 
 - Single Entity Management: Virtual Machine Scale Sets (VMSS) are an Azure resource that allows you to create and manage a group of identical VMs as a single entity.
 - Scalable Solution: VMSS provides a scalable and highly available solution for deploying and managing applications that require automatic scaling based on demand.
 - Benefits: VMSS offers several benefits, including flexibility, automation, simplified management, customization, high availability, and autoscaling, enabling you to build resilient and efficient solutions.
+
 ### Autoscaling Functionality
 
 - Dynamic Adjustment: The autoscaling capability of VMSS allows you to dynamically grow and shrink the number of VMs (such as FortiGate VMs) to match current traffic and performance requirements.
 - Capacity Control: You can set a minimum and maximum number of devices and scale out as needed.
 - Key Benefits of Autoscaling: The main benefits derived from using autoscaling are fault tolerance, availability, and cost management.
+
 ### Integration with Networking Components
 
 - Load Balancer Integration: You can add a scale set to the list of back-end pool members for an Azure Load Balancer, along with individual VMs or an availability set. Devices added to an availability set are automatically included as target members of the load balancer.
+
 ## Azure VPN Gateway
 
 The Azure VPN Gateway, also known as the Virtual Network Gateway, is a crucial networking service or feature provided by Microsoft Azure. Its primary purpose is to establish **secure and reliable connectivity** for integrating various network environments.
+
 ### Primary Functions and Hybrid Cloud Support
 
 The Azure VPN Gateway facilitates two main types of connectivity: connecting internal networks to Azure, and connecting Azure virtual networks to each other.
@@ -173,16 +193,18 @@ The Azure VPN Gateway facilitates two main types of connectivity: connecting int
 **B. Connecting Virtual Networks (VNet-to-VNet)** VPN gateways can also be used to connect two Azure Virtual Networks (VNets) to each other.
 
 - Azure VPN Gateway is one of the two main methods available to achieve connectivity between different VNets (the other being VNet peering).
+
 ### Types of VPN Connections Supported
 
 The gateway supports different VPN approaches to connect resources across boundaries:
 
-|Connection Type|Description & Characteristics|
-|:--|:--|
-|**Site-to-Site VPN**|Established between your on-premises VPN device and an Azure VPN Gateway. This connection uses an **IPSec/IKE VPN** to provide encrypted communication over the internet. This type enables any authorized on-premises resource to access a VNet. The latency is generally **unpredictable** because the traffic must traverse the public internet.|
-|**Point-to-Site VPN**|Established between a single PC connected to your network and a VNet. This is ideal for developers or when you are just starting with Azure, as it requires few or no changes to your existing network. The connection uses the **Secure Socket Tunneling Protocol (SSTP)** to provide encrypted communication over the internet. Similar to site-to-site, the latency is **unpredictable** because the traffic traverses the internet.|
+| Connection Type   | Description & Characteristics                                                                                                                                                                                                                                                                                                                                                                                                   |
+|:------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Site-to-Site VPN**  | Established between your on-premises VPN device and an Azure VPN Gateway. This connection uses an **IPSec/IKE VPN** to provide encrypted communication over the internet. This type enables any authorized on-premises resource to access a VNet. The latency is generally **unpredictable** because the traffic must traverse the public internet.                                                                                     |
+| **Point-to-Site VPN** | Established between a single PC connected to your network and a VNet. This is ideal for developers or when you are just starting with Azure, as it requires few or no changes to your existing network. The connection uses the **Secure Socket Tunneling Protocol (SSTP)** to provide encrypted communication over the internet. Similar to site-to-site, the latency is **unpredictable** because the traffic traverses the internet. |
 
-_(Note: A third option, Azure ExpressRoute, provides a dedicated, private connection that does _not_ traverse the internet, resulting in predictable latency, but this connection is established through an ExpressRoute partner, not solely via the VPN Gateway itself.)_
+*(Note: A third option, Azure ExpressRoute, provides a dedicated, private connection that does not traverse the internet, resulting in predictable latency, but this connection is established through an ExpressRoute partner, not solely via the VPN Gateway itself.)*
+
 ### Technical Requirements and Integration
 
 When configuring the VPN Gateway, specific rules and protocols apply:
@@ -193,6 +215,7 @@ When configuring the VPN Gateway, specific rules and protocols apply:
 - **FortiGate Integration:** Azure VPN Gateway can be configured on one side of a connection while a Network Virtual Appliance (NVA) like FortiGate is configured on the other side.
 
 ## Network traffic filtering
+
 Network traffic filtering in Azure is crucial for enforcing security policies and controlling the flow of traffic within and between resources. Azure offers several native services and features to achieve this.
 
 The sources identify the following main options used to filter network traffic, particularly between subnets:
@@ -203,11 +226,11 @@ The sources identify the following main options used to filter network traffic, 
 
 Key features of NSGs include:
 
-*   **Rules:** NSGs are a list of access control rules that either permit or deny traffic based on various criteria. These security rules allow or deny **inbound network traffic** to, or **outbound network traffic** from, Azure resources based on criteria such as source and destination IP addresses, ports, and protocols.
-*   **Statefulness:** NSGs are stateful, meaning bidirectional policies are not required.
-*   **Application:** NSGs can be applied either at the network interface card (NIC) level or at the full subnet level.
-*   **Limitations:** NSGs only work if a resource is connected to a Virtual Network (VNet); they do not work for other resources like Platform-as-a-Service (PaaS) services.
-*   **Security Implications:** Misconfigured NSGs might inadvertently block or allow unwanted traffic. NSGs are required to restrict traffic for Basic public IP addresses, which are open by default. Standard public IP addresses, conversely, are secure by default and require NSG configuration to allow inbound traffic.
+* **Rules:** NSGs are a list of access control rules that either permit or deny traffic based on various criteria. These security rules allow or deny **inbound network traffic** to, or **outbound network traffic** from, Azure resources based on criteria such as source and destination IP addresses, ports, and protocols.
+* **Statefulness:** NSGs are stateful, meaning bidirectional policies are not required.
+* **Application:** NSGs can be applied either at the network interface card (NIC) level or at the full subnet level.
+* **Limitations:** NSGs only work if a resource is connected to a Virtual Network (VNet); they do not work for other resources like Platform-as-a-Service (PaaS) services.
+* **Security Implications:** Misconfigured NSGs might inadvertently block or allow unwanted traffic. NSGs are required to restrict traffic for Basic public IP addresses, which are open by default. Standard public IP addresses, conversely, are secure by default and require NSG configuration to allow inbound traffic.
 
 ### 2. Azure Firewall
 
@@ -215,10 +238,10 @@ Azure Firewall is a **managed network security service** offering a fully statef
 
 Characteristics of Azure Firewall include:
 
-*   **Functionality:** It provides centralized network traffic filtering and threat protection for Azure resources. It is designed with built-in high availability and unrestricted cloud scalability.
-*   **Management:** Administrators can create, enforce, and log application and network connectivity policies, and the service is fully integrated with Azure Monitor for logging and analytics.
-*   **SKUs:** Azure Firewall is available in Basic, Standard, and **Premium** SKUs.
-*   **Premium Features:** The Premium SKU is distinct because it offers **Advanced Threat Protection features**, such as fully managed Intrusion Detection and Prevention System (IDPS), URL filtering, and inbound/outbound TLS termination.
+* **Functionality:** It provides centralized network traffic filtering and threat protection for Azure resources. It is designed with built-in high availability and unrestricted cloud scalability.
+* **Management:** Administrators can create, enforce, and log application and network connectivity policies, and the service is fully integrated with Azure Monitor for logging and analytics.
+* **SKUs:** Azure Firewall is available in Basic, Standard, and **Premium** SKUs.
+* **Premium Features:** The Premium SKU is distinct because it offers **Advanced Threat Protection features**, such as fully managed Intrusion Detection and Prevention System (IDPS), URL filtering, and inbound/outbound TLS termination.
 
 ### 3. Network Virtual Appliances (NVAs)
 
@@ -228,11 +251,11 @@ NVAs can be used to implement network traffic filtering and enhance network secu
 
 NVAs can be customized for filtering by being configured to:
 
-*   Act as firewalls to filter inbound and outbound network traffic based on rules and policies.
-*   Incorporate IDS/IPS capabilities to detect and prevent network-based attacks.
-*   Include web application firewall (WAF) functionality to protect against common web-based attacks.
-*   Perform Network Address Translation (NAT).
-*   Act as load balancers or offload SSL/TLS encryption and decryption processes.
+* Act as firewalls to filter inbound and outbound network traffic based on rules and policies.
+* Incorporate IDS/IPS capabilities to detect and prevent network-based attacks.
+* Include web application firewall (WAF) functionality to protect against common web-based attacks.
+* Perform Network Address Translation (NAT).
+* Act as load balancers or offload SSL/TLS encryption and decryption processes.
 
 NVAs, such as **FortiGate VMs**, provide advanced network security and next-generation firewall capabilities. They are typically used in conjunction with **User-defined routes (UDRs)** or Border Gateway Protocol (BGP).
 
@@ -240,10 +263,32 @@ NVAs, such as **FortiGate VMs**, provide advanced network security and next-gene
 
 While Azure provides default routing capabilities, administrators often need to explicitly force traffic through a specific filtering resource:
 
-*   **Default Traffic:** By default, all VMs have access to the internet through an Azure-managed Source Network Address Translation (SNAT) service. If a VM has a public IP address, it connects directly to the internet using that address.
-*   **Using UDRs for Inspection:** To force traffic to a Network Virtual Appliance (such as a FortiGate VM) for inspection, an administrator must configure **User-defined routes (UDRs)**. UDRs allow custom routing tables to override the default routing behavior.
-*   **Inspection Scenarios:** UDRs can be used to force traffic destined for the internet or traffic moving between subnets to go through the security device first for inspection.
+* **Default Traffic:** By default, all VMs have access to the internet through an Azure-managed Source Network Address Translation (SNAT) service. If a VM has a public IP address, it connects directly to the internet using that address.
+* **Using UDRs for Inspection:** To force traffic to a Network Virtual Appliance (such as a FortiGate VM) for inspection, an administrator must configure **User-defined routes (UDRs)**. UDRs allow custom routing tables to override the default routing behavior.
+* **Inspection Scenarios:** UDRs can be used to force traffic destined for the internet or traffic moving between subnets to go through the security device first for inspection.
 
 ---
 
-# FortiFlex
+# IP Forwarding
+
+::: warn
+When deploying a network device, such as FortiGate VM, in Azure, IP forwarding is a critical setting for the virtual network card.
+
+:::
+
+Here is a detailed explanation of IP forwarding settings in the context of Fortinet solutions in Azure:
+
+**Purpose and Necessity**
+
+- **Traffic Forwarding Requirement:** You **__must enable IP Forwarding__** for any network interface attached to a VM that is intended to forward network traffic to an address other than its own.
+- **Azure Check Bypass:** This setting is essential because it __prevents Azure from checking the source and destination for a network interface__, allowing the security appliance (like FortiGate) to operate correctly.
+- **Source IP Generation:** With IP forwarding enabled at its internal interface, a __FortiGate VM is able to generate traffic using a source IP address that is different from the IP address assigned to the virtual network interface.__
+
+**Spoofing Prevention**
+
+- **Disabled Status Consequence:** If IP __forwarding is disabled__, the packets are identified as **__spoofing packets__**.
+- **Action Required:** To __prevent this spoofing situation__, you must verify that IP forwarding is enabled on the appropriate network interfaces.
+
+**Deployment Status**
+
+- **Default Behavior:** __IP forwarding is enabled by default__ when you deploy your Fortinet VM either __from Azure Marketplace or by using a template obtained from Fortinet GitHub.__

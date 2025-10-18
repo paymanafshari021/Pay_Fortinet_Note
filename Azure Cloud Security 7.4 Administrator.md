@@ -271,10 +271,7 @@ While Azure provides default routing capabilities, administrators often need to 
 
 # IP Forwarding
 
-::: error
-When deploying a network device, such as FortiGate VM, in Azure, IP forwarding is a critical setting for the virtual network card.
-
-:::
+**__When deploying a network device, such as FortiGate VM, in Azure, IP forwarding is a critical setting for the virtual network card.__**
 
 Here is a detailed explanation of IP forwarding settings in the context of Fortinet solutions in Azure:
 
@@ -292,3 +289,41 @@ Here is a detailed explanation of IP forwarding settings in the context of Forti
 **Deployment Status**
 
 - **Default Behavior:** __IP forwarding is enabled by default__ when you deploy your Fortinet VM either __from Azure Marketplace or by using a template obtained from Fortinet GitHub.__
+
+# Before deploying a FortiGate VM in Azure
+
+Before deploying a FortiGate VM in Azure, you must consider several important aspects related to licensing, support, feature support, networking requirements, and performance.
+
+The key aspects to consider include:
+
+### 1. Licensing Model Selection
+
+- **Choose the correct licensing model** __because the licensing model **cannot be changed** after the FortiGate VM is deployed__. To __change the license__ type (between Bring Your Own License (BYOL) and Pay-As-You-Go (PAYG)), you must __deploy a new instance of FortiGate__.
+- **__BYOL and PAYG are not interchangeable__**__.__
+
+### 2. FortiGate Features and Support
+
+- **Virtual Domains:** Note that FortiGate using the **PAYG** license model does **not support virtual domains**. This must be considered when deciding which configuration to implement.
+  - **VDOM support** is **available only for BYOL (Bring Your Own License)** models on Azure.
+  - The "V" license types such as **FG-VMxxV** (for example, VM02V) **do not include VDOM support** unless additional VDOM licenses are purchased.​
+  - Default PAYG (pay-as-you-go) marketplace images usually include **one root VDOM** only.
+- **Support Level:** Verify that you will receive the **support level needed** because the support level depends on the license type. 
+  - If using **PAYG** licensing, you must **register your VM** before you can receive support from Fortinet.
+  - If using **BYOL**, the customer gets Fortinet 24/7 support with the enterprise bundle.
+
+### 3. VM Sizing and Networking
+
+- **VM Capabilities:** Verify that the VM supports your needs, including the number of virtual Network Interface Cards (NICs) required.
+- **IP Forwarding:** Ensure that the correct **IP forwarding settings** are in place on the virtual network card. 
+  - You **must enable IP Forwarding** for any network interface attached to the VM that forwards network traffic to an address other than its own.
+  - Enabling IP forwarding prevents Azure from checking the source and destination for a network interface.
+  - IP forwarding is **enabled by default** when deploying the VM from Azure Marketplace or a template from Fortinet GitHub.
+
+### 4. Performance
+
+- **Accelerated Networking:** You should **enable accelerated networking** to increase the performance of your VMs.
+- **SR-IOV:** Accelerated networking is the term Microsoft uses for single root I/O virtualization (SR-IOV), which significantly improves network performance.
+- **Applicability:** This feature is supported by several general-purpose and compute-optimized VMs with two vCPUs without hyper-threading support, but it is **most often used in VMs with four or more vCPUs**.
+
+|  |
+|--|

@@ -271,7 +271,7 @@ While Azure provides default routing capabilities, administrators often need to 
 
 # IP Forwarding
 
-::: warn
+::: error
 When deploying a network device, such as FortiGate VM, in Azure, IP forwarding is a critical setting for the virtual network card.
 
 :::

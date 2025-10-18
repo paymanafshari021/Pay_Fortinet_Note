@@ -277,7 +277,7 @@ Here is a detailed explanation of IP forwarding settings in the context of Forti
 
 ### **Purpose and Necessity**
 
-- **Traffic Forwarding Requirement:** You **__must enable IP Forwarding__** for any network interface attached to a VM that is intended to forward network traffic to an address other than its own.
+- **Traffic Forwarding Requirement:** You **must enable IP Forwarding** for any network interface attached to a VM that is intended to forward network traffic to an address other than its own.
 - **Azure Check Bypass:** This setting is essential because it __prevents Azure from checking the source and destination for a network interface__, allowing the security appliance (like FortiGate) to operate correctly.
 - **Source IP Generation:** With IP forwarding enabled at its internal interface, a __FortiGate VM is able to generate traffic using a source IP address that is different from the IP address assigned to the virtual network interface.__
 
@@ -324,3 +324,4 @@ The key aspects to consider include:
 - **Accelerated Networking:** You should **enable accelerated networking** to increase the performance of your VMs.
 - **SR-IOV:** Accelerated networking is the term Microsoft uses for single root I/O virtualization (SR-IOV), which significantly improves network performance.
 - **Applicability:** This feature is supported by several general-purpose and compute-optimized VMs with two vCPUs without hyper-threading support, but it is **most often used in VMs with four or more vCPUs**.
+- ---

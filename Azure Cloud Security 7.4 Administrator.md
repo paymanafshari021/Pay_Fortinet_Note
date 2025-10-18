@@ -347,44 +347,43 @@ For single instance VMs, the guaranteed connectivity depends on the type of mana
 ## Options available for deploying highly available environments
 
 Here are the primary options available for deploying highly available environments with Fortinet in Azure:
-### 1. FortiWeb Solutions
+### FortiWeb Solutions
+
 **FortiWeb: Active-Active Load Balanced with External/Internal Load Balancer (ELB/ILB)**
 
 This solution is designed for enhanced availability and performance by distributing incoming web traffic across multiple FortiWeb instances.
+
 - **Components:** It deploys an environment that includes an Azure load balancer (with a public IP address) and two FortiWeb VMs added to the load balancer’s back-end pool.
 - **Availability Mechanism:** The two FortiWeb VMs communicate with each other, and the Azure fabric uses probes to check system availability.
 - **Failover:** If an instance goes down, the load balancer stops distributing traffic to it. If the failed instance was the primary node, the secondary instance immediately assumes the role of the new primary.
 - **Configuration:** It is crucial to synchronize configuration and session data between the FortiWeb instances to ensure consistency for client sessions and security settings.
-### 2. FortiGate Solutions
+### FortiGate Solutions
 FortiGate offers several distinct HA configuration options:
 #### A. FortiGate: Active-Passive HA with Fabric Connector Failover
 
 This setup configures a redundant pair of FortiGate devices to ensure failover in case of hardware or software failures.
+
 - **Components:** The deployment includes two FortiGate VMs in an active-passive configuration, a VNet with subnets (external, internal, HA management, HA sync, and one protected subnet), and three public IP addresses (one for data traffic access through the active FortiGate and two for management).
 - **Failover Mechanism:** The two FortiGate VMs use **unicast FortiGate Clustering Protocol (FGCP) HA** to synchronize the configuration. On failover, the passive FortiGate takes control and shifts the public IP address and updates internal User-Defined Routing (UDR) via API calls to Azure.
 - **Suitability:** This setup is suitable when HA and failover are crucial, offering an efficient response to failures and less complexity in managing active/standby devices.
 #### B. FortiGate: Active-Passive HA with ELB/ILB
 
 This solution utilizes Azure load balancers to distribute traffic across the redundant pair of FortiGate devices.
+
 - **Components:** It involves two FortiGate VMs in an active-passive deployment, one external Azure standard load balancer, and one internal Azure standard load balancer.
 - **Failover Mechanism:** The FortiGate VMs communicate using **unicast FGCP HA**. The Azure load balancer handles traffic failover using a **health probe** sent to the VMs. Failover times are based on the health probe, typically occurring in a maximum of 15 seconds (two failed attempts per 5 seconds).
 - **Suitability:** This setup is ideal for environments with varying traffic loads that require load distribution for efficient utilization and improved performance during traffic spikes. The load balancer directs incoming traffic to the active device while the passive unit remains in standby.
 #### C. FortiGate: Active-Active Load Balanced with ELB/ILB
 
 This setup involves deploying multiple independent FortiGate devices to handle traffic simultaneously, enhancing both performance and redundancy.
+
 - **Components:** This uses two independent FortiGate VMs, one external Azure standard load balancer, and one internal Azure standard load balancer.
 - **Failover/Redundancy:** The Azure load balancer manages traffic failover using a health probe directed toward the FortiGate VMs.
 - **Configuration Synchronization:** Since the VMs are independent, configuration can be synchronized either by using **FortiManager** or through the **system autoscaling setup**.
 #### D. FortiGate Autoscale using VM Scale Sets (VMSS)
 
 This solution is designed for highly efficient clustering during high workloads by leveraging Azure's native autoscaling features.
+
 - **Mechanism:** Multiple FortiGate-VM instances form a VMSS and are scaled in and out automatically according to predefined workload levels and traffic demand.
 - **HA Features:** Autoscaling utilizes FortiGate native HA features, such as `config-sync`, which synchronizes OS configurations across instances during scale-out events.
 - **Management:** An Azure Functions app handles all autoscaling features, including primary and secondary role assignment, license distribution, and failover management.
-### 3. Azure Route Server
-
-The Azure Route Server itself is a networking service designed with **high availability**.
-
-- It simplifies and automates route management in complex network environments.
-- When integrated with a third-party Network Virtual Appliance (NVA) like FortiGate VM, it is typically used in a FortiGate **active-passive HA configuration**.
-- The Route Server helps simplify route management by removing the need for manual routing table updates on the NVA when virtual network addresses change.

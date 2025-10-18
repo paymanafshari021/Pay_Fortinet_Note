@@ -289,7 +289,7 @@ The key aspects to consider include:
 - **Choose the correct licensing model** __because the licensing model **cannot be changed** after the FortiGate VM is deployed__. To __change the license__ type (between Bring Your Own License (BYOL) and Pay-As-You-Go (PAYG)), you must __deploy a new instance of FortiGate__.
 - **__BYOL and PAYG are not interchangeable__**__.__
 ### 2. FortiGate Features and Support
-- **Virtual Domains:** Note that FortiGate using the **__PAYG__**__ license__ model does **__not support virtual domains__**. This must be considered when deciding which configuration to implement.
+- **Virtual Domains:** Note that FortiGate using the **PAYG** license model does **__not support virtual domains__**. This must be considered when deciding which configuration to implement.
   - **__VDOM support__** is **available only for __BYOL (Bring Your Own License)__** models on Azure.
   - The "V" license types such as **FG-VMxxV** (for example, VM02V) **do not include VDOM support** unless additional VDOM licenses are purchased.​
   - Default PAYG (pay-as-you-go) marketplace images usually include **one root VDOM** only.
@@ -351,3 +351,66 @@ This solution is designed for highly efficient clustering during high workloads 
 - **Mechanism:** Multiple FortiGate-VM instances form a VMSS and are scaled in and out automatically according to predefined workload levels and traffic demand.
 - **HA Features:** Autoscaling utilizes FortiGate native HA features, such as `config-sync`, which synchronizes OS configurations across instances during scale-out events.
 - **Management:** An Azure Functions app handles all autoscaling features, including primary and secondary role assignment, license distribution, and failover management.
+## FortiGate HA with Fabric Connector and FortiGate HA with ELB/ILB
+
+Your query highlights the two main active-passive High Availability (HA) configurations available for FortiGate solutions in Azure: **Active-Passive HA with Fabric Connector Failover** and **Active-Passive HA with External Load Balancer (ELB)/Internal Load Balancer (ILB)**.
+These solutions are designed to ensure service continuity and resilience in case of hardware or software failures.
+### 1. FortiGate Active-Passive HA with Fabric Connector Failover
+This configuration uses the Fabric Connector to integrate security services and manage failover.
+- **HA Mechanism and Suitability:** This setup delivers an HA solution with **less complexity** in managing active and standby devices and provides an **efficient response to failures**. Failover happens when the active device becomes unavailable, and the passive device immediately assumes the active role. This configuration is suitable for scenarios where **HA and failover are crucial**, and the main objective is maintaining service uptime.
+- **Deployment Components:** The environment includes two FortiGate VMs in an active-passive deployment. It requires one Virtual Network (VNet) containing one protected subnet and four FortiGate-specific subnets: external, internal, HA management, and HA sync.
+- **IP Addresses:** Three public IP addresses are used: the first is for access through the active FortiGate, and the other two are for management access.
+- **Failover Process:** The two FortiGate VMs use **unicast FortiGate Clustering Protocol (FGCP) HA** to synchronize their configuration. On failover, the passive FortiGate takes control and issues **API calls to Azure** to shift the public IP address and update the internal User-Defined Routing (UDR) to itself.
+- **Traffic Inspection:** Traffic to be inspected is received using UDRs and public IP addresses, and the specific traffic requiring inspection can be customized by adapting the UDR routing.
+### 2. FortiGate Active-Passive HA with ELB/ILB
+
+This configuration utilizes Azure load balancers (External and Internal) to manage traffic distribution and failover.
+- **HA Mechanism and Suitability:** This solution distributes incoming traffic to the active FortiGate device while the passive unit remains in standby mode. Failover occurs when the load balancer detects the failure of the active device using **health probes**, automatically redirecting traffic to the passive device.
+- **Suitability:** This setup is suitable for environments with **varying traffic loads** that require load distribution for efficient utilization and improved performance during traffic spikes.
+- **Deployment Components:** The environment includes two FortiGate VMs in an active-passive deployment, one **external Azure standard load balancer** for internet communication, and one **internal Azure standard load balancer** to receive and forward internal traffic.
+- **Failover Process:** The FortiGate VMs communicate using the **unicast FGCP HA protocol**. The Azure load balancer manages traffic failover via a **health probe** sent to the VMs. The failover times are based on the health probe, typically resulting in a maximum of **15 seconds** (based on two failed attempts per 5 seconds).
+- **Traffic Inspection:** UDRs for the protected subnets are used to redirect traffic to the internal load balancer. The public IP address for data traffic is configured on the Azure load balancer.
+## Azure Route Server
+
+The Azure Route Server is an important networking service designed to **simplify and automate the management of routes** in complex network environments. By demonstrating competence in understanding the Azure Route Server, you can successfully integrate it with solutions like the FortiGate Virtual Machine (VM).
+### Core Functionality and Design
+The Azure Route Server is characterized by the following features:
+- **High Availability:** It is designed as a networking service with built-in **high availability**.
+- **Central Hub for Routes:** It acts as a central hub that exchanges routes between your virtual networks, your on-premises networks, or peered virtual networks.
+- **Control Plane Operation:** Azure Route Server operates exclusively in the **control plane**. It handles decisions regarding how traffic should be routed, including routing protocols and route advertisements.
+- **Data Traffic Exclusion:** It is **not designed to process user data traffic**, unlike a traditional network device such as a firewall or load balancer.
+- **Topology Agnostic:** The service is network topology-agnostic, meaning it makes no assumptions about the network structure, providing flexibility for routing on irregular networks.
+### Benefits and Route Management
+The use of Azure Route Server provides significant benefits for route management:
+- **Simplification and Automation:** It simplifies the process of managing routes, especially in scenarios involving multiple virtual networks, VPN gateways, and ExpressRoute connections. This improves network performance by streamlining the propagation of network routes.
+- **Elimination of Manual Updates:** Using the Azure Route Server **removes the need for manual routing table updates** on your Network Virtual Appliance (NVA) when virtual network addresses change. This also eliminates the need to manually update User-Defined Routes (UDRs) for the announcement of new routes or the withdrawal of old routes.
+- **Traffic Direction:** It helps manage routing decisions within the network, ensuring that network traffic is directed along the appropriate paths.
+### Technical Requirements and Limitations
+Users planning to implement Azure Route Server must be aware of its operational constraints:
+- **Deployment Limit:** Only **one route server** can be created in a virtual network.
+- **Protocol Support:** Azure Route Server supports **BGP only** as the dynamic routing protocol.
+- **IPv6 Support:** Currently, Azure Route Server **doesn’t support IPv6**.
+- **Public IP Requirement:** A **public IP address is required** for the Azure Route Server to maintain communication with the back-end service that manages the route server configuration.
+- **Limits and Restrictions:** It is important to be aware of limits, such as the number of peers supported and the number of routes each BGP peer can advertise to Azure Route Server. These values can be hard limits or recommendations for better performance, and they may change over time.
+### Integration with FortiGate VM and Use Cases
+Azure Route Server supports integration with third-party Network Virtual Appliances (NVAs), such as the FortiGate VM:
+- **NVA Integration:** If your NVA supports BGP, you can configure it to peer with the Azure Route Server to simplify and centralize routing configurations for traffic passing through the NVA.
+- **FortiGate Integration:** FortiGate VM integration with Azure Route Server typically occurs in a **FortiGate active-passive HA configuration**.
+- **Routing Consistency:** When integrated, active Fortinet VMs receive consistent and up-to-date routing information.
+- **Route Propagation:** When an Azure Route Server is deployed in a Virtual Network (VNet) acting as a hub, the FortiGate VM advertises network prefixes to the Route Server. The Route Server then injects these prefixes so they appear in the effective routes of any virtual machine deployed in the hub VNet or spoke VNet that is peered with the hub VNet (provided the peering is configured to use the remote virtual network's gateway or Route Server).
+- **UDRs Not Required (Hub Scenario):** With an Azure Route Server deployed in a VNet working as a hub, **you do not need to use user-defined routes (UDRs)**.
+- **Other Use Cases:** Azure Route Server can also integrate Azure VPN Gateway and ExpressRoute, propagating the routing tables of both services.
+## Azure Route Server Limitaion
+
+### Key Technical Limitations
+
+- **Deployment Limit:** Only **one route server** can be created in a virtual network.
+- **Protocol Support:** The Azure Route Server supports **BGP only** as the dynamic routing protocol.
+- **IPv6 Support:** Currently, the Azure Route Server **doesn’t support IPv6**.
+- **IP Address Requirement:** A **public IP address is required** for the Azure Route Server. This IP address is needed to maintain communication with the back-end service that manages the route server configuration.
+### Operational and Performance Constraints
+
+- **Traffic Handling:** The Azure Route Server is **not designed to process user data traffic**. It operates exclusively in the **control plane**, handling decisions regarding how traffic should be routed (such as routing protocols and route advertisements).
+- **Performance Limits:** Users should be aware of limitations concerning the number of **peers supported** and the number of **routes each BGP peer can advertise** to the Azure Route Server. These values can be **hard limits** or **recommendations** for better performance.
+
+It is important to note that the Azure Route Server service and its limits and restrictions **can change over time**. Therefore, it is recommended to refer to the official Azure documentation for the most up-to-date information.

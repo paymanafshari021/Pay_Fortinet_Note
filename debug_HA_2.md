@@ -1,8 +1,19 @@
+
+![[Pasted image 20251018224148.png]]
+Force a failover
+```
+diagnose sys ha reset-uptime
+```
+Check the HA uptime difference
+```
+diag sys ha dump-by vcluster
+```
+
+![[Pasted image 20251018224430.png]]
+Shows HA mode, roles, sync status, and failover reasons.
 ```
 get system ha statu
 ```
-
-Shows HA mode, roles, sync status, and failover reasons.
 
 ```
 diagnose sys ha checksum recalculate

@@ -8,7 +8,6 @@ Check the HA uptime difference
 ```
 diag sys ha dump-by vcluster
 ```
-
 ![[Pasted image 20251018224430.png]]
 Shows HA mode, roles, sync status, and failover reasons.
 ```

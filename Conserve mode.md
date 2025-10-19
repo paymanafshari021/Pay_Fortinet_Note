@@ -22,10 +22,10 @@ config system global
 end
 ```
 
-| `memory-use-threshold-extreme <integer>` | The threshold at which memory usage is considered extreme and new sessions are dropped, in percent of total RAM (70 - 97, default = 95). |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `memory-use-threshold-green <integer>`   | The threshold at which memory usage forces the FortiGate to leave conserve mode, in percent of total RAM (70 - 97, default = 82).        |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `memory-use-threshold-red <integer>`     | The threshold at which memory usage forces the FortiGate to enter conserve mode, in percent of total RAM (70 - 97, default = 88).        |
+| `memory-use-threshold-extreme <integer>` | The threshold at which memory usage is considered extreme and new sessions are dropped, in percent of total RAM (70 - 97, default = 95). |
 ## Flow inspection in conserve mode
 
 The FortiGate's flow-based inspection behavior while in conserve mode is configured with the IPS failopen command.

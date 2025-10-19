@@ -1,4 +1,9 @@
 FortiGate's conserve mode is a self-protection mechanism that activates when system memory usage exceeds a configurable threshold (default 88%) to prevent a system crash. This mode impacts performance by reducing functionality, and at a more critical threshold (default 95%), it will drop new sessions to free up memory. The device exits conserve mode once memory usage drops below another threshold (default 82%)
+### What Happens
++ System configuration cannot be changed
++ FortiGate skips quarantine action
++ The `av-failopen` setting also applies to flow-based antivirus inspection
++ if memory usage exceeds the extreme threshold, all new sessions that require inspection are blocked
 ### How it works
 - **Entry:** When memory usage crosses the "red" threshold (e.g., 88%), the FortiGate enters conserve mode. It begins to reduce memory-intensive processes, like some aspects of antivirus scanning, to conserve resources.
 - **Session dropping:** If memory usage continues to rise and hits the "extreme" threshold (e.g., 95%), the FortiGate will start dropping new sessions to reclaim memory.

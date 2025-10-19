@@ -22,7 +22,6 @@ config system global
 end
 ```
 
-
 | `memory-use-threshold-extreme <integer>` | The threshold at which memory usage is considered extreme and new sessions are dropped, in percent of total RAM (70 - 97, default = 95). |
 | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `memory-use-threshold-green <integer>`   | The threshold at which memory usage forces the FortiGate to leave conserve mode, in percent of total RAM (70 - 97, default = 82).        |

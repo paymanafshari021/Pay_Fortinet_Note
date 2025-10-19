@@ -1,3 +1,6 @@
+#  Conserve mode
+#Fortinet #Debug #memory #conserve
+
 FortiGate's conserve mode is a self-protection mechanism that activates when system memory usage exceeds a configurable threshold (default 88%) to prevent a system crash. This mode impacts performance by reducing functionality, and at a more critical threshold (default 95%), it will drop new sessions to free up memory. The device exits conserve mode once memory usage drops below another threshold (default 82%)
 ### What Happens
 + System configuration cannot be changed

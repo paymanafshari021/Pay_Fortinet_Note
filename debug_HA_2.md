@@ -1,11 +1,5 @@
----
-tags:
-  - ha
-  - Fortinet
-  - Debug
----
 # HA 
-
+#ha #Fortinet #Debug 
 
 ![Alt text](attachments/HA_Override_en.png)
 

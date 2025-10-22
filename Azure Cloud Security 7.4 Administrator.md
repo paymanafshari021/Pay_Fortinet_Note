@@ -1,5 +1,5 @@
 ## Azure Virtual Network (VNet)
-
+#azure #Fortinet 
 The Azure Virtual Network (VNet) is described as the fundamental building block of Azure networking. The VNet service securely connects Azure resources to each other.
 
 - Networking Solution The Azure Virtual Network offers a flexible and scalable networking solution necessary for deploying and managing resources in Azure. It is one of the essential networking services provided by Azure.

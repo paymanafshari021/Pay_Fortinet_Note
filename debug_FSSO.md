@@ -1,5 +1,5 @@
-#Agentless_Polling_Mode #FSSO #Debug 
-# Agentless_Polling_Mode
+#Agentless_Polling_Mode #FSSO #Debug #Agentless #Polling #Mode
+# Agentless Polling Mode
 
 ```
 diagnose debug fsso-polling detail

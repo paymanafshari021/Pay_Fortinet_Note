@@ -19,6 +19,9 @@ diagnose debug fsso-polling refresh-user
 
 refresh completes. All logon users are obsolete. Please re-logon to make them available.
 ```
+
 ```bash
 diagnose sniffer packet any 'host 10.124.2.18 and tcp port 445'
+```
+
 

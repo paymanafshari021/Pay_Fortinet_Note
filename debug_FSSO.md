@@ -3,7 +3,8 @@
 
 ```bash
 diagnose debug fsso-polling detail
-
+```
+```
 AD Server Status:
 ID=1, name(10.0.1.10),ip=10.0.1.10,source(security),users(0)
 port=auto username=administrator
@@ -16,9 +17,11 @@ most recent connection status: connected
 
 ```bash
 diagnose debug fsso-polling refresh-user
-
+```
+```
 refresh completes. All logon users are obsolete. Please re-logon to make them available.
 ```
+
 ```bash
 diagnose sniffer packet any 'host 10.124.2.18 and tcp port 445'
 ```

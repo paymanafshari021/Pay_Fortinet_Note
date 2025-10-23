@@ -1,7 +1,10 @@
 #Agentless_Polling_Mode #FSSO #Debug 
 # Agentless_Polling_Mode
 
-`diagnose debug fsso-polling detail`
+```
+diagnose debug fsso-polling detail
+
+```
 ```
 AD Server Status:
 ID=1, name(10.0.1.10),ip=10.0.1.10,source(security),users(0)

@@ -24,4 +24,33 @@ refresh completes. All logon users are obsolete. Please re-logon to make them av
 diagnose sniffer packet any 'host 10.124.2.18 and tcp port 445'
 ```
 
+```bash
+diagnose debug application fssod -1
+```
+
+```bash
+diagnose debug application smbcd -1
+```
+
+```bash
+diagnose debug enable
+
+[fsso_ldap_group_add:427] logon: 10.0.100.58, aduser1/TRAINING, , add group
+CN=aduser1,CN=Users,DC=training,DC=lab
+```
+##### Common errors:
+
++ FortiGate cannot resolve the active directory server name:
+```
+failed to resolve server(<server name>)
+```
++ FortiGate and AD system times must be in sync so that statistics can be calculated correctly:
+```
+Please sync the time of Fortigate and AD server
+```
++ Check FortiGate memory usage:
+```
+No memory alloc
+```
+
 

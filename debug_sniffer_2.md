@@ -1,9 +1,4 @@
----
-tags:
-  - Debug
-  - Fortinet
----
-
+#Debug  #diagnose #sniffer #Fortinet 
 ## Debug 
 
 ```

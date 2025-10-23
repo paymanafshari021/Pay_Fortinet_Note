@@ -7,7 +7,6 @@ FortiGate Cloud-Native Firewall (CNF) is a **Firewall-as-a-Service (FWaaS)** sol
 FortiGate CNF focuses on automation and securing specific cloud network security use cases. It leverages **FortiOS software** to provide consistent availability, scalability, and ease-of-use.
 
 Here is a comprehensive overview of FortiGate CNF based on the sources:
-
 ### Core Identity and Delivery
 
 - **Service Delivery:** FortiGate CNF is delivered as a service that scales to demand and does not require customer maintenance. Customers do not need to configure, provision, or maintain any firewall software infrastructure.

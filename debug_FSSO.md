@@ -1,11 +1,9 @@
 #Agentless_Polling_Mode #FSSO #Debug 
 # Agentless_Polling_Mode
 
-```
+```bash
 diagnose debug fsso-polling detail
 
-```
-```
 AD Server Status:
 ID=1, name(10.0.1.10),ip=10.0.1.10,source(security),users(0)
 port=auto username=administrator
@@ -15,8 +13,12 @@ LDAP query: success(0), fail(0)
 LDAP max group query period(seconds): 0
 most recent connection status: connected
 ```
-`diagnose debug fsso-polling refresh-user`
-```
+
+```bash
+diagnose debug fsso-polling refresh-user
+
 refresh completes. All logon users are obsolete. Please re-logon to make them available.
 ```
-`diagnose sniffer packet any 'host 10.124.2.18 and tcp port 445'`
+```bash
+diagnose sniffer packet any 'host 10.124.2.18 and tcp port 445'
+```

@@ -26,13 +26,7 @@ diagnose sniffer packet any 'host 10.124.2.18 and tcp port 445'
 
 ```bash
 diagnose debug application fssod -1
-```
-
-```bash
 diagnose debug application smbcd -1
-```
-
-```bash
 diagnose debug enable
 
 [fsso_ldap_group_add:427] logon: 10.0.100.58, aduser1/TRAINING, , add group

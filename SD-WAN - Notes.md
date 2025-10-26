@@ -1,0 +1,4 @@
+*  FortiGate devices will act as intelligent SD-WAN nodes that are interconnected by an overlay network to provide secure connectivity across all sites, cloud services, and public Internet and to always select an optimal path for each application
+* Unacceptable paths are sometimes called out of SLA
+* We can configure an SD-WAN rule matching our business-critical applications and preferring "wan1" over "wan2", but only as long as it meets the required SLA target (for example, 200 ms latency). If the health of "wan1" degrades, and it can no longer meet the target, the sessions will be steered to "wan2". All the existing sessions will (by default) switchover. Still, the health of "wan1" will be constantly probed. Once the Internet connection "wan1" recovers, the application sessions will switchover back to "wan1", freeing up the backup link "wan2" and always meeting their SLA targets.
+* 

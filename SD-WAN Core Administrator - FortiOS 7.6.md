@@ -30,3 +30,5 @@
     with **`update-cascade-interface`** enabled to **shut down port5** when links fail.
     ![Text](attachments/Pasted_image_20251101141635.png)
     ![](attachments/Pasted_image_20251101141915.png)
+# tshoot
+https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/665425/troubleshooting-sd-wan

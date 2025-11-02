@@ -27,6 +27,7 @@
     ![Text](attachments/Pasted_image_20251101141635.png)
     ![](attachments/Pasted_image_20251101141915.png)
     
+## Embedded SD-WAN SLA Information in ICMP Probes
 ### ⚠️ **The Problem: Asymmetric or Poor Traffic Paths**
 
 If the **hub** doesn’t know which link (Internet connection) is performing best at a spoke, it might:
@@ -44,17 +45,13 @@ If the **hub** doesn’t know which link (Internet connection) is performing bes
 ### 💬 **The Solution: Passing SLA Information**
 
 To fix this, the spoke can **tell the hub** which links are healthy or not.
-
 It does this by **embedding SLA (Service Level Agreement) information**—things like latency, jitter, packet loss—**into ICMP probe packets** (these are small "ping" messages).
 
 💡 Example:
 
 - Spoke A sends an ICMP probe to the hub saying:
-    
     > “Hey, Link 1 is good — latency 15ms, loss 0%. Link 2 is bad — latency 300ms, loss 10%.”
-    
-- The **hub receives** this info and updates its routing decisions accordingly.
-    
+- The **hub receives** this info and updates its routing decisions accordingly.    
 
 ---
 

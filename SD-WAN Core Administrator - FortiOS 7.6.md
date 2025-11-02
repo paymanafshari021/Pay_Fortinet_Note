@@ -22,8 +22,8 @@
 - Shutting down such interfaces can **trigger failover** via mechanisms like **VRRP**.
 #### **Example**
 - A company uses a **5G backup device** (not connected to FortiGate).
-- A performance SLA monitors **ISP links (port1 and port2)**,  
-    with **`update-cascade-interface`** enabled to **shut down port5** when links fail.
+- A performance SLA monitors **ISP links (port1 and port2)**, with **`update-cascade-interface`** enabled to **shut down port5** when links fail.
+    
     ![Text](attachments/Pasted_image_20251101141635.png)
     ![](attachments/Pasted_image_20251101141915.png)
     

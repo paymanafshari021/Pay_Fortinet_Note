@@ -1,1 +1,0 @@
-![LoaP.png](attachments/LoaP.png)

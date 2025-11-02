@@ -96,7 +96,9 @@ These pings are what carry the SLA status.
 |Embedded SLA info|Health data added into ping messages|Latency, loss, jitter metrics|
 |Hub priorities|Hub uses SLA data to pick best routes|Prefers Link 1 if Link 2 is poor|
 |Active probes|Periodic test packets to check link quality|Pings every few seconds|
-![text](attachments/Pasted_image_20251101114330.png)
+
+
+![text](attachments/Pasted_image_20251102135546.png)
 
 ### ⚙️ **1. On the Spoke: Send Health Info**
 

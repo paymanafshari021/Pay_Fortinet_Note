@@ -25,20 +25,17 @@ It does this by **embedding SLA (Service Level Agreement) information**—things
 - The **hub receives** this info and updates its routing decisions accordingly.    
 
 ---
-
 ### 🧭 **How the Hub Uses SLA Info**
 
 When the hub knows which links are good or bad:
 
 - It can **prefer routes** (IKE routes, BGP routes, or static routes) over links that are **inside SLA** (healthy).
 - It can **de-prioritize** routes over links **outside SLA** (unhealthy).
-
 In simple terms:
 
 > The hub chooses the best “road” based on real-time link health reported by the spoke.
 
 ---
-
 ### 🔄 **When Used with Routing Protocols**
 
 - Works well with **BGP** (Border Gateway Protocol) and **static routes**.
@@ -46,18 +43,14 @@ In simple terms:
 - If not, SD-WAN can use another method — the **route-map-out-preferable** feature — to send link health info to the hub through BGP.
 
 ---
-
 ### 📡 **Active Probes and Protocol Ping**
 
 To make this work:
-
 - The system needs **active probes** — it must actively send out test packets.
 - **Protocol ping** is used to communicate the SLA data between devices.
-
 These pings are what carry the SLA status.
 
 ---
-
 ### ✅ **In Summary**
 
 |Concept|Simple Meaning|Example|
@@ -68,6 +61,7 @@ These pings are what carry the SLA status.
 |Hub priorities|Hub uses SLA data to pick best routes|Prefers Link 1 if Link 2 is poor|
 |Active probes|Periodic test packets to check link quality|Pings every few seconds|
 
+---
 
 ![text](attachments/Pasted_image_20251102135546.png)
 
@@ -87,7 +81,6 @@ The spoke sends small test packets (“pings”) to the hub. Each packet include
 > “This link currently has 45 ms latency.”
 
 ---
-
 ### ⚙️ **2. On the Hub: Read That Health Info**
 
 **Command:**
@@ -104,23 +97,17 @@ The hub receives the probe and says:
 > “The spoke reports 45 ms latency. That’s within the 100 ms SLA threshold.”
 
 ---
-
 ### ⚙️ **3. Set Priorities for Routes**
 
 On the hub, you set priorities for IKE routes (VPN tunnels) depending on whether the SLA is being met.
-
 - **In SLA:**
-    
     ```bash
     set priority-in-sla <value>
     ```
-    
 - **Out of SLA:**
-    
     ```bash
     set priority-out-sla <value>
     ```
-    
 
 👉 **Lower numbers = higher preference.**
 
@@ -131,7 +118,6 @@ If latency goes above 100 ms → `priority-out-sla 20`
 This means the hub will **prefer** the healthy (low-latency) tunnel.
 
 ---
-
 ### ⚙️ **4. Matching Link Cost & Metric**
 
 When using “remote detect mode,” both hub and spoke must use the same **link cost factors and metrics** — so their view of the link is consistent.
@@ -141,39 +127,24 @@ Both sides should measure latency and set the threshold to 100 ms.
 Otherwise, the hub might think a link is “good” while the spoke thinks it’s “bad.”
 
 ---
-
 ### ⚙️ **5. Compatibility Notes**
 
 - You can use this **embedded SLA mechanism** with:
-    
     - **Static routing** (manually defined routes)
-        
     - **BGP** (dynamic routing protocol)
-        
 - But if you use it with **BGP**, your tunnels must have **static IP addresses** (no DHCP).
-    
 - It’s **not compatible** with IKE’s `mode-cfg` (a mode that assigns IPs dynamically).
-    
 
 ➡️ **Example:**  
 If your tunnel IPs are fixed, you can use SLA with BGP.  
 If your tunnels use dynamic IPs (mode-cfg), you **cannot**.
 
 ---
-
 ### 🧠 **In Short**
 
 - The **spoke** measures link health and reports it to the **hub**.
-    
 - The **hub** uses that info to decide which tunnel to prefer.
-    
 - If the SLA is met → use that tunnel (lower priority number).
-    
 - If not → switch to another one.
-    
 - Works with static or BGP routing, but not with dynamic IKE IP assignment.
-    
 
----
-
-Would you like me to include a **simple network diagram** showing how the hub and spoke exchange SLA info? It could make this easier to visualize.

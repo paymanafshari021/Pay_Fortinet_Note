@@ -69,7 +69,7 @@ These pings are what carry the SLA status.
 |Active probes|Periodic test packets to check link quality|Pings every few seconds|
 
 
-![text](attachments/Pasted_image_20251102135546.png)
+![text](Pasted_image_20251102135546.png)
 
 ### ⚙️ **1. On the Spoke: Send Health Info**
 

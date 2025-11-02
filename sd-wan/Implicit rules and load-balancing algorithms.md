@@ -1,4 +1,4 @@
-# Implicit rules and load-balancing algorithms
+# Implicit Rules and Load-balancing Algorithms
 
 ### 🌐 1. The “Implicit Rule”
 

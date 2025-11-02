@@ -96,9 +96,113 @@ These pings are what carry the SLA status.
 |Embedded SLA info|Health data added into ping messages|Latency, loss, jitter metrics|
 |Hub priorities|Hub uses SLA data to pick best routes|Prefers Link 1 if Link 2 is poor|
 |Active probes|Periodic test packets to check link quality|Pings every few seconds|
+![text](attachments/Pasted_image_20251101114330.png)
+
+### ⚙️ **1. On the Spoke: Send Health Info**
+
+**Command:**
+
+```bash
+set embed-measured-health enable
+```
+
+This tells the spoke to **embed link health data** (like latency) inside the **ICMP probe packets** it sends to the hub.
+
+➡️ **Example:**  
+The spoke sends small test packets (“pings”) to the hub. Each packet includes data like:
+
+> “This link currently has 45 ms latency.”
 
 ---
 
-Would you like me to include a **diagram** showing how the SLA info flows between hub and spoke? That can make this concept even clearer.
+### ⚙️ **2. On the Hub: Read That Health Info**
+
+**Command:**
+
+```bash
+set detect-mode remote
+```
+
+This tells the hub to **read the SLA info** that the spoke includes in the probes it receives.
+
+➡️ **Example:**  
+The hub receives the probe and says:
+
+> “The spoke reports 45 ms latency. That’s within the 100 ms SLA threshold.”
+
+---
+
+### ⚙️ **3. Set Priorities for Routes**
+
+On the hub, you set priorities for IKE routes (VPN tunnels) depending on whether the SLA is being met.
+
+- **In SLA:**
+    
+    ```bash
+    set priority-in-sla <value>
+    ```
+    
+- **Out of SLA:**
+    
+    ```bash
+    set priority-out-sla <value>
+    ```
+    
+
+👉 **Lower numbers = higher preference.**
+
+➡️ **Example:**  
+If latency is below 100 ms → `priority-in-sla 5`  
+If latency goes above 100 ms → `priority-out-sla 20`
+
+This means the hub will **prefer** the healthy (low-latency) tunnel.
+
+---
+
+### ⚙️ **4. Matching Link Cost & Metric**
+
+When using “remote detect mode,” both hub and spoke must use the same **link cost factors and metrics** — so their view of the link is consistent.
+
+➡️ **Example:**  
+Both sides should measure latency and set the threshold to 100 ms.  
+Otherwise, the hub might think a link is “good” while the spoke thinks it’s “bad.”
+
+---
+
+### ⚙️ **5. Compatibility Notes**
+
+- You can use this **embedded SLA mechanism** with:
+    
+    - **Static routing** (manually defined routes)
+        
+    - **BGP** (dynamic routing protocol)
+        
+- But if you use it with **BGP**, your tunnels must have **static IP addresses** (no DHCP).
+    
+- It’s **not compatible** with IKE’s `mode-cfg` (a mode that assigns IPs dynamically).
+    
+
+➡️ **Example:**  
+If your tunnel IPs are fixed, you can use SLA with BGP.  
+If your tunnels use dynamic IPs (mode-cfg), you **cannot**.
+
+---
+
+### 🧠 **In Short**
+
+- The **spoke** measures link health and reports it to the **hub**.
+    
+- The **hub** uses that info to decide which tunnel to prefer.
+    
+- If the SLA is met → use that tunnel (lower priority number).
+    
+- If not → switch to another one.
+    
+- Works with static or BGP routing, but not with dynamic IKE IP assignment.
+    
+
+---
+
+Would you like me to include a **simple network diagram** showing how the hub and spoke exchange SLA info? It could make this easier to visualize.
 # tshoot
 https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/665425/troubleshooting-sd-wan

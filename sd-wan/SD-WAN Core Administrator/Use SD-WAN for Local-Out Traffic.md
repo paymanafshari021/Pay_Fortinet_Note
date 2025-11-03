@@ -1,4 +1,4 @@
-# Use SD-WAN for Local-Out Traffic?
+# Use SD-WAN for Local-Out Traffic
 
 ### 🧠 What is _local-out traffic_?
 

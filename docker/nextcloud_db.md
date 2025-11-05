@@ -1,3 +1,4 @@
+```
 version: '3'
 
 volumes:
@@ -31,3 +32,4 @@ services:
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
       - MYSQL_HOST=mariadb
+```

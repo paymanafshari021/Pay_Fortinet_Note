@@ -1,3 +1,5 @@
+# update-static-route
+
 The key concept you are asking about, `update-static-route`, is a critical feature within the FortiGate Secure SD-WAN solution that deals with how the device handles routing when the quality or state of a network connection changes.
 
 Here is an explanation of the key concepts of `update-static-route` using simple words and examples, based on the provided sources:

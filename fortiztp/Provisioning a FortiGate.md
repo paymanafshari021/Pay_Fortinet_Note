@@ -2,14 +2,12 @@
 
 The following describes provisioning a FortiGate. After FortiZTP provisions devices, they appear as _Provisioned_.
 ###### To provision a FortiGate to FortiManager:
-
 1. Go to _Settings > FortiGate_.
 2. Optionally, configure a pre-run CLI template. Pre-run CLI scripts will be pushed to FortiGate before it connects with FortiManager.
     1. Select the _Pre-run CLI Scripts_ tab.
     2. Click _Add_ to create a new script.
     3. Enter a _Name_ for the script, and provide the _CLI Content_.  
-        ![](https://fortinetweb.s3.amazonaws.com/docs.fortinet.com/v2/resources/e09ecc0a-88e6-11f0-9bfd-6af4c3636dc7/images/1ed5ad99afbd57e4bbef7c66aebb70cc_Pre-Run%20CLI%20-%20Enter%20Details.png)  
-        
+        ![](https://fortinetweb.s3.amazonaws.com/docs.fortinet.com/v2/resources/e09ecc0a-88e6-11f0-9bfd-6af4c3636dc7/images/1ed5ad99afbd57e4bbef7c66aebb70cc_Pre-Run%20CLI%20-%20Enter%20Details.png)
     4. Click _Update_ to save the script.  
         This script can now be specified as the default pre-run CLI script for a target FortiManager, or selected during the provisioning process. You can edit or delete an existing script by clicking the _Edit_ or _Delete_ options.
 3. Select the _Provision Target_ tab.
@@ -23,18 +21,5 @@ The following describes provisioning a FortiGate. After FortiZTP provisions devi
 10. In _Assets_, select the checkboxes for the desired FortiGates, then click the _Provision_ button.
 11. Under _Target Location_ in the _Provision_ dialog, select the desired target location for the FortiGate(s). Only options that you have configured in _Settings_ appear in this dialog.
 12. Optionally, enable _Pre-Run CLI_ to provision the FortiGate with a pre-run CLI script. You can choose the _FortiManager Default_ script or select _Specify_ to choose another script configured under the _Pre-run CLI Scripts_ tab.  
-    ![](https://fortinetweb.s3.amazonaws.com/docs.fortinet.com/v2/resources/e09ecc0a-88e6-11f0-9bfd-6af4c3636dc7/images/2db7569e209ae46a428edf9b21c0d21b_Select%20Pre-Run%20CLI.png)  
-    
+    ![](https://fortinetweb.s3.amazonaws.com/docs.fortinet.com/v2/resources/e09ecc0a-88e6-11f0-9bfd-6af4c3636dc7/images/2db7569e209ae46a428edf9b21c0d21b_Select%20Pre-Run%20CLI.png)
 13. Click _Provision_.
-
-###### To provision a FortiGate to FortiManager Cloud:
-
-1. Go to _Settings > FortiGate_.
-2. Enable _FortiManager Cloud_.
-3. In _Assets_, select the checkboxes for the desired FortiGates, then click the _Provision_ button.
-4. Under _Target Location_ in the _Provision_ dialog, select the desired target location for the FortiGate(s). Only options that you have configured in _Settings_ appear in this dialog.
-5. Click _Provision_.
-
-See [Using FortiZTP with FortiManager Cloud](https://docs.fortinet.com/document/fortimanager-cloud/latest/cloud-deployment/552626) for FortiManager Cloud-side instructions.
-
-In previous versions, provisioning a device to FortiManager Cloud using FortiZTP automatically created a model device in FortiManager Cloud. This no longer occurs. You can manually create a model device or perform the provisioning without a model device, then authorize it in the unregistered list in FortiManager Cloud. Performing preconfiguration requires creating a model device manually in FortiManager Cloud before provisioning.

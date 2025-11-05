@@ -1,153 +1,51 @@
-### 🧠 **Main idea**
+The key concept you are asking about, `update-static-route`, is a critical feature within the FortiGate Secure SD-WAN solution that deals with how the device handles routing when the quality or state of a network connection changes.
 
-This section explains what happens in **FortiGate SD-WAN** when a network link becomes **bad or unusable**, and how FortiGate reacts to keep traffic flowing smoothly.
+Here is an explanation of the key concepts of `update-static-route` using simple words and examples, based on the provided sources:
 
----
+### Key Concepts of `update-static-route`
 
-### 💡 **Key concept: Performance SLA**
+In simple terms, `update-static-route` is an action that the FortiGate firewall automatically takes when it detects that an SD-WAN member (a physical or virtual link, like an internet connection or an IPsec tunnel) has gone **dead** or has become **alive** again.
 
-A **performance SLA** (Service Level Agreement) in SD-WAN is like a set of **rules that check the quality of a link** — for example, how fast it is (latency), how reliable it is (packet loss), and how consistent it is (jitter).
-If a link doesn’t meet the set performance criteria, FortiGate can **take actions** to switch traffic to a better link.
+Its main job is to ensure that network traffic avoids using a broken or unhealthy path.
 
----
+#### 1. What it is and why it's used
 
-### ⚙️ **Two automatic actions FortiGate can take**
+- **Location:** This feature is found under the "Action When Inactive" settings for a Performance SLA (Service Level Agreement), which is how FortiGate monitors the health and performance of network links.
+- **Default State:** This option is **enabled by default** for each Performance SLA.
+- **Purpose:** The goal is to dynamically disable static routes associated with a faulty link so that traffic is automatically routed through an alternative, healthy link. This change applies to _all_ traffic flows, even those not explicitly controlled by SD-WAN rules.
 
-When FortiGate decides a link is “down” (because it’s performing poorly), it can do two things automatically:
-1. **update-static-route**
-2. **update-cascade-interface**
-Both are **on by default**.
+#### 2. How it works (The Mechanism)
 
-Let’s focus on what they mean.
+The FortiGate tracks the static routes that are configured to use a specific link's gateway.
 
----
-
-### 1️⃣ **update-static-route**
-
-This means FortiGate will **disable static routes** that use the bad interface.
-**Example:**
-- You have two Internet links:
-    - **port1** → ISP A (main link)
-    - **port2** → ISP B (backup link)
-- You have static routes (fixed paths) that send traffic through **port1**.
-- If the link on **port1** becomes bad, FortiGate **disables those static routes**.
-- This automatically pushes all traffic through **port2** (the working link).
-
-✅ **Benefit:** Keeps users online without manual changes.  
-⚠️ **Warning:** You need to be careful with **overlay tunnels** (like IPsec VPNs).
-
----
-
-### 🧱 **Impact on overlay tunnels (like VPNs)**
-
-If you have a VPN tunnel (say, to headquarters) that uses **port1** and a **static route**, and that static route is disabled, the tunnel will go down too.
-
-FortiGate will then try to **rebuild the tunnel through the backup link (port2)** — _if it’s configured to do that._
-
----
-
-### 2️⃣ **update-cascade-interface**
-
-This is another automatic action that helps FortiGate adjust internal routing when a link goes down — basically making sure everything connected to that link is updated properly.
-
----
-
-### 🧭 **Simple real-world analogy**
-Think of it like driving:
-- You have two roads to work: Road A (main) and Road B (backup).
-- You set up a rule: “If Road A has traffic (too slow), take Road B.”
-- **update-static-route** is like your GPS saying: “Don’t even consider Road A anymore — I’ll block it off.”
-- FortiGate will reroute all cars (traffic) through Road B automatically.
-
-But — if your carpool app (VPN tunnel) was specifically set to start only on Road A, you need to make sure it can also start on Road B when needed.
-
----
----
-
-### 🧩 The Main Idea
-
-These pages are explaining what happens when a **FortiGate** firewall detects that one of its **SD-WAN links** (connections to the internet or other networks) is **not working well** or has gone **down**.
-
----
-
-### 1️⃣ What is a Performance SLA?
-
-A **performance SLA (Service Level Agreement)** is like a **health monitor** for each internet connection (SD-WAN link).  
-It checks whether the link is still **alive** (good) or **dead** (bad) — for example, by testing delay, jitter, or packet loss.
-
----
-
-### 2️⃣ What Actions Can FortiGate Take?
-
-When a link’s performance gets too bad or it goes down, FortiGate can automatically take certain **actions**.  
-The two main ones mentioned are:
-
-- **update-static-route**
-- **update-cascade-interface**
-
-In this section, we focus on **update-static-route**.
-
----
-
-### 3️⃣ What Does “update-static-route” Mean?
-
-A **static route** tells FortiGate where to send traffic for a specific destination.  
-Example:
-
-> “To reach the 10.10.10.0 network, send traffic through `port1` using gateway `192.2.0.2`.”
-
-If **update-static-route** is turned on (it is **on by default**):
-
-- When the link (like `port1`) goes **down**, FortiGate will **disable** (make inactive) any static routes that depend on that link.
-- When the link comes **back up**, those routes become **active** again.
-
-This helps ensure that FortiGate doesn’t keep trying to send traffic through a **dead link**.
-
----
-
-### 4️⃣ Example Scenario
-
-Imagine you have two internet connections:
-
-- **port1** → ISP A (`192.2.0.2`)
-- **port2** → ISP B (`192.3.0.2`)
-
-You have static routes that say:
-
-- “Send most traffic through port1 (preferred path).”
-- “Use port2 if port1 is down.”
-
-Now, suppose port1’s connection fails.
-
-✅ Because **update-static-route** is enabled:
-
-- FortiGate will mark all static routes using port1’s gateway (`192.2.0.2`) as **inactive**.
-- It removes them from the routing table.
-- Then it automatically starts using the static routes through port2 (the backup link).
-
-When port1 comes back online:
-
-- FortiGate detects that it’s **alive** again.
-- It reactivates the static routes using port1.
-
----
-
-### 5️⃣ Impact on VPN or Overlay Tunnels
-
-If a VPN tunnel (like **HUB1-VPN1**) is built over port1, and that link goes down:
-
-- The static route used to reach the VPN peer (remote endpoint) also becomes **inactive**.
-- This means the VPN tunnel will go down.
-- FortiGate will then try to re-establish the VPN using another available link (like port2), if configured to do so.
+- **When a Link Goes Dead (Inactive State):**
     
+    - If the Performance SLA determines that an SD-WAN member is "dead" (due to failed probes or degraded performance).
+    - FortiGate **disables the static routes** that match that member's gateway.
+    - These static routes become **inactive** and are therefore **not installed in the main routing table** (Forwarding Information Base or FIB). You can still view them in the routing table database, but they won't be used for forwarding traffic.
 
----
+- **When a Link Comes Alive (Active State):**
+    
+    - If the member is determined to be "alive" again.
+    - The associated static routes become **active**.
+    - They are re-installed in the routing table, making them available to route traffic if they are the best routes for a destination.
 
-### 💡 In Short
+#### 3. Important Caution (The Caveat)
 
-|Condition|What FortiGate Does (with update-static-route enabled)|Example|
-|---|---|---|
-|Link is **alive**|Static routes through that link are **active**|port1 works → routes through port1 are used|
-|Link goes **dead**|Static routes through that link become **inactive**|port1 fails → routes through port1 disabled, port2 takes over|
-|Link becomes **alive again**|Static routes are reactivated|port1 restored → routes through port1 reappear|
+Administrators must be **careful** because this feature, while helpful for failover, can deactivate routes that are still needed for non-SD-WAN traffic.
 
+- **Impact on Overlay Tunnels (IPsec):** If you have an overlay tunnel (like an IPsec VPN) that relies on a static route to connect to its remote peer over the unhealthy link, disabling that static route could impact the tunnel.
+    - **Example:** A branch office FortiGate uses `update-static-route`. The main internet line (port1) goes down. If an IPsec tunnel uses a static route pointing out port1 to reach the head office, that route is disabled. The FortiGate will then try to establish a new tunnel through a different link (like port2), if configured to do so.
+
+### Example Scenario
+
+Imagine a small office (Site A) with two internet connections, **ISP1 (Port 1)** and **ISP2 (Port 2)**, both configured as SD-WAN members in the `underlay` zone. The administrator has a default static route configured that references the `underlay` zone, meaning both ISP links have equal-cost routes to the internet.
+
+1. **Healthy State:** Both ISP1 and ISP2 are "alive". The default static route through ISP1's gateway and the static route through ISP2's gateway are both **active** in the routing table. Traffic is steered based on SD-WAN rules or load-balanced by the implicit rule.
+2. **Failure State (ISP1 Dies):** The Performance SLA detects that ISP1 (Port 1) is "dead".
+3. **`update-static-route` Action:** Because `update-static-route` is enabled, FortiGate **disables** the static route associated with ISP1's gateway (e.g., 192.2.0.2). This route is removed from the active routing table, meaning no traffic attempts to use the dead ISP1 link.
+4. **Traffic Rerouting:** All traffic automatically switches to use the remaining **active** route (ISP2/Port 2).
+5. **Recovery State (ISP1 Comes Back):** The Performance SLA detects that ISP1 is "alive" again.
+6. **`update-static-route` Action:** The static route for ISP1 is made **active** again and re-installed in the routing table, allowing FortiGate to use it for traffic steering.
+
+This feature is like a traffic cop automatically turning off the lanes and traffic lights leading to a blocked highway exit, forcing all cars (traffic) to use the remaining open routes immediately, rather than waiting for a specific navigation app (SD-WAN rule) to steer them.

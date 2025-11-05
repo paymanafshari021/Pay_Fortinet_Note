@@ -1,4 +1,4 @@
-
+# Prioritize SLA Probes
 ### 🔹 Key Idea: QoS and SD-WAN Health-Check Probes
 
 **QoS (Quality of Service)** is a way to control how network traffic is prioritized — for example, making sure voice or video traffic gets faster service than bulk file downloads.

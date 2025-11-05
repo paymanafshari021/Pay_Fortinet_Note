@@ -66,16 +66,10 @@ This is another automatic action that helps FortiGate adjust internal routing wh
 ---
 
 ### 🧭 **Simple real-world analogy**
-
 Think of it like driving:
-
 - You have two roads to work: Road A (main) and Road B (backup).
-    
 - You set up a rule: “If Road A has traffic (too slow), take Road B.”
-    
 - **update-static-route** is like your GPS saying: “Don’t even consider Road A anymore — I’ll block it off.”
-    
 - FortiGate will reroute all cars (traffic) through Road B automatically.
-    
 
 But — if your carpool app (VPN tunnel) was specifically set to start only on Road A, you need to make sure it can also start on Road B when needed.

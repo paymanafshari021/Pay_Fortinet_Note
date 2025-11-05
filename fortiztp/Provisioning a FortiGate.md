@@ -1,20 +1,6 @@
 # Provisioning a FortiGate
 
 The following describes provisioning a FortiGate. After FortiZTP provisions devices, they appear as _Provisioned_.
-
-###### To provision a FortiGate to FortiGate Cloud:
-
-1. Go to _Settings > FortiGate_.
-2. Ensure that _FortiGate Cloud_ is enabled.
-3. Click _Update_.
-    
-    ![](https://fortinetweb.s3.amazonaws.com/docs.fortinet.com/v2/resources/e09ecc0a-88e6-11f0-9bfd-6af4c3636dc7/images/8ee8ec0f5045e73b5ecaf57b5e9a71d5_Provision.png)
-    
-4. In _Assets_, select the checkboxes for the desired FortiGates, then click _Provision_.
-5. Under _Target Location_ in the _Provision_ dialog, select the desired target location for the FortiGate(s). Only options that you have configured in _Settings_ appear in this dialog.
-6. From the _Please select a firmware profile_ dropdown list, select the desired firmware profile. See [Firmware Profile](https://docs.fortinet.com/document/fortigate-cloud/25.3.a/administration-guide/460884).
-7. Click _Provision_.
-
 ###### To provision a FortiGate to FortiManager:
 
 1. Go to _Settings > FortiGate_.

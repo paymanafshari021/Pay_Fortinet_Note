@@ -1,0 +1,8 @@
+# # Getting started with the FortiZTP portal
+
+| State         | Description                                                                                                                                                                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Incomplete    | Provisioning did not complete within 30 minutes due to one of the following reasons:<br><br>- Device is offline.<br>- Device cannot access the Internet.<br>- Device cannot connect to destination service.<br>- Device does not have required license. |
+| Unprovisioned | Registered to Asset Management with same FortiCloud account used to access FortiZTP and available for provisioning to a Fortinet service.                                                                                                               |
+| Provisioned   | Provisioned to a Fortinet service.                                                                                                                                                                                                                      |
+| Hidden        | Hidden from view in FortiZTP.                                                                                                                                                                                                                           |

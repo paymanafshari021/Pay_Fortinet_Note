@@ -7,7 +7,6 @@ This section explains what happens in **FortiGate SD-WAN** when a network link b
 ### 💡 **Key concept: Performance SLA**
 
 A **performance SLA** (Service Level Agreement) in SD-WAN is like a set of **rules that check the quality of a link** — for example, how fast it is (latency), how reliable it is (packet loss), and how consistent it is (jitter).
-
 If a link doesn’t meet the set performance criteria, FortiGate can **take actions** to switch traffic to a better link.
 
 ---
@@ -15,12 +14,8 @@ If a link doesn’t meet the set performance criteria, FortiGate can **take acti
 ### ⚙️ **Two automatic actions FortiGate can take**
 
 When FortiGate decides a link is “down” (because it’s performing poorly), it can do two things automatically:
-
 1. **update-static-route**
-    
 2. **update-cascade-interface**
-    
-
 Both are **on by default**.
 
 Let’s focus on what they mean.
@@ -30,21 +25,13 @@ Let’s focus on what they mean.
 ### 1️⃣ **update-static-route**
 
 This means FortiGate will **disable static routes** that use the bad interface.
-
 **Example:**
-
 - You have two Internet links:
-    
     - **port1** → ISP A (main link)
-        
     - **port2** → ISP B (backup link)
-        
 - You have static routes (fixed paths) that send traffic through **port1**.
-    
 - If the link on **port1** becomes bad, FortiGate **disables those static routes**.
-    
 - This automatically pushes all traffic through **port2** (the working link).
-    
 
 ✅ **Benefit:** Keeps users online without manual changes.  
 ⚠️ **Warning:** You need to be careful with **overlay tunnels** (like IPsec VPNs).

@@ -9,3 +9,12 @@ This topic provides an overview of the tasks that you need to do to get your For
 5. Configure administrator accounts. See [Managing administrator accounts](https://docs.fortinet.com/document/fortianalyzer/7.4.8/administration-guide/187819/managing-administrator-accounts).
 6. Add devices to the FortiAnalyzer unit so that the devices can send logs to the FortiAnalyzer unit. See [Adding devices](https://docs.fortinet.com/document/fortianalyzer/7.4.8/administration-guide/339761/adding-devices).
 7. Configure the operation mode. See [Configuring the operation mode](https://docs.fortinet.com/document/fortianalyzer/7.4.8/administration-guide/731581/configuring-the-operation-mode) and [Operation modes](https://docs.fortinet.com/document/fortianalyzer/7.4.8/administration-guide/882432/operation-modes)
+---
+#### ToDo
++ Change/Remove Admin Password
++ Increasing Account Security Through Password Policy
+	+ System settings > Settings > Password Policy
++ Trusted Host
++ Secure communication methods https/ssh - change default port
++ External Authentication of Administrators
++ 

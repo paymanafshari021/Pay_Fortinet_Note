@@ -8,4 +8,5 @@ With FortiAnalyzer VMs, you can dynamically add more disk space:
 4. Reboot the VM, and then run the command `get system status` to see the new disk space available
 With hardware FortiAnalyzer, you must add one or more disks to the device
 + If you are using RAID, this requires you to rebuild your RAID array
+
 Be sure to account for future growth and size correctly from the outset!

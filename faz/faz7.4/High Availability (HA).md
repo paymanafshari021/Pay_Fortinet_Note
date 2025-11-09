@@ -200,10 +200,10 @@ Enhances performance and responsiveness in High Availability (HA) clusters throu
 ---
 # Use the following CLI commands to diagnose HA:
 
-`diagnose ha status`(Shows HA status)
-`diagnose ha stats` (Shows HA statistics)
-`diagnose ha dump-datalog` (Dump HA data log)
-`diagnose ha failover` (Run on master, force HA failover)
-`diagnose ha force-cfg-resync` (Force HA to re-sync configuration) 
-`diagnose ha load-balance` (Shows HA load balance status)
-`diagnose ha restart-init-sync` (Run on master, restart HA initial sync)
++ `diagnose ha status`(Shows HA status)
++ `diagnose ha stats` (Shows HA statistics)
++ `diagnose ha dump-datalog` (Dump HA data log)
++ `diagnose ha failover` (Run on master, force HA failover)
++ `diagnose ha force-cfg-resync` (Force HA to re-sync configuration) 
++ `diagnose ha load-balance` (Shows HA load balance status)
++ `diagnose ha restart-init-sync` (Run on master, restart HA initial sync)

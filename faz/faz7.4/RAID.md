@@ -148,3 +148,20 @@ The RAID Management page displays disk status and space usage for FortiAnalyzer 
 - **Verifying:** System checks parity data integrity on redundant drives.
 - **Degraded:** Disk removed from use by RAID controller.
 - **Inoperable:** One or more drives missing; data inaccessible.
+
+---
+# Viewing RAID Failures
+
+**System Settings > Dashboard > Alert Message Console**
+
+---
+# Hot Swapping
+
+This means **removing or inserting a hard drive while the system is still running** — no need to turn it off.
+
+| RAID Type         | Managed By                      | Can You Replace Disk While Running? | Example                        |
+| ----------------- | ------------------------------- | ----------------------------------- | ------------------------------ |
+| **Hardware RAID** | RAID controller (hardware chip) | ✅ Yes — supports **hot swapping**   | High-end FortiAnalyzer models  |
+| **Software RAID** | Operating system (software)     | ❌ No — must **shut down first**     | Lower-end FortiAnalyzer models |
+
+---

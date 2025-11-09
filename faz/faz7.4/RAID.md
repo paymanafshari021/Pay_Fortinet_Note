@@ -180,3 +180,23 @@ You can check the RAID and disk status using the following commands for a hardwa
 | Vendor-specific SMART attributes                                                        | `diagnose system disk attributes`                                                                                                                                                                                                                                                                       |
 
 On FortiAnalyzer-VM, only the diagnose system disk usage command is available.
+
+---
+# Disk Configuration Recommendations
+
+- **RAID Level**: Use default RAID 50 as per FortiAnalyzer data sheet.
+- **Hardware Considerations**: Upgrade hardware if RAID 50 requirements are not met.
+### Disk Space Planning
+- **Future Needs**: Plan for future storage requirements.
+- **Adding Disks**: Expanding an existing RAID array requires rebuilding the array and restoring backups.
+- **Available Space**: Depends on RAID level and reserved space for temporary files (used for indexing, reporting, file management).
+- **Log Quotas**: Consider both:
+    - **Archive**: Original logs received by FortiAnalyzer
+    - **Analytics**: Space needed for indexing and analysis
+### Allocation Recommendations
+- **Default Ratio**: Use Fortinet’s recommended Analytics : Archive ratio for most deployments.
+- **Custom Allocation**: Increase Archive space if retaining logs longer than analytical data.
+### Virtual Disk Options
+- **Adding/Expanding**:
+    - Add a new virtual disk for more space
+    - Increase existing virtual disk size without reformatting

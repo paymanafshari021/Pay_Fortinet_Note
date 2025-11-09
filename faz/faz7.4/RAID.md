@@ -3,8 +3,8 @@
 FortiAnalyzer units with multiple drives support several RAID configurations. Refer to your device’s datasheet for exact compatibility.
 
 ---
-![[Pasted image 20251109152534.png]]
-![[Pasted image 20251109152503.png]]
+![](attachments/02.png)
+![](attachments/01.png)
 #### **Linear RAID**
 
 - **Function:** Combines all disks into one large virtual disk.
@@ -185,3 +185,23 @@ Increase FortiAnalyzer storage capacity by installing additional hard disks.
 4. **Configure RAID level** (see related documentation).
     
 5. **Restore log data** from backup if applicable.
+
+---
+### RAID Management – Disk Status Summary
+
+**Purpose:**  
+The RAID Management page displays disk status and space usage for FortiAnalyzer devices.
+
+**Disk Status Types:**
+
+- **Good:** Disk operates normally.
+    
+- **Rebuilding:** Data is being restored to a new disk; array not yet fault-tolerant.
+    
+- **Initializing:** Data is written to all disks to establish fault tolerance.
+    
+- **Verifying:** System checks parity data integrity on redundant drives.
+    
+- **Degraded:** Disk removed from use by RAID controller.
+    
+- **Inoperable:** One or more drives missing; data inaccessible.

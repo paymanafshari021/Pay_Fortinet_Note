@@ -166,7 +166,7 @@ This means **removing or inserting a hard drive while the system is still runnin
 
 ---
 # Diagnosing RAID
-You can check the RAID and disk status using the following commands for a hardware- based FortiAnalyzer:
+You can check the RAID and disk status using the following commands for a hardware-based FortiAnalyzer:
 
 | What to investigate                                                                     | CLI command to use                                                                                                                                                                                                                                                                                      |
 | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

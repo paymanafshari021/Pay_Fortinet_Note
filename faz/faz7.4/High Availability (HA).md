@@ -96,3 +96,49 @@ FortiAnalyzer HA synchronizes logs between units in two phases: **initial synchr
 - Ensures log consistency across the HA cluster.
 - Secondary units keep Log Data Sync **on by default** so that, if promoted to primary, they continue synchronization.
 - For a **standby (non-secondary) unit**, Log Data Sync can be **disabled** to save resources.
+
+---
+
+### FortiAnalyzer Configuration Synchronization (v7.4.8)
+
+**Purpose:**  
+Provides redundancy and load balancing across FortiAnalyzer HA cluster units by synchronizing configurations.
+### **Modules Synchronized Across Cluster**
+
+- **Device Manager**
+- **Incidents & Events**
+- **Reports**
+- **Most System Settings**
+
+---
+
+### **System Settings Synchronization Summary**
+
+**Synchronized:**
+
+- All ADOMs
+- Storage Info
+- Network > SNMP
+- Admin
+- Certificates > CA Certificates
+- Certificates > CRL
+- Log Forwarding
+- Fetcher Management
+- Task Monitor
+- Advanced:
+    - Mail Server
+    - Syslog Server
+    - Meta Fields
+    - Device Log Settings
+    - Advanced Settings
+
+**Partially Synchronized:**
+
+- Dashboard > Status > System Information — _Only Administrative Domain is synchronized._
+
+**Not Synchronized:**
+
+- Network
+- HA
+- Certificates > Local Certificates
+- Event Log

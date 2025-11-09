@@ -75,3 +75,24 @@ Two panes are used:
 
 - **Priority:** Determines secondary unit seniority.
 - **Log Data Sync:** Enabled by default for real-time log synchronization.
+
+---
+
+### Log Synchronization Overview
+
+FortiAnalyzer HA synchronizes logs between units in two phases: **initial synchronization** and **real-time synchronization**.
+### 1. Initial Logs Sync
+
+- Occurs when a new unit joins an HA cluster.
+- The **primary unit** copies its logs to the new **secondary unit**.
+- After synchronization:
+    - The secondary unit **reboots**.
+    - It **rebuilds its log database** using the synchronized logs.
+- Progress is shown in the **Cluster Status → Initial Logs Sync** column.
+### 2. Real-Time Log Synchronization (Log Data Sync)
+
+- **Automatically enabled** after initial sync.
+- The **primary unit** forwards logs in **real time** to all **secondary units**.
+- Ensures log consistency across the HA cluster.
+- Secondary units keep Log Data Sync **on by default** so that, if promoted to primary, they continue synchronization.
+- For a **standby (non-secondary) unit**, Log Data Sync can be **disabled** to save resources.

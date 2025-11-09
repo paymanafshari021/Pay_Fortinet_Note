@@ -1,3 +1,5 @@
+
+https://docs.fortinet.com/document/fortianalyzer/7.4.8/administration-guide/347290/raid-management
 ### Supported RAID Levels – Summary (FortiAnalyzer 7.6.4)
 
 FortiAnalyzer units with multiple drives support several RAID configurations. Refer to your device’s datasheet for exact compatibility.

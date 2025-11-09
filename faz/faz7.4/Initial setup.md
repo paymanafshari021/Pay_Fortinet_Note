@@ -17,4 +17,3 @@ This topic provides an overview of the tasks that you need to do to get your For
 + Trusted Host
 + Secure communication methods https/ssh - change default port
 + External Authentication of Administrators
-+ 

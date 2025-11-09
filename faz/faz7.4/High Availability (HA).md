@@ -99,7 +99,7 @@ FortiAnalyzer HA synchronizes logs between units in two phases: **initial synchr
 
 ---
 
-### FortiAnalyzer Configuration Synchronization
+## FortiAnalyzer Configuration Synchronization
 **Purpose:**  
 Provides redundancy and load balancing across FortiAnalyzer HA cluster units by synchronizing configurations.
 ### **Modules Synchronized Across Cluster**
@@ -110,7 +110,7 @@ Provides redundancy and load balancing across FortiAnalyzer HA cluster units by 
 
 ---
 
-### **System Settings Synchronization **
+## **System Settings Synchronization **
 
 **Synchronized:**
 - All ADOMs
@@ -138,7 +138,7 @@ Provides redundancy and load balancing across FortiAnalyzer HA cluster units by 
 
 ---
 
-### **Monitoring HA Status**
+# **Monitoring HA Status**
 
 **Location:**  
 _System Settings > HA_ → **Cluster Status** pane
@@ -160,7 +160,7 @@ Displays and monitors the High Availability (HA) status of the FortiAnalyzer clu
 
 ---
 
-### FortiAnalyzer HA Failover and Rejoin Behavior 
+# FortiAnalyzer HA Failover and Rejoin Behavior 
 
 #### **Primary Unit Failover Selection**
 - Each cluster unit has a **priority (1–120)**; default is **100**.
@@ -176,7 +176,7 @@ Displays and monitors the High Availability (HA) status of the FortiAnalyzer clu
     - **Priority boosted by 120**, ensuring they can reclaim the primary role.
 
 ---
-### **FortiAnalyzer HA Load Balancing 
+# FortiAnalyzer HA Load Balancing 
 
 **Purpose:**  
 Enhances performance and responsiveness in High Availability (HA) clusters through synchronized log sharing.

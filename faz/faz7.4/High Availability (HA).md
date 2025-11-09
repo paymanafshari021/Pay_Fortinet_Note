@@ -19,3 +19,59 @@ https://docs.fortinet.com/document/fortianalyzer/7.4.8/administration-guide/5067
 > **Licensing:** The cluster adopts the smallest managed-device limit among member licenses.
 
 ![](attachments/03.png)
+
+---
+
+### **FortiAnalyzer HA Configuration Summary (v7.4.8)**
+
+#### **Overview**
+
+Configure High Availability (HA) under **System Settings > HA** to form or modify a cluster.  
+Two panes are used:
+
+- **Cluster Settings** – Create or change HA configuration.
+- **Cluster Status** – Monitor HA status.
+#### **Cluster Setup**
+
+- Set **Operation Mode**:
+    
+    - **Active-Passive** or **Active-Active** (geo-redundant supported).
+    - **Standalone** disables HA.
+- Add **IP addresses** and **serial numbers** of all units (primary and secondary) to each other’s configuration.
+- All units must share the same **Group Name**, **Group ID**, and **Password**.
+- Configuration synchronization allows full management via the primary unit’s GUI.
+
+#### **Key Configuration Options**
+
+**Cluster Settings**
+
+- **Operation Mode:** Active-Passive / Active-Active / Standalone.
+- **Preferred Role:**
+    - _Primary_ – becomes primary if first in a new cluster.
+    - _Secondary_ – default; synchronizes with current primary.
+- **Initial Sync:** Required before node becomes fully functional.
+
+**Cluster Virtual IP**
+
+- **IP Address & Interface:** Define redundancy address and interface.
+- **Action:** Add (+) or remove (x) virtual IPs.
+
+**Peer Configuration**
+
+- **Peer IP / Peer SN:** Enter each unit’s IP and serial number.
+- **Action:** Add (+) or remove (x) peers.
+
+**Cluster Identification**
+
+- **Group Name / Group ID (1–255) / Password:** Must match across all members.
+
+**Heartbeat Settings**
+
+- **Heart Beat Interval:** Time between heartbeat packets (default: 4s).
+- **Heart Beat Interface:** Interface used for heartbeat traffic.
+- **Failover Threshold:** Time before a unit is considered failed (Interval × 3; default 12s).
+
+**Other Settings**
+
+- **Priority:** Determines secondary unit seniority.
+- **Log Data Sync:** Enabled by default for real-time log synchronization.

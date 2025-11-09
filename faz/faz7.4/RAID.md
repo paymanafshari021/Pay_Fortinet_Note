@@ -122,9 +122,7 @@ Increase FortiAnalyzer storage capacity by installing additional hard disks.
 **Recommendations:**
 
 - Use **only Fortinet-supplied disks**; third-party disks are **not supported**.
-    
 - Contact a **Fortinet reseller** to purchase extra disks.
-    
 
 **Procedure:**
 

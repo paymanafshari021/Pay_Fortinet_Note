@@ -3,7 +3,8 @@
 FortiAnalyzer units with multiple drives support several RAID configurations. Refer to your device’s datasheet for exact compatibility.
 
 ---
-
+![[Pasted image 20251109152534.png]]
+![[Pasted image 20251109152503.png]]
 #### **Linear RAID**
 
 - **Function:** Combines all disks into one large virtual disk.

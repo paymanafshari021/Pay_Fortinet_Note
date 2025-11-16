@@ -29,5 +29,25 @@ You can’t build the SD-WAN overlay until:
 - Branch devices are grouped.
 - IP ranges and routing numbers are planned.
 
+### **Step-by-Step Checklist**
+
+1. Ensure FortiManager is installed and accessible.
+2. Add hub FortiGate devices to FortiManager (physical or model devices).
+3. Configure WAN, ISP links, and other interfaces on hub devices.
+4. (Optional) Add branch FortiGate devices to FortiManager now or later.
+5. Create a device group in FortiManager for all branch devices.
+6. Plan network details:
+    - Decide topology type (Hub-and-Spoke or Full Mesh).
+    - Allocate overlay network address space (default: `10.10.0.0/16`).
+    - Allocate loopback IP address space (default: `172.16.0.0/16`).
+    - Select BGP AS number (default: `65000`).
+7. Verify IP ranges do not conflict with existing networks.
+8. Define SD-WAN overlay template in FortiManager:
+    - Assign hubs and branch device group.
+    - Configure overlay network and loopback IPs.
+    - Set BGP AS number and routing policies.
+9. Deploy configuration to all devices and validate connectivity.
+10. Test failover and performance to ensure SD-WAN works as expected.
+
 ---
 

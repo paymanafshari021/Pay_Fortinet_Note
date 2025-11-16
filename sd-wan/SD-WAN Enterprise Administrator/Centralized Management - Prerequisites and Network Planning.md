@@ -91,3 +91,27 @@ Primary hub might use AS number `65000`, secondary hub `65001`.
 Vienna = Primary HUB, Berlin = Secondary HUB, Graz = Branch.
 ### **Why This Matters**
 FortiManager makes it easy to scale from a simple single-hub setup to a more resilient dual-hub or multi-hub architecture without starting over.
+
+### **Step-by-Step Checklist for Converting Single HUB to Dual HUB Topology**
+
+1. **Review Current Topology**  
+    Confirm your existing single HUB setup and note all network settings.
+2. **Plan Second HUB**  
+    Choose location and hardware for the secondary HUB (e.g., another data center).
+3. **Reuse Existing Settings**  
+    Apply the same network settings (IP ranges, routes) to the second HUB for consistency.
+4. **Update SD-WAN Overlay Template**  
+    In FortiManager, edit the overlay template to include Dual HUB topology.
+5. **Assign Roles**  
+    Set Primary HUB and Secondary HUB roles in the template.
+6. **Configure Device Groups**  
+    Ensure branches are grouped properly; add new branches if needed.
+7. **Overlay Orchestration**  
+    Use SD-WAN Manager to automate tunnel creation between hubs and branches.
+8. **Set BGP AS Numbers**  
+    Assign unique Autonomous System numbers for each HUB (e.g., 65000 for primary, 65001 for secondary).
+9. **Test Failover**  
+    Simulate HUB failure to confirm branches switch to the secondary HUB.
+10. **Document Changes**  
+    Record all updates for future troubleshooting and audits.
+

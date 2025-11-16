@@ -357,10 +357,23 @@ Use these for interface-level configurations:
 #### **Server Configuration**
 - For **Active** or **Prefer Passive** modes:
     - Configure up to **two servers** for probes.
->[!CAUTION] 
+>[!CAUTION]
 Best practice: Two servers prevent false positives caused by server issues.
 #### **Enable Probe Packets**
 - Applicable for **Active** or **Prefer Passive** modes.
 - **Disabling probes**:
     - FortiGate uses last known metrics but stops monitoring.
     - Recommended only for troubleshooting, as new link quality changes won’t be detected.
+#### **Check Interval**
+    - Frequency of sending probes to target servers.
+    - **Default:** Every 500 ms.
+#### **Failure Before Inactive**
+    - Number of consecutive failed probes before marking a member as dead.
+    - **Default:** 5 failures.
+    - Dead members are not used for traffic steering.
+- **Restore Link After**
+    - Number of consecutive successful probes required to change a member from dead to alive.
+    - **Default:** 5 successes.
+    - Initially, all members are alive.
+- **Probe Timeout**
+    - Time to wait for a probe response before considering it failed.

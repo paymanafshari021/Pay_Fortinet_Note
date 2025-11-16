@@ -326,3 +326,41 @@ Use these for interface-level configurations:
 > [!CAUTION]  
 > When creating a zone via **SD-WAN template**, FortiManager automatically creates a **normalized interface**.
 
+---
+
+## **FortiManager Performance SLA Configuration Sections**
+
+- **Header**
+    - Configure member health check settings.
+    - Specify which members the health check applies to.
+- **SLA Target**
+    - Define performance requirements for alive members.
+    - Used for traffic steering strategies (lowest cost, with/without load balancing).
+- **Link Status**
+    - Set criteria for alive/dead members.
+    - Configure probe interface and acceptable failure rate.
+- **Action When Inactive**
+    - Define actions when a member’s state changes (alive/dead).
+    - Options include updating static routes or toggling alert interfaces.
+- **Advanced Options**
+    - Configure additional performance SLA settings.
+
+---
+## **Health Check Configuration Overview**
+
+#### **Probe Modes**
+- **Active**: FortiGate sends periodic probes through the member to monitor health and performance.
+- **Passive**: Monitors actual network traffic flowing through the member.
+- **Prefer Passive**: Starts in passive mode; switches to active if no **TCP** traffic for 3 minutes.
+- **Remote**: Uses SLA information from a remote device.
+- **Agent Based**: Collaborates with FortiMonitor agents for application-level performance stats.
+#### **Server Configuration**
+- For **Active** or **Prefer Passive** modes:
+    - Configure up to **two servers** for probes.
+>[!CAUTION] 
+Best practice: Two servers prevent false positives caused by server issues.
+#### **Enable Probe Packets**
+- Applicable for **Active** or **Prefer Passive** modes.
+- **Disabling probes**:
+    - FortiGate uses last known metrics but stops monitoring.
+    - Recommended only for troubleshooting, as new link quality changes won’t be detected.

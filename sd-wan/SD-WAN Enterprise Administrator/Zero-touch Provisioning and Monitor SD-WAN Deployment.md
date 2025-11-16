@@ -71,3 +71,5 @@
 - Misconfiguration (e.g., wrong IP or gateway) can:
     - Break connectivity between FortiGate and FortiManager.
     - Cause ZTP process failure.
+
+![](attachments/04.png)

@@ -138,3 +138,83 @@ This feature lets you choose **where** a specific SD-WAN member (interface) shou
 So, when FortiManager installs the configuration:
 - Small branches get ISP1 and ISP2.
 - Main branches get ISP1, ISP2, and MPLS.
+
+---
+
+## Metadata Variables
+
+- **ADOM-Level Parameters**: Defined at the ADOM level and also available at the Global ADOM level for per-ADOM mapping.
+- **Purpose**: Provide flexibility when a parameter needs different values across devices.
+#### **Usage**
+- Can be applied in:
+    - **CLI scripts**
+    - **Templates**
+    - **Model devices**
+#### **Management**
+- **Access Location**:  
+    _Policy & Objects → Advanced → Metadata Variables menu_
+- **Actions Available**:
+    - Review
+    - Edit
+    - Create
+#### **Naming Rules**
+- Allowed characters:
+    - **Letters**
+    - **Numbers**
+    - **Underscores**
+
+---
+## Metadata Variables in SD-WAN Configuration
+
+#### **Purpose of Metadata Variables**
+- Allow assigning different values to a setting for each device.
+- Useful for configuring SD-WAN members via templates without creating separate templates for each device.
+#### **Key Use Cases**
+- **Interface Member Setting**:  
+    Enables different interfaces on different devices within the same template.
+- **Gateway Setting**:  
+    Define a metadata variable for gateway IP addresses, which differ across devices.
+#### **Example Scenario**
+- **Variable `sdwan_port1_gw`**:  
+    Assigns unique gateway IP for `port1` on each device (e.g., `192.2.0.2` for branch1, `203.0.113.2` for branch2).
+- **Variable `inet3`**:  
+    Specifies interface name for SD-WAN member (e.g., branch1 uses `port3`, branch2 uses `port8`).
+#### **Performance SLA**
+- Health check servers can use:
+    - One static IP (same for all devices).
+    - One metadata variable (adjusts IP based on device location).
+#### **How to Reference Metadata**
+- Prefix variable with `$` in configuration.
+- FortiManager displays available variables and allows creating new ones via “+” option.
+#### **Indicator for Metadata Usage**
+- A **magnifying glass with a `$` sign** marks fields where metadata variables can be applied.
+#### **How to Use Metadata Variables**
+- Enter `$` in the field → a **pop-up menu** appears:
+    - **Select** an existing variable.
+    - **Create** a new variable by clicking **“+”**.
+    - **Edit** an existing variable using the **pen icon** (visible on hover).
+#### **Managing Metadata Variables**
+- To **review or edit all metadata variables** at the **ADOM level**:
+    - Navigate to:  
+        **Policy & Objects → Advanced → Metadata Variables**
+---
+## **Creating Metadata Variables in FortiManager**
+
+- **New Variable Creation**
+    - Click **“+”** to create a new metadata variable.
+    - A window appears to define:
+        - **Variable name**
+        - **Values**
+        - **Per-device mapping**
+- **Default Value**
+    - Always set a **default value** for each metadata variable.
+    - FortiManager uses this default when:
+        - Installing configuration on devices without specific per-device mapping.
+- **Per-Device Mapping**
+    - Expand the **Per-Device Mapping** menu to assign values for individual devices.
+    - Configure either:
+        - A **default value**, or
+        - A **device-specific mapping** for every applicable device.
+> [!CAUTION] 
+>  ⚠️ **Important Rule** : FortiManager **cannot install configurations** if:
+>  A metadata variable has **no value** (neither default nor per-device mapping).

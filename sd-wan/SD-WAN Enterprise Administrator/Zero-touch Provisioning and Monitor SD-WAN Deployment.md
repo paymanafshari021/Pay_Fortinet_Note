@@ -1,7 +1,9 @@
+
 #ztp #Zero-touch
+# Zero-touch Provisioning and Monitor SD-WAN Deployment
 ## Zero-touch Provisioning
 
-### **ZTP Deployment Process**
+### **ZTP Workflow**
 
 #### **1. Initial Configuration**
 - Define **topology** and prepare configuration elements:
@@ -22,16 +24,13 @@
 - When technicians connect sites:
     - **FortiManager auto-recognizes** each site.
     - Loads the **desired configuration** automatically.
-
-![[Pasted image 20251116151256.png]]
-![[Pasted image 20251116151359.png]]
-![[Pasted image 20251116151443.png]]
+![](attachments/01.png)
+![](attachments/02.png)
+![](attachments/03.png)
 ### **Device Blueprint Overview**
-
 - A device blueprint defines parameters for a specific device model.
 - Multiple blueprints can exist for the same model.
 ### **Key Parameters**
-
 - **Automatically Link to Real Device (Auto-Link)**  
     Required for ZTP/LTP.
 - **Enforce Firmware Version**  

@@ -276,3 +276,53 @@ Use these for interface-level configurations:
 - Scripts are executed in **top-down order**.
 
 ---
+## **Firewall Policy and IPsec Interfaces**
+- **Policy Package Requirement**
+    - Firewall policies for SD-WAN must be grouped into a **policy package**.
+    - A policy package can contain multiple firewall policies assigned to one or more managed devices.
+#### **Key Rules for SD-WAN Policies**
+- Policies must reference **SD-WAN zones**, **not individual members**.
+- Other interfaces in the policy are typically **normalized interfaces**.
+#### **Normalized Interfaces**
+- Allow referencing different interfaces per device or platform.
+- Require **mapping rules** to correctly associate normalized names with actual device interfaces.
+- Enable sharing of objects (e.g., firewall policies) across multiple devices with varying configurations.
+#### **FortiManager Behavior**
+- When installing objects with normalized interfaces:
+    - Reads mapping rules.
+    - Assigns the correct physical interface to each target device.
+#### **When Normalization is Required**
+- **Required:** If you do **not** plan to use an IPsec interface as an SD-WAN member.
+    - Reason: Firewall policies need to reference normalized interfaces for the tunnel to function.
+- **Not Required:** If you plan to configure an IPsec interface as an SD-WAN member.
+    - Reason: SD-WAN members do not use normalized interfaces.
+#### **Firewall Policy Considerations**
+- For SD-WAN:
+    - Policies must reference **SD-WAN zones**, not individual members.
+- For IPsec (non-SD-WAN):
+    - After normalizing the IPsec interface, you can reference it in firewall policies.
+---
+### **Configuring an SD-WAN Zone in Device Manager**
+#### **Mandatory Settings**
+- **Name**: Assign a name to the zone.
+- **Interface Members**: Select one or more interfaces for the zone (at least one required).
+    - Zones can be used to steer traffic.
+#### **Optional Setting: `service-sla-tie-break`**
+- Applies to all SD-WAN rule strategies **except** when using **load balancing**.
+- Commonly used with **lowest cost strategy**.
+### **Tie-Breaker Options**
+- **`cfg-order`**:
+    - Default behavior.
+    - Selects members meeting SLA in the order they were configured.
+- **`fib-best-match`**:
+    - Chooses member with the most specific route (longest prefix match).
+- **`input-device`**:
+    - Ensures overlay stickiness (traffic stays on the same overlay if possible).
+    - Replies sent through the overlay link that received the incoming flow, if SLA is met.
+    - CLI commands:
+        - `set input-zone`
+        - `set tie-break input-device`
+### **FortiManager Behavior**
+> [!CAUTION]  
+> When creating a zone via **SD-WAN template**, FortiManager automatically creates a **normalized interface**.
+

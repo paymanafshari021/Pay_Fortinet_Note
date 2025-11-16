@@ -259,3 +259,20 @@ Use these for interface-level configurations:
 - FortiManager GUI shows **only metadata variables** when typing `{{`.
 - To use device database variables, **manually type them**.
 - Full list of supported variables: Refer to **FortiManager Administration Guide**.
+
+---
+## Script Types on FortiManager
+
+### **CLI Scripts**
+- Use FortiGate CLI commands.
+- Reference metadata variables with the **$** symbol.
+- Simple to use; **no advanced programming logic**.
+### **Jinja Scripts**
+- Use **Python-like syntax** for advanced configuration scenarios.
+- Reference metadata variables with **double braces: `{{ }}`**.
+## Template Groups
+- Allow assignment of **multiple CLI and/or Jinja scripts** to managed devices.
+- **Mixed script types** are supported.
+- Scripts are executed in **top-down order**.
+
+---

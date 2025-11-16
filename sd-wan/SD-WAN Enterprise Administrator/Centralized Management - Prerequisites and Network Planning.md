@@ -112,3 +112,29 @@ FortiManager makes it easy to scale from a simple single-hub setup to a more res
     Simulate HUB failure to confirm branches switch to the secondary HUB.
 10. **Document Changes**  
     Record all updates for future troubleshooting and audits.
+
+---
+
+## SD-WAN Member - Installation Target
+### **SD-WAN Template**
+An SD-WAN template is like a blueprint for configuring multiple devices in your network. Instead of setting up each device manually, you create one template and apply it to many devices.
+### **Common vs. Unique Configurations**
+Most devices might share the same basic SD-WAN setup (for example, two internet links: ISP1 and ISP2).  
+But some devices have extra links, like:
+- **Branch A**: Has ISP1 and ISP2 only.
+- **Branch B**: Has ISP1, ISP2, and an MPLS link.
+- **Branch C**: Has ISP1, ISP2, and a 4G/5G link.
+So, not all devices are identical.
+### **Installation Targets**
+This feature lets you choose **where** a specific SD-WAN member (interface) should be installed:
+- You can select **device groups** (e.g., “Main Branches”) or **individual devices**.
+> [!CAUTION] 
+> ⚠️ If you leave the “Installation Target” empty, the member applies to **every device**.
+### **Example from the text**
+- The template defines **three SD-WAN members**:
+    - **port1 (ISP1)** → applies to all branches.
+    - **port2 (ISP2)** → applies to all branches.
+    - **port4 (MPLS)** → applies **only** to devices in the “main group” (big branches).
+So, when FortiManager installs the configuration:
+- Small branches get ISP1 and ISP2.
+- Main branches get ISP1, ISP2, and MPLS.

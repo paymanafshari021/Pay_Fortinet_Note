@@ -1,7 +1,6 @@
 
 #ztp #Zero-touch
-# Zero-touch Provisioning and Monitor SD-WAN Deployment
-## Zero-touch Provisioning
+# Zero-touch Provisioning 
 
 ### **ZTP Workflow**
 

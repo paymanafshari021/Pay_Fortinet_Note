@@ -51,3 +51,43 @@ You can’t build the SD-WAN overlay until:
 
 ---
 
+## Convert Single HUB to Dual HUB
+
+### **1. Single HUB vs. Dual HUB Topology**
+- **Single HUB**: Your SD-WAN network has one central hub that connects all branch offices.
+- **Dual HUB**: You add a second hub for redundancy and better performance. If one hub fails, traffic can go through the other.
+**Example:**  
+Imagine a company with 10 branch offices connected to one main data center (HUB). If that hub goes down, all branches lose connectivity. By adding a second hub, branches can switch to the backup hub automatically.
+### **2. Converting Single HUB to Dual HUB**
+- You don’t need to rebuild everything from scratch. You can reuse existing network settings for the second hub.
+- This saves time because you keep the same device groups, routes, and objects.
+**Example:**  
+If your current hub uses IP settings like `192.168.1.x`, you can apply similar settings to the new hub without reconfiguring all branches.
+### **3. Device Groups and Branches**
+- Branches are grouped into **device groups** for easier management.
+- When you add more devices (branches), you can assign them to the same group.
+**Example:**  
+If you have branches in Vienna, Graz, and Linz, you can put them in one group called “Austria Branches” and apply the same SD-WAN policies.
+### **4. SD-WAN Manager & Overlay Orchestration**
+- **SD-WAN Manager**: A tool in FortiManager that helps configure and manage SD-WAN.
+- **Overlay Orchestration**: Automates the creation of tunnels between hubs and branches.
+**Example:**  
+Instead of manually creating VPN tunnels for each branch, the orchestration feature sets them up automatically.
+### **5. Overlay Template & Region Settings**
+- Templates define how your SD-WAN overlay works (authentication, topology, etc.).
+- **Region Settings**: Decide which hubs and branches belong to which region.
+**Example:**  
+You can create a template for “Europe Region” with two hubs (Vienna and Berlin) and assign branches in Europe to it.
+### **6. BGP AS Number**
+
+- **BGP (Border Gateway Protocol)** is used for routing between hubs and branches.
+- Each hub needs an **AS number** (Autonomous System number) for BGP.
+**Example:**  
+Primary hub might use AS number `65000`, secondary hub `65001`.
+### **7. Role Assignment**
+- Defines which device acts as **Primary HUB**, **Secondary HUB**, or **Branch**.
+- Helps automate failover and routing.
+**Example:**  
+Vienna = Primary HUB, Berlin = Secondary HUB, Graz = Branch.
+### **Why This Matters**
+FortiManager makes it easy to scale from a simple single-hub setup to a more resilient dual-hub or multi-hub architecture without starting over.

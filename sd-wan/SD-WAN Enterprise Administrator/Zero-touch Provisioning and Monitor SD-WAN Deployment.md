@@ -47,6 +47,6 @@
     Assigns templates or template groups to the device.
 ### **Important Notes**
 >  [!CAUTION] 
->  Devices in a group inherit all associated templates.  
-	**Avoid conflicts:** Do not assign both provisioning templates and group templates to the same blueprint.
-> CSV files can map templates to device serial numbers when multiple blueprints exist for the same model.
+>  - Devices in a group inherit all associated templates.
+>  - **Avoid conflicts:** Do not assign both provisioning templates and group templates to the same blueprint.
+> - CSV files can map templates to device serial numbers when multiple blueprints exist for the same model.

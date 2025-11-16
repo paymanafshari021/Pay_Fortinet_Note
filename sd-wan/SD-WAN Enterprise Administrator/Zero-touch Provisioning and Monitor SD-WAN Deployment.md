@@ -50,3 +50,24 @@
 >  - Devices in a group inherit all associated templates.
 > 	 - **Avoid conflicts:** Do not assign both provisioning templates and group templates to the same blueprint.
 > - CSV files can map templates to device serial numbers when multiple blueprints exist for the same model.
+---
+### **Enforce Device Configuration (Device Blueprint Wizard)**
+- **Purpose**  
+    Controls FortiManager’s behavior for the interface used by FortiGate to connect during ZTP/LTP.
+- **Scope**  
+    Applies **only** during Zero Touch Provisioning (ZTP) or Low Touch Provisioning (LTP).
+### **Functionality**
+- If **enabled**:
+    - FortiManager enforces blueprint settings on the connection interface (e.g., alias for `port1`).
+    - Allows FortiManager to modify the interface used by FortiGate to connect.
+	- Useful for:
+	    - Setting interface alias.
+	    - Adjusting interface speed.
+	- **Warning:** Incorrect configuration can break connectivity between FortiManager and FortiGate.
+- If **disabled**:
+    - FortiManager does **not** apply alias or interface attributes.
+    - Prevents any configuration changes to the connection interface during ZTP/LTP.
+### **Important Considerations**
+- Misconfiguration (e.g., wrong IP or gateway) can:
+    - Break connectivity between FortiGate and FortiManager.
+    - Cause ZTP process failure.

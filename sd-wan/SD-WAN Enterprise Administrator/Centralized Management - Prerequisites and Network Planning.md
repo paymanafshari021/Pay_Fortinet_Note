@@ -317,7 +317,7 @@ Use these for interface-level configurations:
 - **`fib-best-match`**:
     - Chooses member with the most specific route (longest prefix match).
 - **`input-device`**:
-    - Ensures overlay stickiness (traffic stays on the same overlay if possible).
+    - Ensures overlay **stickiness** (traffic stays on the same overlay if possible).
     - Replies sent through the overlay link that received the incoming flow, if SLA is met.
     - CLI commands:
         - `set input-zone`

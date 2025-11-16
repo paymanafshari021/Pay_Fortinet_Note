@@ -218,3 +218,44 @@ So, when FortiManager installs the configuration:
 > [!CAUTION] 
 >  ⚠️ **Important Rule** : FortiManager **cannot install configurations** if:
 >  A metadata variable has **no value** (neither default nor per-device mapping).
+
+---
+
+## **Device Database Variables in Jinja Templates**
+
+- **Purpose**: Provide dynamic configurations without defining duplicate metadata variables.
+- **Availability**:
+    - Natively available on **FortiManager** for each managed device.
+    - Supported **only in Jinja scripts**, **not compatible with CLI scripts**.
+### **Key Features**
+- Direct access to device database variables in Jinja templates.
+- Eliminates need for administrator-defined metadata variables.
+### **Example Usage**
+- **Jinja Script**:
+```
+    config system global
+    set hostname {{DVMDB.name}}
+    end
+```
+- **Common Variables**:
+#### Device Database Variables (`DVMDB`)
+Use these to access device-specific details:
+- **Name**: `{{DVMDB.name}}`
+- **Serial Number**: `{{DVMDB.serial}}`
+- **OS Type**: `{{DVMDB.os_type}}`
+- **Platform**: `{{DVMDB.platform}}`
+- **Version**: `{{DVMDB.version}}`
+- **Hostname**: `{{DVMDB.hostname}}`
+- **Description**: `{{DVMDB.description}}`
+#### **System Interface Variables (`intf`)**
+Use these for interface-level configurations:
+- **Interface Name**: `{{intf.name}}`
+- **Allow Access**: `{{intf.allowaccess}}`
+- **Type**: `{{intf.type}}`
+- **IP Address**: `{{intf.ip}}`
+- **Mode**: `{{intf.mode}}`
+- **VDOM**: `{{intf.vdom}}`
+### **Important Notes**
+- FortiManager GUI shows **only metadata variables** when typing `{{`.
+- To use device database variables, **manually type them**.
+- Full list of supported variables: Refer to **FortiManager Administration Guide**.

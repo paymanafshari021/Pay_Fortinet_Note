@@ -1,5 +1,5 @@
-
-# Prerequisites and Network Planning
+# Centralized Management
+##  Prerequisites and Network Planning
 
 ### **1. FortiManager and Hub Devices**
 - FortiManager is the central management system for Fortinet devices. It must control the main FortiGate devices that act as hubs in your SD-WAN network.
@@ -28,3 +28,6 @@ You can’t build the SD-WAN overlay until:
 - Hubs are managed by FortiManager.
 - Branch devices are grouped.
 - IP ranges and routing numbers are planned.
+
+---
+

@@ -107,25 +107,16 @@ config log memory filter
 end
 ```
 ## Configure log retention on FortiGates with disks
-
+```
 config log disk setting
 	set status enable
 	set maximum-log-age 0
 end
-
- 
-
- 
-
-    Local-In Policies for management
-
+```
+## Local-In Policies for management
 Create a group called, for example, "GRP_ALLOWED_SOURCES_MGMT_LOCAL_IN" with all your relevant hosts and subnets
-
- 
-
- 
-
-config firewall local-in-policy
+```
+ config firewall local-in-policy
     edit 0
         set intf "any"
         set srcaddr "GRP_ALLOWED_SOURCES_MGMT_LOCAL_IN"
@@ -144,21 +135,13 @@ config firewall local-in-policy
         set schedule "always"
     next
 end
+```
+## Changes services as necessary
 
- 
-
- 
-
-Changes services as necessary
-
-    Use trusted hosts in addition to local-in policies
-    Use Network Protocol Enforcement in Application Control profiles
-        Apply where necessary. Be careful with HTTP/HTTPS, because legitimate programs use it.
-
- 
-
- 
-
+  Use trusted hosts in addition to local-in policies
+  Use Network Protocol Enforcement in Application Control profiles
+  Apply where necessary. Be careful with HTTP/HTTPS, because legitimate programs use it.
+```
 config application list
     edit "<PROFILE>"
         set control-default-network-services enable
@@ -194,17 +177,9 @@ config application list
         end
     next
 end
-
- 
-
- 
-
-    Route RFC1918 addresses in a blackhole
-
- 
-
- 
-
+```
+Route RFC1918 addresses in a blackhole
+```
 config firewall address
 edit "N_RFC-1918-10_8"
 set allow-routing enable
@@ -233,16 +208,9 @@ set blackhole enable
 next
 end
 
- 
-
- 
-
-    Small things for hardening
-
- 
-
- 
-
+```
+ ## Small things for hardening
+```
 config system global
 set admin-https-ssl-versions tlsv1-2 tlsv1-3
 set admin-https-redirect enable
@@ -256,17 +224,9 @@ config system auto-install
 set auto-install-config disable
 set auto-install-image disable
 end
-
- 
-
- 
-
-    Use Threat Feeds
-
- 
-
- 
-
+```
+Use Threat Feeds
+```
 config system external-resource
     edit "EXT_TF_EMERGINGTHREAT_BLOCK_IPs"
         set type address
@@ -307,10 +267,10 @@ set service "ALL"
 set logtraffic all
 next
 end
-
-    Block ISDB objects
-
- config firewall internet-service-group
+```
+## Block ISDB objects
+```
+config firewall internet-service-group
 edit "ISDB-BLOCK-SOURCE"
 set direction source
 set member "Botnet-C&C.Server" "Hosting-Bulletproof.Hosting" "Malicious-Malicious.Server" "Phishing-Phishing.Server" "Proxy-Proxy.Server" "Spam-Spamming.Server" "Tor-Exit.Node" "Tor-Relay.Node" "VPN-Anonymous.VPN"
@@ -343,25 +303,4 @@ set service "ALL"
 set logtraffic all
 next
 end
-
-
-config system sdwan
-set status enable
-config zone
-edit "virtual-wan-link"
-next
-edit "z_sd-wan_Internet"
-next
-end
-config members
-edit 1
-set interface "wan2"
-set zone "z_sd-wan_Internet"
-next
-edit 2
-set interface "wan1"
-set zone "z_sd-wan_Internet"
-next
-end
-end
-end
+```

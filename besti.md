@@ -1,55 +1,25 @@
-I keep a document, which I call my baseline configuration, so here are parts of it.
-
- 
-
-        Activate private data encryption
-
- 
-
+Activate private data encryption
+```
 config system global
 	set private-data-encryption enable
 end​
-
+```
 Enter a 32-bit hex key after this. FMG will ask for this key if you are not on 7.6 with automatic private data encryption and once FMG implements this fully
 
- 
-
-    Run an automatic disc check after a reboot
-
- 
-
+Run an automatic disc check after a reboot
+```
 config system global
 	set autorun-log-fsck enable
 end​
-
- 
-
-    Use the extended IPS DB if you feel it is necessary
-
- 
-
-config ips global
-    set database extended
-end​
-
- 
-
-    Log CLI commands
-
- 
-
+``` 
+Log CLI commands
+```
 config system global 
     set cli-audit-log enable 
 end
-
- 
-
-    Run SSL-VPN on a loopback if you aren't on 7.4 (not necessary there because ISDB objects can be used in local-in policies in 7.4+)
-
- 
-
- 
-
+```
+Run SSL-VPN on a loopback if you aren't on 7.4 (not necessary there because ISDB objects can be used in local-in policies in 7.4+)
+```
 config system interface
      edit "vpn_loopback"
         set vdom "root"
@@ -101,24 +71,16 @@ config firewall policy
         set logtraffic all
     next
 end
-
+```
  
 
- 
-
- 
-
-    Configure an SD-WAN zone regardless of the amount of WAN connections you have
-    Use zones for all your interfaces, even if a zone only has one interface
-    Add interface bandwidth widgets to a dashboard so historic statistics are recorded
-    Disable unused interfaces
-    Enable device detection on internal interfaces
-    Various HA settings
-
- 
-
- 
-
+ Configure an SD-WAN zone regardless of the amount of WAN connections you have
+Use zones for all your interfaces, even if a zone only has one interface 
+Add interface bandwidth widgets to a dashboard so historic statistics are recorded
+Disable unused interfaces
+Enable device detection on internal interfaces
+## Various HA settings
+```
 config system ha
 	set session-pickup enable
 	set session-pickup-connectionless enable
@@ -128,17 +90,9 @@ config system ha
 	set memory-failover-threshold 86
 	set ssd-failover enable
 end
-
- 
-
- 
-
-    Log implicit denies and local traffic
-
- 
-
- 
-
+```
+## Log implicit denies and local traffic
+```
 config log setting
 	set fwpolicy-implicit-log enable
 	set local-in-allow enable
@@ -151,16 +105,8 @@ end
 config log memory filter
     set local-traffic enable
 end
-
- 
-
- 
-
-    Configure log retention on FortiGates with disks
-
- 
-
- 
+```
+## Configure log retention on FortiGates with disks
 
 config log disk setting
 	set status enable
@@ -260,31 +206,31 @@ end
  
 
 config firewall address
-    edit "N_RFC-1918-10_8"
-        set allow-routing enable
-        set subnet 10.0.0.0 255.0.0.0
-    next
-    edit "N_RFC-1918-172_12"
-        set allow-routing enable
-        set subnet 172.16.0.0 255.240.0.0
-    next
-    edit "N_RFC-1918-192_16"
-        set allow-routing enable
-        set subnet 192.168.0.0 255.255.0.0
-    next
+edit "N_RFC-1918-10_8"
+set allow-routing enable
+set subnet 10.0.0.0 255.0.0.0
+next
+edit "N_RFC-1918-172_12"
+set allow-routing enable
+set subnet 172.16.0.0 255.240.0.0
+next
+edit "N_RFC-1918-192_16"
+set allow-routing enable
+set subnet 192.168.0.0 255.255.0.0
+next
 end
 config firewall addrgrp
-    edit "GRP_RFC-1918"
-        set member "N_RFC-1918-10_8" "N_RFC-1918-172_12" "N_RFC-1918-192_16"
-        set allow-routing enable
-    next
+edit "GRP_RFC-1918"
+set member "N_RFC-1918-10_8" "N_RFC-1918-172_12" "N_RFC-1918-192_16"
+set allow-routing enable
+next
 end
 config router static
-    edit 0
-		set dstaddr "GRP_RFC-1918"
-		set distance 254
-        set blackhole enable
-    next
+edit 0
+set dstaddr "GRP_RFC-1918"
+set distance 254
+set blackhole enable
+next
 end
 
  
@@ -298,17 +244,17 @@ end
  
 
 config system global
-	set admin-https-ssl-versions tlsv1-2 tlsv1-3
-	set admin-https-redirect enable
-	set ssl-static-key-ciphers disable
-	set strong-crypto enable
-	set dh-params 8192
-	set admin-lockout-threshold 3
-	set admin-lockout-duration 300
+set admin-https-ssl-versions tlsv1-2 tlsv1-3
+set admin-https-redirect enable
+set ssl-static-key-ciphers disable
+set strong-crypto enable
+set dh-params 8192
+set admin-lockout-threshold 3
+set admin-lockout-duration 300
 end
 config system auto-install
-	set auto-install-config disable
-	set auto-install-image disable
+set auto-install-config disable
+set auto-install-image disable
 end
 
  
@@ -340,68 +286,82 @@ config system external-resource
     next
 end
 config firewall policy
-    edit 0
-        set name "BLOCK TRAFFIC 2 BAD IPs"
-        set srcintf "any"
-        set dstintf "<WAN_INTERFACE>"
-        set srcaddr "all"
-        set dstaddr "EXT_TF_EMERGINGTHREAT_BLOCK_IPs" "EXT_TF_EMERGINGTHREAT_COMPRO_IPs" "EXT_TF_FEODO_IP_BLOCKLIST" "EXT_TF_FIREHOL_LEVEL1"
-        set schedule "always"
-        set service "ALL"
-        set logtraffic all
-    next
-	edit 0
-        set name "BLOCK TRAFFIC FROM BAD IPs"
-        set srcintf "<WAN_INTERFACE>"
-        set dstintf "any"
-        set srcaddr "EXT_TF_EMERGINGTHREAT_BLOCK_IPs" "EXT_TF_EMERGINGTHREAT_COMPRO_IPs" "EXT_TF_FEODO_IP_BLOCKLIST" "EXT_TF_FIREHOL_LEVEL1"
-        set dstaddr "all"
-        set schedule "always"
-        set service "ALL"
-        set logtraffic all
-    next
+edit 0
+set name "BLOCK TRAFFIC 2 BAD IPs"
+set srcintf "any"
+set dstintf "<WAN_INTERFACE>"
+set srcaddr "all"
+set dstaddr "EXT_TF_EMERGINGTHREAT_BLOCK_IPs" "EXT_TF_EMERGINGTHREAT_COMPRO_IPs" "EXT_TF_FEODO_IP_BLOCKLIST" "EXT_TF_FIREHOL_LEVEL1"
+set schedule "always"
+set service "ALL"
+set logtraffic all
+next
+edit 0
+set name "BLOCK TRAFFIC FROM BAD IPs"
+set srcintf "z_sd-wan_WAN"
+set dstintf "any"
+set srcaddr "EXT_TF_EMERGINGTHREAT_BLOCK_IPs" "EXT_TF_EMERGINGTHREAT_COMPRO_IPs" "EXT_TF_FEODO_IP_BLOCKLIST" "EXT_TF_FIREHOL_LEVEL1"
+set dstaddr "all"
+set schedule "always"
+set service "ALL"
+set logtraffic all
+next
 end
-
- 
-
- 
 
     Block ISDB objects
 
- 
-
- 
-
-config firewall internet-service-group
-	edit "ISDB-BLOCK-SOURCE"
-		set direction source
-		set member "Botnet-C&C.Server" "Hosting-Bulletproof.Hosting" "Malicious-Malicious.Server" "Phishing-Phishing.Server" "Proxy-Proxy.Server" "Spam-Spamming.Server" "Tor-Exit.Node" "Tor-Relay.Node" "VPN-Anonymous.VPN"
-	next
-	edit "ISDB-BLOCK-DESTINATION"
-		set direction destination
-		set member "Blockchain-Crypto.Mining.Pool" "Botnet-C&C.Server" "DNS-DoH_DoT" "Hosting-Bulletproof.Hosting" "Malicious-Malicious.Server" "Phishing-Phishing.Server" "Proxy-Proxy.Server" "Spam-Spamming.Server" "Tor-Exit.Node" "Tor-Relay.Node" "VPN-Anonymous.VPN"
-	next
+ config firewall internet-service-group
+edit "ISDB-BLOCK-SOURCE"
+set direction source
+set member "Botnet-C&C.Server" "Hosting-Bulletproof.Hosting" "Malicious-Malicious.Server" "Phishing-Phishing.Server" "Proxy-Proxy.Server" "Spam-Spamming.Server" "Tor-Exit.Node" "Tor-Relay.Node" "VPN-Anonymous.VPN"
+next
+edit "ISDB-BLOCK-DESTINATION"
+set direction destination
+set member "Blockchain-Crypto.Mining.Pool" "Botnet-C&C.Server" "DNS-DoH_DoT" "Hosting-Bulletproof.Hosting" "Malicious-Malicious.Server" "Phishing-Phishing.Server" "Proxy-Proxy.Server" "Spam-Spamming.Server" "Tor-Exit.Node" "Tor-Relay.Node" "VPN-Anonymous.VPN"
+next
 end
 config firewall policy
-	edit 0
-		set name "BLOCK TRAFFIC 2 BAD ISDB IPs"
-		set srcintf "any"
-		set dstintf "<WAN_INTERFACE>"
-		set srcaddr "all"
-		set internet-service enable
-		set internet-service-group "ISDB-BLOCK-DESTINATION"
-		set schedule "always"
-		set logtraffic all
-	next
-	edit 0
-		set name "BLOCK ISDB TRAFFIC 2 INTERNAL"
-		set srcintf "<WAN_INTERFACE>"
-		set dstintf "any"
-		set dstaddr "all"
-		set internet-service-src enable
-		set internet-service-src-group "ISDB-BLOCK-SOURCE"
-		set schedule "always"
-		set service "ALL"
-		set logtraffic all
-	next
+edit 0
+set name "BLOCK TRAFFIC 2 BAD ISDB IPs"
+set srcintf "any"
+set dstintf "z_sd-wan_WAN"
+set srcaddr "all"
+set internet-service enable
+set internet-service-group "ISDB-BLOCK-DESTINATION"
+set schedule "always"
+set logtraffic all
+next
+edit 0
+set name "BLOCK ISDB TRAFFIC 2 INTERNAL"
+set srcintf "z_sd-wan_WAN"
+set dstintf "any"
+set dstaddr "all"
+set internet-service-src enable
+set internet-service-src-group "ISDB-BLOCK-SOURCE"
+set schedule "always"
+set service "ALL"
+set logtraffic all
+next
+end
+
+
+config system sdwan
+set status enable
+config zone
+edit "virtual-wan-link"
+next
+edit "z_sd-wan_Internet"
+next
+end
+config members
+edit 1
+set interface "wan2"
+set zone "z_sd-wan_Internet"
+next
+edit 2
+set interface "wan1"
+set zone "z_sd-wan_Internet"
+next
+end
+end
 end

@@ -84,3 +84,71 @@ config system external-resource
 end
 
 ```
+
+```
+config firewall policy
+    edit 0
+        set name "BLOCK TRAFFIC TO BAD_IPs"
+        set srcintf "any"
+        set dstintf "<WAN_INTERFACE>"
+        set srcaddr "all"
+        set dstaddr \
+            "EXT_TF_EMERGINGTHREAT_BLOCK_IPs" \
+            "EXT_TF_EMERGINGTHREAT_COMPRO_IPs" \
+            "EXT_TF_FEODO_IP_BLOCKLIST" \
+            "EXT_TF_FIREHOL_LEVEL1" \
+            "EXT_TF_BLOCKLISTDE_ALL" \
+            "EXT_TF_CINS_BADGUYS" \
+            "EXT_TF_C2_TRACKER" \
+            "EXT_TF_ABUSECH_SSLBL" \
+            "EXT_TF_IPSUM" \
+            "EXT_TF_DIGITALSIDE_URLS" \
+            "EXT_TF_BLOCKLISTDE_SSH" \
+            "EXT_TF_BLOCKLISTDE_MAIL" \
+            "EXT_TF_BLOCKLISTDE_FTP" \
+            "EXT_TF_BLOCKLISTDE_WEB" \
+            "EXT_TF_FIREHOL_LEVEL2" \
+            "EXT_TF_FIREHOL_LEVEL3" \
+            "EXT_TF_MALICIOUS_IP_GITHUB" \
+            "EXT_TF_MALICIOUS_OUTGOING_IP_GITHUB" \
+            "EXT_TF_THREATHIVE" \
+            "EXT_TF_ISMALICIOUS_FREE"
+        set schedule "always"
+        set service "ALL"
+        set action deny
+        set logtraffic all
+    next
+
+    edit 0
+        set name "BLOCK TRAFFIC FROM BAD_IPs"
+        set srcintf "z_sd-wan_WAN"
+        set dstintf "any"
+        set srcaddr \
+            "EXT_TF_EMERGINGTHREAT_BLOCK_IPs" \
+            "EXT_TF_EMERGINGTHREAT_COMPRO_IPs" \
+            "EXT_TF_FEODO_IP_BLOCKLIST" \
+            "EXT_TF_FIREHOL_LEVEL1" \
+            "EXT_TF_BLOCKLISTDE_ALL" \
+            "EXT_TF_CINS_BADGUYS" \
+            "EXT_TF_C2_TRACKER" \
+            "EXT_TF_ABUSECH_SSLBL" \
+            "EXT_TF_IPSUM" \
+            "EXT_TF_DIGITALSIDE_URLS" \
+            "EXT_TF_BLOCKLISTDE_SSH" \
+            "EXT_TF_BLOCKLISTDE_MAIL" \
+            "EXT_TF_BLOCKLISTDE_FTP" \
+            "EXT_TF_BLOCKLISTDE_WEB" \
+            "EXT_TF_FIREHOL_LEVEL2" \
+            "EXT_TF_FIREHOL_LEVEL3" \
+            "EXT_TF_MALICIOUS_IP_GITHUB" \
+            "EXT_TF_MALICIOUS_OUTGOING_IP_GITHUB" \
+            "EXT_TF_THREATHIVE" \
+            "EXT_TF_ISMALICIOUS_FREE"
+        set dstaddr "all"
+        set schedule "always"
+        set service "ALL"
+        set action deny
+        set logtraffic all
+    next
+end
+```

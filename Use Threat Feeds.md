@@ -16,7 +16,6 @@ config system external-resource
         set type address
         set resource "https://raw.githubusercontent.com/ktsaou/blocklist-ipsets/master/firehol_level1.netset"
     next
-
     edit "EXT_TF_BLOCKLISTDE_ALL"
         set type address
         set resource "https://lists.blocklist.de/lists/all.txt"
@@ -32,14 +31,10 @@ config system external-resource
     edit "EXT_TF_ABUSECH_SSLBL"
         set type address
         set resource "https://sslbl.abuse.ch/blacklist/sslipblacklist.txt"
-    next
+    next 
     edit "EXT_TF_IPSUM"
         set type address
         set resource "https://raw.githubusercontent.com/stamparm/ipsum/master/ipsum.txt"
-    next
-    edit "EXT_TF_DIGITALSIDE_URLS"
-        set type address
-        set resource "https://osint.digitalside.it/Threat-Intel/lists/latesturls.txt"
     next
     edit "EXT_TF_BLOCKLISTDE_SSH"
         set type address
@@ -65,24 +60,15 @@ config system external-resource
         set type address
         set resource "https://raw.githubusercontent.com/ktsaou/blocklist-ipsets/master/firehol_level3.netset"
     next
-    edit "EXT_TF_MALICIOUS_IP_GITHUB"
-        set type address
-        set resource "https://raw.githubusercontent.com/romainmarcoux/malicious-ip/main/malicious.ip"
-    next
     edit "EXT_TF_MALICIOUS_OUTGOING_IP_GITHUB"
         set type address
         set resource "https://raw.githubusercontent.com/romainmarcoux/malicious-outgoing-ip/main/malicious_outgoing.ip"
-    next
+    next 
     edit "EXT_TF_THREATHIVE"
         set type address
         set resource "https://threathive.net/hiveblocklist.txt"
     next
-    edit "EXT_TF_ISMALICIOUS_FREE"
-        set type address
-        set resource "https://ismalicious.com/blocklist.txt"
-    next
 end
-
 ```
 
 ```
@@ -102,17 +88,14 @@ config firewall policy
             "EXT_TF_C2_TRACKER" \
             "EXT_TF_ABUSECH_SSLBL" \
             "EXT_TF_IPSUM" \
-            "EXT_TF_DIGITALSIDE_URLS" \
             "EXT_TF_BLOCKLISTDE_SSH" \
             "EXT_TF_BLOCKLISTDE_MAIL" \
             "EXT_TF_BLOCKLISTDE_FTP" \
             "EXT_TF_BLOCKLISTDE_WEB" \
             "EXT_TF_FIREHOL_LEVEL2" \
             "EXT_TF_FIREHOL_LEVEL3" \
-            "EXT_TF_MALICIOUS_IP_GITHUB" \
             "EXT_TF_MALICIOUS_OUTGOING_IP_GITHUB" \
             "EXT_TF_THREATHIVE" \
-            "EXT_TF_ISMALICIOUS_FREE"
         set schedule "always"
         set service "ALL"
         set action deny

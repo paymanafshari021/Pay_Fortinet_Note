@@ -80,3 +80,72 @@ These settings are the recommended IPsec configuration when BGP routing runs ove
 - `config redistribute "connected"` injects the local LAN subnet (e.g., 10.0.1.0/24 on port5) into BGP so it is advertised to hub and other spokes
 ---
 ![[20.png]]
+## BGP Configuration on Hub with Per-Overlay BGP
+
+**Key Purpose**  
+- Configures BGP on the hub for spokes acting as dial-up clients over multiple overlays/underlays.
+
+**Neighbor-Groups**  
+- Used to group spokes sharing the same underlay (e.g., same ISP).  
+- Hub always initiates BGP peerings from spokes (expected dial-up behavior).  
+- Common settings from the neighbor-group are automatically applied to each dynamic spoke peering.  
+- Optional settings (rarely used on hub by overlay orchestrator):  
+  - `interface` – binds BGP packets to a specific interface  
+  - `update-source` – specifies source IP for BGP packets  
+- On spokes, these settings are mandatory to prevent cross-overlay BGP peerings.
+
+**Route Reflector Settings**  
+- Enable `route-reflector-client` in neighbor-group so spokes can learn each other’s prefixes.  
+- Enable route reflector on the hub only if ADVPN is planned.
+
+**Neighbor-Range**  
+- Defines the IP address range of expected spoke BGP peers per neighbor-group.  
+- Helps contain route propagation within the same underlay/ISP when route reflection is active.
+
+**Route Advertisement**  
+- `redistribute connected` injects connected subnets into BGP using a defined route-map.  
+- Alternative: use `config network` to manually advertise specific IGP prefixes (connected, static, OSPF, RIP, etc.) into BGP.  
+
+In summary, the configuration leverages neighbor-groups and neighbor-ranges to efficiently manage dynamic spoke peerings per overlay while providing control and scalability for route reflection and ADVPN scenarios.
+
+---
+![[21.png]]
+## BGP on Loopback Design – Key Summary
+#### Core Concept
+- Uses unique loopback IP addresses to identify each SD-WAN node in the overlay.
+- Loopback serves as BGP peering address, ADVPN shortcut monitoring, etc.
+- ⚠️ No tunnel IP addresses are configured → IKE Mode Config is **not used**.
+#### Design Requirements
+- ⚠️ Allocate one summary subnet (loopback summary) that covers all loopback addresses.
+- Hub advertises this loopback summary route to all spokes.
+#### Routing Mechanism
+- Relies on Fortinet proprietary BGP extension: **tag-based recursive resolution** (tag-match).
+#### How Tag-Based Recursive Resolution Works
+- Spokes tag inbound BGP routes from each hub using **route-map-in** (e.g., tag 1 for routes from Hub1).
+- During recursive next-hop resolution, the FortiGate only considers routes that carry the **same tag** as the route being resolved.
+- ⚠️ Routes learned from other hubs or by other protocols are ignored for resolution, even if they are administratively better.
+#### Resolution Modes
+- **Preferred mode**: Uses only tag-matched routes.
+- 🎁 **Merge mode** (used in BGP-on-loopback SD-WAN topologies): Combines tag-match results with standard best-match resolution.
+#### Important Characteristics
+- Tag-based resolution is **locally significant only** on the resolving FortiGate.
+- No BGP capability negotiation; tags and resolution outcomes are **not advertised** to peers.
+- All BGP peering and messaging remain fully standards-compliant.
+خلاصهٔ متن به زبان فارسی:
+
+در طراحی **BGP روی Loopback**، هر گرهٔ SD-WAN با یک آدرس Loopback منحصربه‌فرد شناسایی می‌شود. این آدرس برای **BGP Peering**، **نظارت بر میان‌بُرهای ADVPN** و سایر عملکردها استفاده می‌شود. در مرحلهٔ طراحی، یک **زیرشبکهٔ واحد** برای همهٔ آدرس‌های Loopback تعریف و توسط هاب‌ها به سخو (Spoke)‌ها تبلیغ می‌شود. در این مدل نیازی به آدرس‌دهی Tunnel یا استفاده از **IKE Mode-Config** نیست.
+
+مسیر‌یابی در این معماری از یک قابلیت اختصاصی Fortinet استفاده می‌کند به نام **Tag-based Recursive Resolution**. این روش به دستگاه‌ها اجازه می‌دهد به مسیرهای BGP دریافتی یک **Tag** اختصاص دهند و هنگام حلّ مسیر، فقط مسیرهایی را در نظر بگیرند که همان Tag را دارند.
+
+نحوهٔ کار:
+
+- سخو‌ها برای مسیرهای دریافت‌شده از هر هاب، با استفاده از Route-map یک Tag مشخص می‌گذارند (مثلاً HUB1_TAG = 1).
+    
+- سپس دستگاه تلاش می‌کند مسیرهای دارای این Tag را فقط با مسیرهایی که از همان هاب یاد گرفته شده‌اند حل کند؛ مسیرهای هاب دیگر یا مسیرهای «بهترین تطابق» خارج از همین Tag وارد روند حلّ نمی‌شوند.
+    
+
+دو حالت وجود دارد: **Preferred** (فقط براساس Tag) و **Merge** (ترکیب Tag و بهترین‌تطابق). در SD-WAN معمولاً حالت **Merge** استفاده می‌شود.
+
+این مکانیزم فقط روی دستگاه اثر دارد و **با همتاهای BGP مذاکره نمی‌شود**؛ یعنی Tagها یا نتایج آن به سایر همتاها ارسال نمی‌شود و ارتباط همچنان کاملاً مطابق استاندارد BGP باقی می‌ماند.
+
+---

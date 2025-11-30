@@ -22,7 +22,7 @@
   - Fortinet proprietary **exchange-interface-ip** attribute
 	  - Administrator manually assigns the IP address on the spoke and hub sides
 ---
-![[11.png]]
+![](attachments/11.png)
 ## IPsec Dynamic Tunnel Establishment (Dial-Up VPN)
 - Enables branches to establish IPsec tunnels with a central server without pre-configuring every remote endpoint.
 - Common in **hub-and-spoke topologies**.
@@ -84,14 +84,86 @@ end
     - Interface level (example uses this on spoke)
     - VPN tunnel parameter level (example uses this on hub)
   - Supports IPv4, IPv6, or both
-### Key Recommendations and Notes
+### 🎁 Key Recommendations and Notes
 
 - With BGP on loopback design: Fortinet recommends setting the tunnel (loopback) IP address in the VPN tunnel definition
 - Configuration changes (hub and spoke):
   - Same commands on both sides except:
     - Assign different local overlay IPs
     - On spoke only: explicitly define the hub’s overlay IP address, using the full overlay subnet mask (e.g., /24, not /32) for proper next-hop resolution with IBGP route reflection
-### Important Limitation
+### ⚠️ Important Limitation
 
 - Uses a Fortinet-proprietary IKE attribute to exchange addresses
 - Works only when both endpoints are FortiGate devices (unlike standard IKE mode config)
+---
+## Net-Device Parameter in IPsec Phase1-Interface
+
+- **Purpose**: FortiGate-specific parameter that controls whether a kernel interface is created for each dial-up IPsec tunnel.
+#### Behavior When Enabled
+- Creates a dynamic interface for each tunnel (named with phase1 name + index)
+- Easier identification for monitoring and troubleshooting
+- Consumes additional CPU resources
+- Slows down tunnel setup and tear-down rates
+#### Behavior When Disabled (Default)
+- No kernel interface created
+- Generates a tunnel ID (in the form of an IP address)
+- Tunnel ID is used as the gateway in the route entry
+#### ⚠️ Fortinet Recommendation for SD-WAN Topologies
+- **Hub**: Keep `net-device disable` (default)
+- **Spokes**: Enable `net-device`
+- ⚠️ **Important restriction**: If SD-WAN is configured on the hub, FortiOS blocks the use of dynamic (dial-up) IPsec tunnels as SD-WAN members
+---
+![](attachments/13.png)
+## Routing in SD-WAN Overlay Networks
+- After defining overlay tunnels, a routing protocol must be selected.
+#### Supported Protocols
+- FortiGate supports **RIP**, **OSPF**, and **BGP**.
+- Any of these three can be combined with **ADVPN**.
+#### 🎁 Recommendations by Topology Size
+- **Static routing**: Sufficient for small SD-WAN topologies.
+- **Dynamic routing**: Required for most networks to improve scalability.
+#### 🎁 Preferred Protocol
+- **BGP** (specifically **IBGP**) offers the most flexibility and advanced route-selection fine-tuning.
+- **BGP/IBGP** is the most commonly used protocol on overlay networks, especially in SD-WAN and ADVPN deployments.
+---
+![](attachments/14.png)
+## SD-WAN Overlay IBGP Routing Options
+#### Overview
+When selecting IBGP as the overlay routing protocol, two implementation types are available:
+- **BGP per Overlay** (Historical design, fully supported, formerly the only option supporting ADVPN)
+- **BGP on Loopback** (Current recommended and most common design)
+#### BGP per Overlay
+- Each spoke establishes a **separate IBGP session per overlay tunnel** toward each hub.
+- Sessions terminate on the **tunnel interface IP** on both hub and spoke.
+- Spokes advertise LAN prefixes over **all** established IBGP sessions.
+- Requires **unique tunnel subnet per overlay** in the region (e.g., dual-hub with two underlays → 4 separate subnets).
+- Subnet sizing must accommodate all spokes + hubs; choose summarizable ranges (e.g., 10.201.1.0/24 + 10.202.1.0/24 → summarize as 10.200.0.0/14).
+- Hub tunnel IPs configured manually; spokes can receive IPs dynamically via IKE mode-config.
+#### 🎁 BGP on Loopback (Recommended)
+- Each spoke establishes **one IBGP session per hub**.
+- Sessions terminate on **loopback interface** (unique per SD-WAN node).
+- Spokes advertise LAN prefixes over this **single session per hub**.
+- Significantly simplifies configuration and greatly reduces advertised routes.
+- Relies on unique loopback IP for:
+  - BGP session termination
+  - ADVPN shortcut monitoring
+  - Node identification in the overlay
+---
+ ![](attachments/15.png)
+### ADVPN Shortcut Route Learning Options in FortiGate SD-WAN
+FortiGate provides two methods for spokes to learn each other's routes when ADVPN shortcuts are enabled. Both can be combined with **BGP per overlay** or **BGP on loopback** topologies.
+#### Route Reflection (Historical Design)
+- Hub learns all spoke routes.
+- Hub reflects (re-advertises) these routes to all other spokes.
+- **Drawbacks**:
+  - Poor scalability with many spokes.
+  - High CPU/memory usage on the hub due to route reflection.
+  - Larger, more complex routing tables on all devices.
+#### 🎁 Dynamic BGP (Recommended Alternative)
+- Hub only learns and advertises **summary routes** for spokes.
+- Spokes establish direct BGP peering **only over active ADVPN shortcut tunnels**.
+- Route exchange occurs **only after** the shortcut tunnel is up and only between spokes that actually need to communicate.
+- **Example**: Spoke B ↔ Spoke C establish a shortcut → negotiate BGP peering → exchange routes.  
+  Spoke A ↔ Spoke B have no traffic → no shortcut → no BGP peering or route exchange.
+**Key Advantage of Dynamic BGP**: Significantly better scalability and reduced resource usage on hub and spokes.
+---

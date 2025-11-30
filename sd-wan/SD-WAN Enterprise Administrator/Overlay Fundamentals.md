@@ -82,3 +82,93 @@ Fortinet study guide specifically mentioned the **Network ID**. This is a critic
 - **Advantage in IKEv2:** It can tag traffic with a **Network ID**. This allows you to build **multiple distinct tunnels** between the exact same local and remote IP addresses. This is mandatory for complex failover scenarios where you might want one tunnel for "Voice Traffic" and a parallel tunnel for "Data Traffic" between the same two sites.
 
 ---
+## SD-WAN Hub-and-Spoke IPsec Overlay Topology
+
+#### Topology Design
+- Standard deployment uses **IPsec overlays** in a **hub-and-spoke** model
+- Hub: Located in central office/data center; acts as **dial-up IPsec server**
+- Spokes (branches/edges): Distributed remote sites; connect as dial-up clients
+- Each underlay interface on the hub has a **separate dial-up server** configuration → creates **point-to-multipoint (PTMP)** overlays
+- Spokes typically connect to **all overlays** for full-mesh reachability and redundancy
+#### Performance Recommendations
+- Fortinet best practice: **Group overlays by ISP** (same-ISP overlays preferred over cross-ISP)
+- Reason: Lower latency and better performance when tunnels stay within the same ISP
+#### Traffic Flow & SD-WAN Placement
+- Majority of traffic initiated **spoke → hub** (branches accessing central workloads)
+- SD-WAN therefore primarily required on **spokes**
+- SD-WAN may also be needed on the **hub** when hub-initiated traffic (hub → spoke) is significant
+#### Routing
+- Preferred protocol: **Dynamic routing** (usually **BGP**) over the overlays
+- Purpose: Exchange prefixes across all overlays; enables scalability and supports **ADVPN** with SD-WAN
+- Static routing possible but not recommended for larger deployments
+
+Goal: Full prefix exchange and multi-path connectivity across all available overlays.
+
+---
+## Other Common Overlay Designs
+
+#### 1. Hub-and-Spoke with Static Tunnels
+- Each branch/site establishes static IPsec (or GRE, etc.) tunnels only to the hub(s)
+- Branches normally do **not** have direct tunnels to each other
+
+**Advantages:**
+- High stability and predictability
+- Centralized policy enforcement at the hub
+- Easier log reading and troubleshooting (all traffic flows through the hub)
+- Simple scalability from the branch perspective (each branch only manages 1–2 tunnels)
+
+**Disadvantages:**
+- Suboptimal routing (hairpinning through the hub even for branch-to-branch traffic)
+- Hub can become a bandwidth and processing bottleneck
+- Single point of failure unless multiple/redundant hubs are deployed
+
+#### 2. Full-Mesh Static Tunnels
+- Every site establishes static tunnels directly to every other site
+- Creates a complete any-to-any topology
+
+**Advantages:**
+- Optimal routing / lowest latency (direct site-to-site paths)
+- No hub bottleneck
+- High stability (static configuration, no dynamic protocol issues)
+
+**Disadvantages:**
+- Poor scalability – number of tunnels grows exponentially
+- Formula for number of bidirectional VPN tunnels required:
+  
+  **N × (N-1) / 2**  
+  where N = number of sites
+
+  Example:
+  - 5 sites  → 10 tunnels
+  - 10 sites → 45 tunnels
+  - 20 sites → 190 tunnels
+  - 50 sites → 1,225 tunnels
+
+- Dramatically increased planning, configuration, and operational overhead
+- Very difficult to manage and troubleshoot at scale
+
+### Quick Comparison Table
+
+| Design                  | Scalability | Optimal Routing | Ease of Management | Typical Use Case                  |
+|-------------------------|-------------|-----------------|--------------------|-----------------------------------|
+| Hub-and-Spoke (static)  | Good        | No (hairpin)    | Easy               | Small to medium networks, centralized services |
+| Full-Mesh (static)      | Very Poor   | Yes             | Very Hard          | Very small networks (< ~8–10 sites) |
+| Dynamic (e.g., SD-WAN, DMVPN, ADVPN) | Excellent   | Yes (with dynamic spokes) | Moderate       | Medium to large/very large networks |
+
+In modern deployments, full-mesh static tunnels are rarely used beyond a handful of sites. Most organizations today prefer SD-WAN or dynamic overlay solutions (like Fortinet ADVPN, Cisco DMVPN, Viptela, Velocloud, etc.) that combine the stability of static hub tunnels with on-demand/direct spoke-to-spoke tunnels to get the best of both worlds.
+
+---
+## SD-WAN Overlay Orchestrator Topology
+- Defines a **hub-and-spoke** SD-WAN topology
+- Secures overlay links using **IPsec**
+- Supports up to **four hubs**
+### Overlay Routing Protocol Options (IBGP)
+The orchestrator provides two IBGP topologies for branch-to-hub routing:
+- **BGP per overlay**
+  - FortiGate establishes a separate BGP neighbor relationship **for each overlay**
+  - Widely deployed in the field
+  - Suitable for **small-to-medium-sized topologies**, with or without ADVPN
+- **BGP on loopback**
+  - FortiGate establishes a **single BGP neighbor relationship** with each device (using loopback interfaces)
+  - Scales better as the number of devices and links increases
+  - Used in the lab exercises

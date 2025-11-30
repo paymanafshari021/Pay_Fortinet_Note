@@ -78,3 +78,5 @@ These settings are the recommended IPsec configuration when BGP routing runs ove
 - Ensures BGP control plane follows the same SD-WAN path selection as data plane
 #### Route Redistribution
 - `config redistribute "connected"` injects the local LAN subnet (e.g., 10.0.1.0/24 on port5) into BGP so it is advertised to hub and other spokes
+---
+![[20.png]]

@@ -171,4 +171,4 @@ The orchestrator provides two IBGP topologies for branch-to-hub routing:
 - **BGP on loopback**
   - FortiGate establishes a **single BGP neighbor relationship** with each device (using loopback interfaces)
   - Scales better as the number of devices and links increases
-  - Used in the lab exercises
+  - Used in the Fortinet lab exercises

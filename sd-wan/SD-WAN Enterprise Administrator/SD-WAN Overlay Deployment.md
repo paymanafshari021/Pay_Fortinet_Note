@@ -58,3 +58,23 @@ FortiManager automatically prepares IPsec templates for **hub-and-spoke topology
 - net-device: enable
 
 These settings are the recommended IPsec configuration when BGP routing runs over loopback interfaces instead of directly over the overlay tunnels.
+
+---
+![[19.png]]
+## IBGP Configuration for Spokes with BGP Per Overlay
+
+#### Key Characteristics
+- Uses **IBGP** (local AS = remote AS = 65000)
+- Preferred over EBGP because IBGP preserves the original next-hop, which is essential for proper ADVPN operation
+- Supports SD-WAN ECMP; requires `set ibgp-multipath enable` to allow equal-cost multipath for IBGP routes
+#### Neighbor Configuration
+- Each `config neighbor` entry defines one hub overlay IP:
+  - e.g., 192.168.1.61 → Hub overlay over ISP1
+  - e.g., 192.168.1.125 → Hub overlay over ISP2
+- `interface` setting binds BGP session to the specific SD-WAN overlay interface
+- 🎁 `update-source` explicitly sets the source IP (optional/redundant here because `interface` already forces the correct source IP, but recommended for consistency)
+#### Purpose of Binding
+- Prevents accidental cross-overlay BGP peerings (e.g., ISP1 overlay talking to ISP2 overlay)
+- Ensures BGP control plane follows the same SD-WAN path selection as data plane
+#### Route Redistribution
+- `config redistribute "connected"` injects the local LAN subnet (e.g., 10.0.1.0/24 on port5) into BGP so it is advertised to hub and other spokes

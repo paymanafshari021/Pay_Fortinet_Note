@@ -5,8 +5,9 @@ https://docs.fortinet.com/document/fortianalyzer/7.4.8/administration-guide/3472
 FortiAnalyzer units with multiple drives support several RAID configurations. Refer to your device’s datasheet for exact compatibility.
 
 ---
-![](fortinet-repo/faz/faz7.4/attachments/02.png)
-![](fortinet-repo/faz/faz7.4/attachments/01.png)
+
+![](attachments/02.png)
+![](attachments/01.png)
 #### **Linear RAID**
 
 - **Function:** Combines all disks into one large virtual disk.
@@ -200,3 +201,16 @@ On FortiAnalyzer-VM, only the diagnose system disk usage command is available.
 - **Adding/Expanding**:
     - Add a new virtual disk for more space
     - Increase existing virtual disk size without reformatting
+---
+|RAID Level|Min. Drives|Structure / Function|Capacity|Protection|Performance|Notes|
+|---|---|---|---|---|---|---|
+|**RAID 0** (Striping)|2|Data striped across drives|Sum of all drives|**None** — any drive failure = total data loss|Very high (parallel reads/writes)|Not fault-tolerant; avoid for critical systems|
+|**RAID 1** (Mirroring)|2|Full mirror of data across drives|Size of one drive|Survives **1 drive** failure|Good reads (2 reads), normal write|No rebuild needed after failure; simple redundancy|
+|**RAID 1s** (RAID 1 + Hot Spare)|3|RAID 1 with automatic standby disk|Total disks − 2|Hot spare auto-replaces failed disk|Same as RAID 1|Adds automatic rebuild capability|
+|**RAID 5** (Striping + Parity)|3|Striping with single parity|Total disks − 1|Tolerates **1 drive** failure|Fast reads, slower writes; degraded during rebuild|Common balance of speed + redundancy|
+|**RAID 5s** (RAID 5 + Hot Spare)|4|RAID 5 with a hot spare|Total disks − 2|Auto-rebuild with spare|Same as RAID 5|Hot spare inclusion improves recovery time|
+|**RAID 6** (Dual Parity)|4|Striping with **2 parity blocks**|Total disks − 2|Tolerates **2 drives** failing|Slightly slower writes than RAID 5|Higher protection than RAID 5|
+|**RAID 6s** (RAID 6 + Hot Spare)|5|RAID 6 with hot spare|Total disks − 3|Auto-rebuild with spare|Same as RAID 6|Protects against dual failure + automatic spare|
+|**RAID 10** (1+0)|4|Stripe of mirrored pairs|50% of total disks|One drive per mirror pair may fail|Very high; excellent for mixed workloads|Ideal for speed + redundancy|
+|**RAID 50** (5+0)|6 (typically ≥9)|Striped RAID 5 arrays|Total disks − number of RAID 5 groups|One drive failure **per sub-array**|High read, faster than RAID 5|Efficient scaling; use `diagnose system raid status` to view|
+|**RAID 60** (6+0)|8|Striped RAID 6 arrays|Total disks − 2×(# of sub-arrays)|Two drive failures **per sub-array**|High reads, medium writes|Slower writes than RAID 50; strong redundancy|

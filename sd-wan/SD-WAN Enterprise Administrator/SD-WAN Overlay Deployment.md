@@ -177,7 +177,7 @@ In short: BGP on loopback simplifies spoke-to-hub neighborship but requires `rec
 
 ---
 ![[23.png]]
-### BGP Route Reflector in FortiGate SD-WAN with ADVPN
+## BGP Route Reflector in FortiGate SD-WAN with ADVPN
 #### Default IBGP Behavior
 - By default, IBGP routers do **not** advertise routes learned from one internal neighbor to another internal neighbor (no route propagation between peers).
 #### Route Reflector Role
@@ -197,3 +197,29 @@ In short: BGP on loopback simplifies spoke-to-hub neighborship but requires `rec
 #### Additional-Path Limitation
 - By default (`set additional-path disable`), the hub reflects **only one path** (here, the one with next hop 192.168.1.1).
 - The second path (next hop 192.168.1.65) is **not** reflected unless additional-path is explicitly enabled.
+---
+![[24.png]]
+## BGP Path Advertisement in SD-WAN Overlays
+#### Default Behavior
+- FortiGate as BGP speaker advertises **only one path per prefix** by default.
+- In hub-and-spoke with hub as route reflector, the hub reflects **only one path** per prefix to spokes, even if it learns multiple paths from a spoke client.
+#### SD-WAN Requirement
+- SD-WAN needs **all available paths** to all destinations on every site.
+- Reason: Missing routes in the FIB can cause SD-WAN rules and members to be skipped.
+#### Recommended Best Practice
+- 🎁 Configure FortiGate to advertise **additional paths** so peers learn all available paths.
+- Specifically on the **hub**: advertise **one additional path per overlay** (add-paths send).
+#### Example Scenario (10.0.1.0/24 from spoke2)
+- Hub learns two paths:
+  - Via HUB1-VPN1 → next-hop 192.168.1.1
+  - Via HUB1-VPN2 → next-hop 192.168.1.65
+- Hub is configured to:
+  - Send two additional paths
+  - Reflect prefixes learned from clients (with add-paths)
+- Spoke is configured to receive additional paths (add-paths receive).
+#### Result on Spoke
+- Spoke receives **both paths** from the hub via each overlay.
+- Total: **four routes** for 10.0.1.0/24 (two paths × two overlays).
+- Because iBGP preserves next-hop, the routing table on the spoke shows **duplicate routes** for the prefix (expected and normal).
+---
+![[25.png]]

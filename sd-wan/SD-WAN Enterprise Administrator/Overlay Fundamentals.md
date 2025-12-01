@@ -15,7 +15,6 @@ IPsec is a suite of protocols providing authentication and encryption for traffi
   - Peers automatically detect NAT along the path  
   - If NAT is detected:  
     - IKE switches from UDP 500 to **UDP 4500**  
-<<<<<<< HEAD
     - ESP packets are encapsulated in **UDP 4500** (UDP encapsulation)  
 This allows IPsec tunnels to function reliably in NAT environments. 
 ## IKE-Protokoll und IPsec-Tunnels
@@ -190,4 +189,3 @@ The orchestrator provides two IBGP topologies for branch-to-hub routing:
   - FortiGate establishes a **single BGP neighbor relationship** with each device (using loopback interfaces)
   - Scales better as the number of devices and links increases
   - Used in the Fortinet lab exercises
->>>>>>> origin/main

@@ -176,3 +176,4 @@ In short: BGP on loopback simplifies spoke-to-hub neighborship but requires `rec
 نمونه کانفیگی که در اسلاید نشان داده شده، توسط FortiManager overlay orchestrator آماده شده و شامل تنظیمات پیشنهادی فورتی‌نت است. همچنین پارامترهای `ibgp-multipath` و `ebgp-multipath` در آن فعال شده تا هاب برای توپولوژی‌های چندمنطقه‌ای (multi-region) آماده باشد.
 
 ---
+![[23.png]]

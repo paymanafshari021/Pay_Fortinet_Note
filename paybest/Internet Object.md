@@ -6,7 +6,7 @@ set start-ip 1.0.0.0
 set end-ip 9.255.255.255
 next 
 edit "Internet_IPv4_11-126"
- set type iprange
+set type iprange
 set start-ip 11.0.0.0
 set end-ip 126.255.255.255
 next

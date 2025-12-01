@@ -222,4 +222,4 @@ In short: BGP on loopback simplifies spoke-to-hub neighborship but requires `rec
 - Total: **four routes** for 10.0.1.0/24 (two paths × two overlays).
 - Because iBGP preserves next-hop, the routing table on the spoke shows **duplicate routes** for the prefix (expected and normal).
 ---
-![[attachments/25.png]]
+![][attachments/25.png]

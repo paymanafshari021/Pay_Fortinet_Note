@@ -177,3 +177,23 @@ In short: BGP on loopback simplifies spoke-to-hub neighborship but requires `rec
 
 ---
 ![[23.png]]
+### BGP Route Reflector in FortiGate SD-WAN with ADVPN
+#### Default IBGP Behavior
+- By default, IBGP routers do **not** advertise routes learned from one internal neighbor to another internal neighbor (no route propagation between peers).
+#### Route Reflector Role
+- Configuring `route-reflector-client` on hub neighbor groups turns the FortiGate hub into a **BGP route reflector**.
+- This allows the hub to **reflect** routes learned from one IBGP client (spoke) to other IBGP clients (other spokes).
+- Required when ADVPN is enabled so spokes can learn each other’s prefixes directly via the hub.
+#### How Reflection Works in the Example
+- Spoke1 advertises 10.0.1.0/24 to the hub over two overlays (HUB1-VPN1 and HUB1-VPN2).
+- Hub learns the prefix with two different next hops:
+  - 192.168.1.1 (via HUB1-VPN1)
+  - 192.168.1.65 (via HUB1-VPN2)
+- Hub reflects the prefix to Spoke2, preserving the original next hop (IBGP next-hop-unchanged behavior).
+#### Spoke Behavior on Receiving Reflected Routes
+- Spoke2 performs a **recursive route lookup** using the preserved next hop.
+- Lookup matches static routes for overlay subnets → outgoing interface becomes HUB1-VPN1 (or HUB1-VPN2).
+- Routing table on Spoke2 shows **[2]** duplicate entries for 10.0.1.0/24 (one per path), visible in FIB but summarized in RIB.
+#### Additional-Path Limitation
+- By default (`set additional-path disable`), the hub reflects **only one path** (here, the one with next hop 192.168.1.1).
+- The second path (next hop 192.168.1.65) is **not** reflected unless additional-path is explicitly enabled.

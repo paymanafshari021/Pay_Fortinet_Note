@@ -15,6 +15,24 @@ IPsec is a suite of protocols providing authentication and encryption for traffi
   - Peers automatically detect NAT along the path  
   - If NAT is detected:  
     - IKE switches from UDP 500 to **UDP 4500**  
+<<<<<<< HEAD
+    - ESP packets are encapsulated in **UDP 4500** (UDP encapsulation)  
+This allows IPsec tunnels to function reliably in NAT environments. 
+## IKE-Protokoll und IPsec-Tunnels
+
+IKE (Internet Key Exchange) verhandelt die privaten Schlüssel und Verschlüsselungsverfahren, die für den Aufbau eines IPsec-Tunnels erforderlich sind. Beide Tunnel-Enden müssen sich auf identische Security Associations (SAs) und geheime Schlüssel einigen, sonst wird kein Tunnel etabliert.
+### Security Associations (SAs)
+- Eine SA ist ein Bündel aus Algorithmen und Parametern für Verschlüsselung und Authentifizierung.
+- Bei bidirektionalem Verkehr werden immer **zwei SAs** verwendet — je eine pro Richtung.
+- Beide Peers müssen exakt dieselben Sicherheitsregeln akzeptieren.
+- SAs haben eine Lebensdauer und müssen nach Ablauf durch die Peers neu verhandelt werden.
+### IKE-Phasen
+- **Phase 1** → Verhandelt die **IKE SA**: stellt einen authentisierten und verschlüsselten Kanal bereit, über den Phase 2 sicher ablaufen kann.
+- **Phase 2** → Verhandelt die **IPsec SA(s)**: diese werden für die eigentliche Verschlüsselung und Entschlüsselung des Nutzdatenverkehrs verwendet.
+### IKE-Versionen
+- **IKEv1**: Ältere, weit verbreitete, aber veraltete Version (deprecated). Sollte in neuen Deployments nicht mehr verwendet werden.
+- **IKEv2**: Aktuelle, empfohlene Version. Bietet mehr Funktionen, einfachere Bedienung und exklusive Features wie **Network ID**, das mehrere Tunnel zwischen denselben Gateways ermöglicht — besonders wichtig für SD-WAN-Failover und ADVPN-Szenarien.
+=======
     - ESP packets are encapsulated in **UDP 4500** (UDP encapsulation) 
 This allows IPsec tunnels to function reliably in NAT environments. 
 ---
@@ -172,3 +190,4 @@ The orchestrator provides two IBGP topologies for branch-to-hub routing:
   - FortiGate establishes a **single BGP neighbor relationship** with each device (using loopback interfaces)
   - Scales better as the number of devices and links increases
   - Used in the Fortinet lab exercises
+>>>>>>> origin/main

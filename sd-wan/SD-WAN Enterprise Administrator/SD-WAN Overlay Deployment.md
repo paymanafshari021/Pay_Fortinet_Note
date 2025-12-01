@@ -149,3 +149,30 @@ In summary, the configuration leverages neighbor-groups and neighbor-ranges to e
 این مکانیزم فقط روی دستگاه اثر دارد و **با همتاهای BGP مذاکره نمی‌شود**؛ یعنی Tagها یا نتایج آن به سایر همتاها ارسال نمی‌شود و ارتباط همچنان کاملاً مطابق استاندارد BGP باقی می‌ماند.
 
 ---
+![[22.png]]
+## BGP on Loopback Key Points
+
+- **Recursive Next-Hop Resolution**  
+  - By default, FortiGate BGP does not consider routes when the next-hop is resolved recursively.  
+  - For BGP on loopback to work (hub and spokes), you **must enable** `recursive-next-hop`.  
+  - This parameter allows one level of recursive route resolution.  
+  - Must be enabled on **both hub and all spokes**.
+
+- **Neighbor-Group Configuration**  
+  - Standard “BGP per overlay” design → one neighbor-group per overlay pointing to the hub.  
+  - BGP on loopback design → requires **only one neighbor-group** (named **EDGE** by FortiManager overlay orchestrator) for **all spokes**, regardless of the number of overlays.
+
+- **Hub Configuration (FortiManager Orchestrated)**  
+  - Uses Fortinet-recommended BGP parameters.  
+  - Automatically enables **ibgp-multipath** and **ebgp-multipath**.  
+  - Prepares the hub for multi-region topologies with load-balancing capabilities.
+
+In short: BGP on loopback simplifies spoke-to-hub neighborship but requires `recursive-next-hop` everywhere and a single “EDGE” neighbor-group, while the hub gets multipath enabled for scalability.
+
+به طور پیش‌فرض، روت‌های BGP وقتی که next-hop آن‌ها نیاز به resolution بازگشتی (recursive) داشته باشد، در نظر گرفته نمی‌شوند. چون در طراحی BGP on Loopback، هاب و اسپوک‌ها باید این نوع روت‌ها را بپذیرند، باید پارامتر `recursive-next-hop` را فعال کنید. این پارامتر به FortiGate اجازه می‌دهد تا یک سطح resolution بازگشتی را انجام دهد. این تنظیم باید هم روی هاب و هم روی تمام اسپوک‌ها فعال شود.
+
+در حالت معمولی «BGP per overlay» برای هر اورلی یک neighbor-group جداگانه تعریف می‌کردید، اما در طراحی BGP on Loopback فقط به یک neighbor-group واحد برای تمام اسپوک‌ها (صرف‌نظر از تعداد اورلی‌ها) نیاز دارید. در اورکستریتور FortiManager این گروه به طور خودکار با نام EDGE ساخته می‌شود.
+
+نمونه کانفیگی که در اسلاید نشان داده شده، توسط FortiManager overlay orchestrator آماده شده و شامل تنظیمات پیشنهادی فورتی‌نت است. همچنین پارامترهای `ibgp-multipath` و `ebgp-multipath` در آن فعال شده تا هاب برای توپولوژی‌های چندمنطقه‌ای (multi-region) آماده باشد.
+
+---

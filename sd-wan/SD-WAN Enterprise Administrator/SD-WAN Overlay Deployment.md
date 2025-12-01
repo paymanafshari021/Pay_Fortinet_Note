@@ -36,7 +36,7 @@ FortiManager automatically prepares IPsec templates for **hub-and-spoke topology
   → Prevents cross-overlay traffic
 **Optional**: Add keepalive settings to both templates as needed.
 ---
-![][attachments/18.png]
+![](attachments/18.png)
 ## IPsec Templates Settings - BGP on Loopback Overlay Template in FortiManager
 
 **Key Behavior** When "BGP on loopback" is selected in the overlay template, FortiManager automatically optimizes the generated IPsec templates for loopback-based BGP routing.
@@ -60,7 +60,7 @@ FortiManager automatically prepares IPsec templates for **hub-and-spoke topology
 These settings are the recommended IPsec configuration when BGP routing runs over loopback interfaces instead of directly over the overlay tunnels.
 
 ---
-![][attachments/19.png]
+![](attachments/19.png)
 ## IBGP Configuration for Spokes with BGP Per Overlay
 
 #### Key Characteristics
@@ -79,7 +79,7 @@ These settings are the recommended IPsec configuration when BGP routing runs ove
 #### Route Redistribution
 - `config redistribute "connected"` injects the local LAN subnet (e.g., 10.0.1.0/24 on port5) into BGP so it is advertised to hub and other spokes
 ---
-![][attachments/20.png]
+![](attachments/20.png)
 ## BGP Configuration on Hub with Per-Overlay BGP
 
 **Key Purpose**  
@@ -109,7 +109,7 @@ These settings are the recommended IPsec configuration when BGP routing runs ove
 In summary, the configuration leverages neighbor-groups and neighbor-ranges to efficiently manage dynamic spoke peerings per overlay while providing control and scalability for route reflection and ADVPN scenarios.
 
 ---
-![][attachments/21.png]
+![](attachments/21.png)
 ## BGP on Loopback Design – Key Summary
 #### Core Concept
 - Uses unique loopback IP addresses to identify each SD-WAN node in the overlay.
@@ -149,7 +149,7 @@ In summary, the configuration leverages neighbor-groups and neighbor-ranges to e
 این مکانیزم فقط روی دستگاه اثر دارد و **با همتاهای BGP مذاکره نمی‌شود**؛ یعنی Tagها یا نتایج آن به سایر همتاها ارسال نمی‌شود و ارتباط همچنان کاملاً مطابق استاندارد BGP باقی می‌ماند.
 
 ---
-![][attachments/22.png]
+![](attachments/22.png)
 ## BGP on Loopback Key Points
 
 - **Recursive Next-Hop Resolution**  
@@ -176,7 +176,7 @@ In short: BGP on loopback simplifies spoke-to-hub neighborship but requires `rec
 نمونه کانفیگی که در اسلاید نشان داده شده، توسط FortiManager overlay orchestrator آماده شده و شامل تنظیمات پیشنهادی فورتی‌نت است. همچنین پارامترهای `ibgp-multipath` و `ebgp-multipath` در آن فعال شده تا هاب برای توپولوژی‌های چندمنطقه‌ای (multi-region) آماده باشد.
 
 ---
-![][attachments/23.png]
+![](attachments/23.png)
 ## BGP Route Reflector in FortiGate SD-WAN with ADVPN
 #### Default IBGP Behavior
 - By default, IBGP routers do **not** advertise routes learned from one internal neighbor to another internal neighbor (no route propagation between peers).
@@ -198,7 +198,7 @@ In short: BGP on loopback simplifies spoke-to-hub neighborship but requires `rec
 - By default (`set additional-path disable`), the hub reflects **only one path** (here, the one with next hop 192.168.1.1).
 - The second path (next hop 192.168.1.65) is **not** reflected unless additional-path is explicitly enabled.
 ---
-![][attachments/24.png]
+![](attachments/24.png)
 ## BGP Path Advertisement in SD-WAN Overlays
 #### Default Behavior
 - FortiGate as BGP speaker advertises **only one path per prefix** by default.
@@ -222,4 +222,4 @@ In short: BGP on loopback simplifies spoke-to-hub neighborship but requires `rec
 - Total: **four routes** for 10.0.1.0/24 (two paths × two overlays).
 - Because iBGP preserves next-hop, the routing table on the spoke shows **duplicate routes** for the prefix (expected and normal).
 ---
-![][attachments/25.png]
+![](attachments/25.png)

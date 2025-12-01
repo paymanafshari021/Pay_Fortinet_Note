@@ -15,7 +15,7 @@
 #### ADVPN Support
 - Predefined templates also support enabling ADVPN with corresponding recommended parameters in hub-and-spoke topologies.
 ---
-![[attachments/17.png]]
+![](attachments/17.png)
 ## IPsec Templates Settings BGP per Overlay Orchestrator (Default/Recommended)  in FortiManager
 
 FortiManager automatically prepares IPsec templates for **hub-and-spoke topology** with **BGP per overlay** routing.

@@ -40,23 +40,6 @@
 | BGP in Enterprise Part2         | پیشرفته Enterprise                | Failover, Load balancing, Security         | PBR, multipath, TTL Security                                            | تست failover و امنیت مسیرها                 |
 
 ---
-
-### **1. Stub AS**
-- An AS that only handles **local traffic** and has **a single connection** to another AS.
-- **Characteristics:**
-    - Only one exit point to the Internet or another AS.
-    - Routes traffic that originates and terminates **within the AS**.
-### **2. Multihomed AS**
-- An AS that handles **local traffic only**, but has **multiple connections** to different ASes.
-- **Characteristics:**
-    - Multiple exit points for redundancy or load balancing.
-    - Still does not provide transit for other ASes.
-### **3. Transit AS**
-- An AS that handles **local traffic** and also **transit traffic** (traffic passing through to other ASes).
-- **Characteristics:**
-    - Provides connectivity between other ASes.
-    - Can originate, terminate, and forward traffic.
----
 # Redistribution
 
 + Taking routes from one source (like connected interfaces, static routes, or even another routing protocol)  

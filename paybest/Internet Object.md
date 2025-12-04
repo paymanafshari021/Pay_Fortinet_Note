@@ -1,3 +1,4 @@
+**Das sind alle öffentlichen IP-Adressen, die NICHT in private, reservierte oder spezielle RFC-Bereiche fallen**
 ```
 config firewall address
 edit "Internet_IPv4_1-9"

@@ -54,33 +54,33 @@
 
 ---
 ## Route Reflectors
-### **The Problem: Full Mesh Peering**
+### The Problem: Full Mesh Peering
 - Every IBGP router must form a direct connection (a BGP session) with **every other IBGP router**.
 - The number of connections grows _fast_ as you add routers.
 - If you have _N_ routers, you need **N × (N-1) / 2** connections.
 - This becomes hard to manage and wastes resources.
-### **The Solution: Route Reflectors (RRs)**
+### The Solution: Route Reflectors (RRs)
 A **Route Reflector (RR)** is a router that acts like a _central hub_ for IBGP information.  
 Instead of every router talking to every other router, they all talk to the RR.
-### **How RRs reduce connections**
+### How RRs reduce connections
 - Each router only needs to connect to the RR (or a small set of RRs).
 - The RR receives route updates from one router and “reflects” (forwards) them to others.
-### **Example**
+### Example
 Imagine you have **5 routers** again, but now Router A is the **Route Reflector**.
 Instead of 10 connections:
 - Router A connects to B, C, D, E
 - Routers B, C, D, and E only connect to A — **not to each other**
 Now you have **only 4 connections** instead of 10.
-### **What the RR does**
+### What the RR does
 If Router B learns a new route:
 - B tells the RR (A)
 - The RR tells C, D, and E
 - Everyone stays updated without being directly connected
-### **Why this helps**
+### Why this helps
 - **Greatly reduces the number of IBGP sessions**
 - **Makes large networks easier to manage**
 - **Still ensures that routing information is shared everywhere inside the AS**
-### BGP Route Reflector (RR) setup**
+### BGP Route Reflector (RR) setup
 In large networks using BGP, having every router talk to every other router becomes complicated.
 A **Route Reflector (RR)** helps reduce that complexity by acting like a “hub” for BGP updates.
 ### **AS divided into clusters**
@@ -89,13 +89,13 @@ To make management easier, the AS is divided into **clusters**.
 Each cluster has:
 - **One Route Reflector (RR)** — the “boss” router of the cluster
 - **Multiple clients** — the routers that report to the RR
-### **How communication works**
+### How communication works
 - Client routers send their BGP route updates **only** to their RR.
 - The RR then shares routes with:
     - Other RRs in the network
     - Border routers (routers that connect to other ASes)
 This reduces the number of connections needed.
-### **FortiGate devices can act as either**
+### FortiGate devices can act as either
 - **RR (the boss),** or
 - **BGP client (a participant)**
 This makes FortiGate flexible in BGP setups.

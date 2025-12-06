@@ -108,3 +108,4 @@ This makes FortiGate flexible in BGP setups.
 - Router B → RR
 - Router C → RR
 The RR reflects updates to other RRs or border routers.
+---

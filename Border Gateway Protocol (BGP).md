@@ -80,4 +80,31 @@ If Router B learns a new route:
 - **Greatly reduces the number of IBGP sessions**
 - **Makes large networks easier to manage**
 - **Still ensures that routing information is shared everywhere inside the AS**
----
+### BGP Route Reflector (RR) setup**
+In large networks using BGP, having every router talk to every other router becomes complicated.
+A **Route Reflector (RR)** helps reduce that complexity by acting like a “hub” for BGP updates.
+### **AS divided into clusters**
+An **Autonomous System (AS)** is a group of routers under one organization.  
+To make management easier, the AS is divided into **clusters**.
+Each cluster has:
+- **One Route Reflector (RR)** — the “boss” router of the cluster
+- **Multiple clients** — the routers that report to the RR
+### **How communication works**
+- Client routers send their BGP route updates **only** to their RR.
+- The RR then shares routes with:
+    - Other RRs in the network
+    - Border routers (routers that connect to other ASes)
+This reduces the number of connections needed.
+### **FortiGate devices can act as either**
+- **RR (the boss),** or
+- **BGP client (a participant)**
+This makes FortiGate flexible in BGP setups.
+### Networking Example
+#### Without RR:
+- Router A must talk to Router B, C, D, E, etc.
+- Too many connections → messy and slow.
+#### With RR:
+- Router A → RR
+- Router B → RR
+- Router C → RR
+The RR reflects updates to other RRs or border routers.

@@ -234,7 +234,7 @@ The PDF divides attributes into **four categories**:
 2. **Well-known discretionary**
 3. **Optional transitive**
 4. **Optional non-transitive**
-## 1. **Well-Known Mandatory Attributes**
+### 1. **Well-Known Mandatory Attributes**
 
 These **must** be present in every BGP route advertisement.  
 If they’re missing → the route is rejected.
@@ -249,7 +249,7 @@ In other words:
 
 Example of a delivery analogy:  
 It’s like a package needing the **destination address**, **sender**, and **return address** — otherwise it can’t be delivered.
-## 2. **Well-Known Discretionary Attributes**
+### 2. **Well-Known Discretionary Attributes**
 
 These attributes are common but **not required** for every route.
 - LOCAL_PREF
@@ -258,7 +258,7 @@ These attributes are common but **not required** for every route.
 Example:  
 It’s like optional shipping instructions:  
 “Fragile” or “keep upright” — helpful, but the package can still be shipped without them.
-## 3. **Optional Transitive Attributes**
+### 3. **Optional Transitive Attributes**
 
 These attributes may or may not be present, but if a router doesn’t understand them, it **still passes them along** to the next AS.
 - COMMUNITY    
@@ -266,7 +266,7 @@ These attributes may or may not be present, but if a router doesn’t understand
 
 Think of this as:  
 “I don’t know what this label means, but I’ll keep it on the package in case someone else needs it.”
-## 4. **Optional Non-Transitive Attributes**
+### 4. **Optional Non-Transitive Attributes**
 
 If a router doesn’t understand these, it **drops them** and does _not_ pass them to other ASes.
 - MULTI_EXIT_DISC (MED)

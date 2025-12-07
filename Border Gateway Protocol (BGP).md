@@ -289,9 +289,9 @@ The IP address of the next router to send traffic to.
 Example:  
 To reach 10.0.0.0/8, send traffic to **192.0.2.1**.
 ### 🔹 **ORIGIN** (Well-known mandatory)
-Indicates how the route originated (IGP, EGP, or Incomplete).
-It tells how a route was first put into BGP — in other words, where did this route come from originally?
-The ORIGIN value is one of the early “tie-breakers” in the best-path selection process (step 5 in FortiGate’s list).
++ Indicates how the route originated (IGP, EGP, or Incomplete).
++ It tells how a route was first put into BGP — in other words, where did this route come from originally?
++ The ORIGIN value is one of the early “tie-breakers” in the best-path selection process (step 5 in FortiGate’s list).
 
 | ORIGIN Code | Name               | Meaning (in simple words)                                                                                                                                                                                  | How it usually gets set                                                                                                                | Preference (lower = better) |
 | ----------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
@@ -300,121 +300,303 @@ The ORIGIN value is one of the early “tie-breakers” in the best-path selecti
 | **2**       | **Incomplete / ?** | Nobody really knows how this route got into BGP. Usually it was redistributed from somewhere without proper origin info (e.g., redistributed from another BGP speaker or manually created). Least trusted. | When one AS re-advertises a route received from eBGP without changing the origin, or when using `redistribute` without extra settings. | **Worst** (loses)           |
 
 Lower values mean “better.”
-
----
-
-## 🔹 **LOCAL_PREF** (Well-known discretionary)
-
-Used **inside one AS** to decide the preferred exit point.
-
-Higher LOCAL_PREF = better path.
+### 🔹 **LOCAL_PREF** (Well-known discretionary)
++ LOCAL_PREF = Local Preference
++ It is the most powerful way to control which way traffic leaves your own network (AS).
++ Used **inside one AS** to decide the preferred exit point.
++ It is never sent to other companies/ISPs (it does not cross AS borders).
++ Higher LOCAL_PREF = better path.
 
 Example:  
-Two paths to the internet:
+Your company (AS 65000) has **two internet connections**:
+- Link A → ISP-FAST (100 Gbit/s, low latency, expensive)
+- Link B → ISP-CHEAP (10 Gbit/s, higher latency, cheap backup)
 
-- Path A: LOCAL_PREF 200
-    
-- Path B: LOCAL_PREF 100
-    
+You want **all outgoing traffic** to normally leave via the fast ISP, but you still keep the cheap ISP as backup.
 
-Routers choose **Path A**.
+You configure on your border routers:
+```
+config router bgp
+    config neighbor
+        edit "ISP-FAST"
+            set route-map-in "SET-HIGH-LOCALPREF"
+        next
+        edit "ISP-CHEAP"
+            set route-map-in "SET-LOW-LOCALPREF"
+        next
+    end
+end
 
----
+config route-map
+    edit "SET-HIGH-LOCALPREF"
+        config rule
+            edit 1
+                set set-local-preference 200   ← higher = better
+            next
+        end
+    next
+    edit "SET-LOW-LOCALPREF"
+        config rule
+            edit 1
+                set set-local-preference 50    ← lower = worse
+            next
+        end
+    next
+end
+```
+Result inside your entire AS:
+- Every router sees routes from ISP-FAST with LOCAL_PREF = 200
+- Every router sees routes from ISP-CHEAP with LOCAL_PREF = 50 → **All routers automatically prefer ISP-FAST for outgoing traffic** (because 200 > 50)
 
-## 🔹 **MED** — Multi Exit Discriminator (Optional non-transitive)
+If the fast link goes down, LOCAL_PREF 50 is still valid → traffic automatically switches to the backup ISP. When the fast link comes back up, traffic automatically switches back. Perfect!
+#### Where LOCAL_PREF Stands in the Decision Process
 
-Used between ASes to say:
+In FortiGate’s best-path list (slide 343), LOCAL_PREF is **step 2** – very early and very strong:
+1. Highest Weight (Cisco-only, FortiGate ignores it)
+2. **Highest LOCAL_PREF** ← this one almost always decides the winner inside your AS
+3. Locally originated
+4. Shortest AS-PATH 
+5. … and so on
 
-> “Please enter my AS through _this_ router.”
+That’s why network engineers say: 
+**“LOCAL_PREF is the big knob for outbound traffic engineering.”**
 
-Lower MED = preferred.
+| Attribute       | Scope                  | Direction it influences | Preference rule | Typical values               |
+| --------------- | ---------------------- | ----------------------- | --------------- | ---------------------------- |
+| LOCAL_PREF      | Only inside your AS    | Outbound (exit) traffic | Higher = better | 100 (default), 50–500 common |
+| AS_PATH prepend | Sent to other ASes     | Inbound traffic         | Longer = worse  | —                            |
+| MED             | Sent to neighboring AS | Inbound traffic (weak)  | Lower = better  | 0–4 billion                  |
+### 🔹 **MED** — Multi Exit Discriminator (Optional non-transitive)
+**MED** is a polite **hint** you send to **another company (another AS)** saying:  
+“Hey, if you have multiple connections to my network, please come in through **this** door — it’s better for me.”
+- **Lower MED = better** (preferred entry point)  
+- Default MED = 0 (which is the best possible)  
+- It is **optional** and **non-transitive** → it usually only works between **directly connected** ASes (you and your ISP, or you and a peer).
 
-Example:  
-ISP advertises two entry points:
+Think of MED as a little sign on your front doors when someone wants to visit your house (your AS):
 
-- R1 MED = 20
-    
-- R2 MED = 50
-    
+```
+Your Company (AS 65000)
+┌──────────────────────┐
+│   Door A (London)     │ ← You put a sign: MED = 0   (please use this one!)
+│   100 Gbit/s link     │
+├──────────────────────┤
+│   Door B (Frankfurt)  │ ← You put a sign: MED = 100 (backup, slower link)
+│   10 Gbit/s link      │
+└──────────────────────┘
+         ↑                ↑
+     ISP’s network (AS 65001)
+```
 
-Neighbors prefer **R1**.
+Because Door A has **lower MED (0 < 100)**, the ISP will send **all traffic destined to your company** through the fast London link — exactly what you wanted!
+#### Real-World Example (The Classic Use Case)
+You are a customer with **two BGP links** to the **same ISP**:
+- Primary link: 100 Gbit/s in New York  
+- Backup link: 10 Gbit/s in New Jersey
 
----
+You want the ISP to send you traffic over the fast link whenever possible.
+
+On your FortiGate(s), you configure:
+
+```text
+config router bgp
+    config neighbor
+        edit "ISP-NYC"          # primary link
+            set capability-default-originate enable
+        next
+        edit "ISP-NJ"           # backup link
+            set send-med 100    # ← higher = worse for inbound
+        next
+    end
+end
+```
+
+Result:  
+- Routes advertised over the NYC link → MED = 0 (default) → **preferred**  
+- Routes advertised over the NJ link → MED = 100 → **less preferred**
+
+The ISP sees the lower MED on the NYC path and automatically sends all your inbound traffic there. If the NYC link fails, the ISP automatically fails over to NJ.
+#### Very Important Things to Know About MED
+
+| Fact                                              | What It Means in Practice                                                             |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Only compared **between the same neighboring AS** | MED from ISP-A is **never** compared to MED from ISP-B. It only works inside one ISP. |
+| Often ignored or stripped                         | Many ISPs remove or ignore MED by default. You have to ask them to honor it.          |
+| Non-transitive                                    | If your ISP re-advertises your routes to someone else, the MED is usually removed.    |
+| Step 6 in FortiGate’s decision list               | It’s quite late — Weight, Local_Pref, AS_PATH, Origin all win over MED.               |
+| Lower = better (opposite of Local_Pref)           | Local_Pref: higher = better (outbound), MED: lower = better (inbound)                 |
+
+#### Quick Comparison: The Big Three Traffic Engineering Tools
+
+| Tool          | Direction it Controls | Scope                     | Preference Rule     | Who Sees It?                  |
+|---------------|------------------------|---------------------------|---------------------|--------------------------------|
+| **Local_Pref**   | Outbound (exit)       | Only inside your AS       | Higher = better     | Only your own routers          |
+| **AS_PATH prepending** | Inbound (entry)     | Everyone on the internet  | Longer = worse      | Everyone (very strong)         |
+| **MED**          | Inbound (entry)       | Usually only your direct ISP | Lower = better      | Only the neighboring AS (weak) |
 
 ## 🔹 **COMMUNITY** (Optional transitive)
 
-A tagging system used to mark routes for special handling.
+**COMMUNITY** = **sticky labels (tags)** that you can stick on BGP routes.
 
-Example:  
-A route marked with **no-export** should not be sent outside the AS.
+These labels travel with the route across the internet (they are **transitive** – they survive even when the route passes through many different companies).  
+Whoever receives the route can look at the labels and decide:  
+“Do I want to treat this route specially?”
 
-COMMUNITY tags make policies easier to manage.
+Think of it like putting colored stickers on letters you send:
+
+- Red sticker = “This is customer traffic – treat it nicely!”  
+- Blue sticker = “This is backup link – only use if everything else is dead.”  
+- Black sticker = “Do NOT announce this prefix to anyone else!”
+#### The Most Famous Communities (Used by Almost Every ISP)
+
+| Community Value         | Meaning (what the receiver usually does)                              | Real-World Example |
+|-------------------------|-----------------------------------------------------------------------|--------------------|
+| **65000:666**           | “Blackhole this prefix” – drop all traffic to it (used against DDoS) | You are under attack on 203.0.113.10/32 → you ask your ISP to add this community |
+| **65001:100**           | Set Local_Pref = 100 (normal customer route)                         | Default for your prefixes |
+| **65001:80**            | Set Local_Pref = 80 (backup/customer route)                          | You announce your prefix via a slower backup link |
+| **65001:90**            | Set Local_Pref = 90 (peer route)                                     | Routes learned from another ISP you peer with |
+| **no-export** (well-known) | Do NOT send this route outside your own AS                          | You announce an internal subnet by mistake → slap no-export on it |
+| **no-advertise** (well-known) | Do NOT send this route to ANY BGP neighbor (even inside your AS)  | Super private prefixes |
+
+#### Example
+
+You have two internet links:
+
+- Primary ISP (AS 65001) – fast and expensive  
+- Backup ISP (AS 65002) – slow and cheap
+
+You want the whole internet to prefer your primary ISP, but keep the backup as failover.
+
+You configure on your FortiGate:
+
+```text
+config router route-map
+    edit "TAG-PRIMARY"
+        config rule
+            edit 1
+                set set-community "65001:100"   # normal priority
+            next
+        end
+    next
+    edit "TAG-BACKUP"
+        config rule
+            edit 1
+                set set-community "65001:80"    # lower priority
+            next
+        end
+    next
+end
+
+config router bgp
+    config neighbor
+        edit "Primary-ISP"
+            set route-map-out "TAG-PRIMARY"
+        next
+        edit "Backup-ISP"
+            set route-map-out "TAG-BACKUP"
+        next
+    end
+end
+```
+
+Result:  
+- Primary ISP receives your prefixes with community 65001:100 → sets Local_Pref 100 → preferred by everyone  
+- Backup ISP receives your prefixes with community 65001:80 → sets Local_Pref 80 → only used if primary disappears
+
+This is how almost every company does **inbound traffic engineering** when they can’t use MED or AS-path prepending is too aggressive.
+#### Quick Facts Table
+
+| Feature               | COMMUNITY                                      |
+|-----------------------|--------------------------------------------------|
+| Type                  | Optional transitive (travels everywhere)        |
+| Format                | Usually **AS:number** (e.g., 65001:80) or well-known names |
+| Main use              | Tell other networks “please treat my route like this” |
+| Most common actions   | Change Local_Pref, prepend AS_PATH, blackhole, no-export |
+| Who decides meaning?  | The **receiver** (your ISP decides what 65001:80 actually does) |
 
 ---
+# Route Selection
+A router may learn **multiple possible paths** to reach the same destination.  
+BGP must pick **one “best” route** (unless ECMP is enabled).
 
-# ⭐ How BGP Uses Attributes
+To do this, BGP compares route attributes in a **specific order**, called the **route selection process**.
 
-BGP compares attributes **in a specific order** to pick the best route.  
-The PDF lists the order (weight, local-pref, as-path, etc.) but the main idea is:
+Think of this as BGP’s **tie-breaker list** — it checks rule #1 first, and only moves to rule #2 if the first rule is tied, and so on.
+## BGP Route Selection (Simple Explanation of Each Step)
 
-> Attributes guide BGP’s decision on the “best” path.
+### **1. Highest weight**
+(Weight is Cisco-proprietary; FortiGate treats it like a custom value.)
 
-Without attributes, BGP wouldn’t know which path to prefer.
+- Bigger weight = better route.
+- Useful when **you** want to force traffic a certain way.
+## **2. Highest local preference (LOCAL_PREF)**
+
+Used **inside one AS** to choose the best exit point. 
+
+Higher LOCAL_PREF = more preferred.
+## **3. Prefer routes that originated locally**
+
+If the router itself created a route (for example, through `network` or redistribution), it prefers it over routes learned from neighbors.
+## **4. Shortest AS path**
+
+Routes with **fewer AS hops** are considered shorter and preferred.
+## **5. Lowest origin type**
+
+Origin types (best to worst):
+
+1. IGP
+2. EGP
+3. Incomplete
+## **6. Lowest MED (Multi-Exit Discriminator)**
+
+Lower MED = “Enter my AS through this router — it's better.”
+## **7. Lowest IGP metric to the NEXT_HOP**
+
+This checks the internal metric (inside your AS) to reach the next hop router.
+- Lower metric = closer = better.
+## **8. Prefer EBGP routes over IBGP routes**
+
+If all previous rules tie, routes learned from **external neighbors** (EBGP) are preferred over those learned internally (IBGP).
+## **9. If ECMP is enabled: install up to 10 equal-cost routes**
+
+ECMP = Equal Cost Multi-Path.
+
+- If multiple routes tie on all previous rules, FortiGate can install **up to 10** of them.
+- Traffic is shared across the equal routes.
+## **10. Lowest router ID**
+
+Router ID = unique identification for a BGP router.
+
+If absolutely everything else matches, use the router with the **lowest router ID**.
+### Easy Real-Life Analogy
+
+Imagine you’re picking the best route to drive somewhere.
+
+You evaluate:
+1. Is there a route you personally prefer?
+2. Which road has fewer traffic rules?
+3. Which one starts closer to you?
+4. Which has fewer toll booths (AS hops)?
+5. Which road is officially recommended (origin)?
+6. Which road has lower congestion warnings (MED)?
+7. Which road is physically nearest to join (IGP metric)?
+8. Prefer main highways (EBGP) over back streets (IBGP).
+9. If two routes tie, use both (ECMP).
+10. If still tied, pick the direction with the lower sign number.
+### Quick Summary (Super Simple)
+
+BGP compares paths in this order:
+1. Highest weight
+2. Highest LOCAL_PREF
+3. Originated locally
+4. Shortest AS_PATH
+5. Lowest origin type
+6. Lowest MED
+7. Lowest IGP metric to next hop
+8. EBGP > IBGP
+9. ECMP (if enabled)
+10. Lowest router ID
+
+This ensures BGP always picks a single “best path” in a predictable way.
 
 ---
-
-# ✔ Simple Example Putting It All Together
-
-### Router R1 receives two routes to 10.0.0.0/8:
-
-**Route A:**
-
-- LOCAL_PREF = 200
-    
-- AS_PATH = 64510 → 64520
-    
-- MED = 40
-    
-
-**Route B:**
-
-- LOCAL_PREF = 100
-    
-- AS_PATH = 64510
-    
-- MED = 10
-    
-
-### Which one wins?
-
-1. Compare LOCAL_PREF → Route A wins (200 > 100)  
-    → **Decision stops here** (higher priority than AS_PATH or MED)
-    
-
-Result: **Route A** becomes the best path.
-
----
-
-# ✔ Quick Summary (Super Simple)
-
-- BGP attributes are **labels** used to pick the best path.
-    
-- Attributes fall into **four types**:
-    
-    - Required everywhere
-        
-    - Optional but common
-        
-    - Optional and passed along
-        
-    - Optional and dropped
-        
-- Important attributes include **AS_PATH**, **NEXT_HOP**, **LOCAL_PREF**, **ORIGIN**, **MED**, and **COMMUNITY**.
-    
-- BGP checks attributes in a priority order to decide the best route.
-    
-
----
-
-If you’d like, I can also explain **Route Selection**, **AS Types**, or **Prefix Lists** in the same clear style!
-

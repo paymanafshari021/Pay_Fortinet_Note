@@ -1,4 +1,8 @@
 # Border Gateway Protocol (BGP)
+#bgp #bfd #Routing-objects
++ Border Gateway Protocol (BGP): https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/750736/bgp
++ Bidirectional Forwarding Detection (BFD): https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/771813/bfd
++ Routing objects: https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/654952/routing-objects
 ## BGP Overview
 - Border Gateway Protocol (BGP) is a standardized **Exterior Gateway Protocol (EGP)**. 
 - Differs from interior protocols like **RIP, OSPF, and EIGRP**, which are **Interior Gateway Protocols (IGPs)**.
@@ -61,6 +65,7 @@ But iBGP has a rule called **split horizon**:
 > (Otherwise, routing loops could happen.)
 #### What this means:
 Every iBGP router must directly peer with every other iBGP router.
+
 This is called **full mesh**.
 #### Why this is a problem:
 If you have many routers, the number of sessions grows very fast.
@@ -72,6 +77,7 @@ This becomes hard to manage.
 ### **What Route Reflectors Do**
 A **Route Reflector (RR)** is a special iBGP router that _breaks_ the full-mesh requirement.  
 It is allowed to **forward iBGP-learned routes to other iBGP routers.**
+
 > Think of the RR as a “post office” for BGP routes inside the AS.
 
 Instead of every router talking to every other router,  
@@ -84,21 +90,15 @@ Routers that connect to, and rely on, the RR are called **clients**.
     - other clients
     - other RRs
     - border routers
+
 So clients do NOT have to peer with each other.
-
-
----
-## 4. **Route Reflector Clusters**
+### **Route Reflector Clusters**
 A **cluster** = one RR + its clients.  
 Large networks may have multiple clusters, and multiple RRs.
 
 This keeps things organized and prevents single points of failure.
-
----
-
-# ▶ Simple Example
-
-### 🏢 Imagine a company network with 5 routers:
+#### Simple Example
+##### Imagine a company network with 5 routers:
 
 ```
 R1 — core router
@@ -107,34 +107,22 @@ R3
 R4
 R5
 ```
-
 ### Without RRs:
-
 - Every router needs an iBGP session with every other router.
-    
 - 5 routers → 10 iBGP sessions.
-    
-
 ### With a Route Reflector:
-
 Let **R1** be the RR.  
 All others (R2–R5) are clients.
-
 ```
 R2 →|
 R3 →|→   R1 (RR)
 R4 →|
 R5 →|
 ```
-
 **Only 4 sessions**, and everyone learns every route.
 
----
-
-# ▶ Multi-Cluster Example
-
+### Multi-Cluster Example
 If the AS grows, you might divide routers into clusters:
-
 ```
 Cluster 1:
    RR1
@@ -146,41 +134,91 @@ Cluster 2:
 
 RR1 ↔ RR2
 ```
-
 - Routers inside a cluster talk only to their RR.
-    
 - RRs share information between clusters.
-    
 
 This scales much better in large networks.
 
 ---
+# RIBs (Routing Information Bases)
 
-# ⭐ Why Route Reflectors Are Useful
+A BGP router stores route information in **three logical tables** called **RIBs**.  
+Think of them as _three inboxes_ that process routing information step by step.
 
-✔ Reduce the number of iBGP sessions  
-✔ Easier configuration  
-✔ Better scalability in large AS networks  
-✔ No need for full mesh
+The three RIBs are:
+1. **RIB-in**
+2. **Local RIB**
+3. **RIB-out**
 
----
+Let's break them down using simple words and examples.
+## 1. **RIB-in — “Everything I heard”**
 
-# ✔ Quick Summary in Plain English
+The **RIB-in** contains **all the routes a router receives** from its BGP neighbors _before_ any filtering or decisions. It is the raw inbox.
 
-- iBGP normally requires every router to directly peer with every other one.
-    
-- This doesn’t scale well.
-    
-- A Route Reflector acts like a “hub” for BGP routes.
-    
-- Clients talk only to the RR, not to each other.
-    
-- The AS can be divided into clusters.
-    
-- This keeps the network simpler and easier to manage.
-    
+> The RIB-in contains unprocessed routing information learned from inbound update messages.
 
----
+### Example:
+Router R1 receives these routes from its neighbor:
+- 10.0.0.0/8
+- 172.16.0.0/12
+- 192.168.1.0/24
 
-If you want, I can also explain RIBs, AS types, attributes, or routing selection from the same PDF in the same simple style!
----
+Even if R1 plans to ignore some of them, **all three go into RIB-in** first.
+## 2. **Local RIB — “What I decide to keep”**
+
+The **Local RIB** contains routes the router has **accepted** after applying:
+- filters,
+- route maps,
+- policies.
+
+This is the router’s **“cleaned-up” inbox**.  
+Only the routes the router actually wants are kept.
+
+> Local RIB contains routing information that the BGP speaker selects after applying its local policies.
+
+### Example:
+Continuing from R1:
+RIB-in had 10.0.0.0/8, 172.16.0.0/12, 192.168.1.0/24.
+
+A filter says: “Block 192.168.1.0/24.”
+
+So the **Local RIB** ends up with:
+
+- 10.0.0.0/8
+- 172.16.0.0/12
+
+Only the accepted routes remain.
+## 3. **RIB-out — “What I choose to send out”**
+
+The **RIB-out** is the list of routes the router decides to advertise to its BGP neighbors.
+
+Before sending routes out, the router may apply:
+- outbound filters,
+- route maps,
+- attribute changes.
+> RIB-out contains the routing information selected to advertise to peers.
+
+### Example:
+R1’s Local RIB has:
+
+- 10.0.0.0/8
+- 172.16.0.0/12
+
+But R1 wants to advertise _only_ 10.0.0.0/8 to a neighbor.
+
+Thus, the **RIB-out** contains:
+
+- 10.0.0.0/8
+
+This is like your **“outbox”** — messages you choose to send.
+### Putting It All Together (Simple Flow)
+```
+BGP RX → RIB-in → Inbound Filter → Local RIB → Outbound Filter → RIB-out → BGP TX
+           ^                                          ^
+       received routes                       routes to advertise
+```
+1. **RIB-in:** “Everything I heard.”
+2. **Local RIB:** “What I kept after filtering.”
+3. **RIB-out:** “What I decide to tell others.”
+
+

@@ -220,5 +220,203 @@ BGP RX → RIB-in → Inbound Filter → Local RIB → Outbound Filter → RIB-o
 1. **RIB-in:** “Everything I heard.”
 2. **Local RIB:** “What I kept after filtering.”
 3. **RIB-out:** “What I decide to tell others.”
+---
+# BGP Attributes
 
+When BGP learns multiple possible paths to a destination, it must choose **the best one**.  
+To make that decision, BGP looks at **attributes** — pieces of information attached to each route.
+
+Think of BGP attributes as **labels** on a package that help you decide the best delivery path.
+## Four Types of BGP Attributes
+
+The PDF divides attributes into **four categories**:  
+1. **Well-known mandatory**
+2. **Well-known discretionary**
+3. **Optional transitive**
+4. **Optional non-transitive**
+## 1. **Well-Known Mandatory Attributes**
+
+These **must** be present in every BGP route advertisement.  
+If they’re missing → the route is rejected.
+
+In other words:
+> “You must attach these labels to _every_ route.”
+
+### Important ones:
+- **AS_PATH**
+- **ORIGIN**
+- **NEXT_HOP**
+
+Example of a delivery analogy:  
+It’s like a package needing the **destination address**, **sender**, and **return address** — otherwise it can’t be delivered.
+## 2. **Well-Known Discretionary Attributes**
+
+These attributes are common but **not required** for every route.
+- LOCAL_PREF
+- ATOMIC_AGGREGATE
+
+Example:  
+It’s like optional shipping instructions:  
+“Fragile” or “keep upright” — helpful, but the package can still be shipped without them.
+## 3. **Optional Transitive Attributes**
+
+These attributes may or may not be present, but if a router doesn’t understand them, it **still passes them along** to the next AS.
+- COMMUNITY    
+- AGGREGATOR
+
+Think of this as:  
+“I don’t know what this label means, but I’ll keep it on the package in case someone else needs it.”
+## 4. **Optional Non-Transitive Attributes**
+
+If a router doesn’t understand these, it **drops them** and does _not_ pass them to other ASes.
+- MULTI_EXIT_DISC (MED)
+
+This is like a note meant only for the local post office.  
+If another post office sees it and doesn’t understand it, they simply remove it.
+## Key Attributes
+## 🔹 **AS_PATH** (Well-known mandatory)
+
+Shows the list of autonomous systems the route has passed through.
+
+Used for: **picking the shortest path**.
+
+### Example
+
+Route A: AS_PATH = 64512 → 64520 → 64530  
+Route B: AS_PATH = 64512 → 64599
+
+Route B has fewer AS hops → **preferred**.
+
+---
+
+## 🔹 **NEXT_HOP** (Well-known mandatory)
+
+The IP address of the next router to send traffic to.
+
+Example:  
+To reach 10.0.0.0/8, send traffic to **192.0.2.1**.
+
+---
+
+## 🔹 **ORIGIN** (Well-known mandatory)
+
+Indicates how the route originated (IGP, EGP, or Incomplete).  
+Lower values mean “better.”
+
+---
+
+## 🔹 **LOCAL_PREF** (Well-known discretionary)
+
+Used **inside one AS** to decide the preferred exit point.
+
+Higher LOCAL_PREF = better path.
+
+Example:  
+Two paths to the internet:
+
+- Path A: LOCAL_PREF 200
+    
+- Path B: LOCAL_PREF 100
+    
+
+Routers choose **Path A**.
+
+---
+
+## 🔹 **MED** — Multi Exit Discriminator (Optional non-transitive)
+
+Used between ASes to say:
+
+> “Please enter my AS through _this_ router.”
+
+Lower MED = preferred.
+
+Example:  
+ISP advertises two entry points:
+
+- R1 MED = 20
+    
+- R2 MED = 50
+    
+
+Neighbors prefer **R1**.
+
+---
+
+## 🔹 **COMMUNITY** (Optional transitive)
+
+A tagging system used to mark routes for special handling.
+
+Example:  
+A route marked with **no-export** should not be sent outside the AS.
+
+COMMUNITY tags make policies easier to manage.
+
+---
+
+# ⭐ How BGP Uses Attributes
+
+BGP compares attributes **in a specific order** to pick the best route.  
+The PDF lists the order (weight, local-pref, as-path, etc.) but the main idea is:
+
+> Attributes guide BGP’s decision on the “best” path.
+
+Without attributes, BGP wouldn’t know which path to prefer.
+
+---
+
+# ✔ Simple Example Putting It All Together
+
+### Router R1 receives two routes to 10.0.0.0/8:
+
+**Route A:**
+
+- LOCAL_PREF = 200
+    
+- AS_PATH = 64510 → 64520
+    
+- MED = 40
+    
+
+**Route B:**
+
+- LOCAL_PREF = 100
+    
+- AS_PATH = 64510
+    
+- MED = 10
+    
+
+### Which one wins?
+
+1. Compare LOCAL_PREF → Route A wins (200 > 100)  
+    → **Decision stops here** (higher priority than AS_PATH or MED)
+    
+
+Result: **Route A** becomes the best path.
+
+---
+
+# ✔ Quick Summary (Super Simple)
+
+- BGP attributes are **labels** used to pick the best path.
+    
+- Attributes fall into **four types**:
+    
+    - Required everywhere
+        
+    - Optional but common
+        
+    - Optional and passed along
+        
+    - Optional and dropped
+        
+- Important attributes include **AS_PATH**, **NEXT_HOP**, **LOCAL_PREF**, **ORIGIN**, **MED**, and **COMMUNITY**.
+    
+- BGP checks attributes in a priority order to decide the best route.
+    
+
+---
+
+If you’d like, I can also explain **Route Selection**, **AS Types**, or **Prefix Lists** in the same clear style!
 

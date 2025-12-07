@@ -229,7 +229,7 @@ To make that decision, BGP looks at **attributes** — pieces of information att
 Think of BGP attributes as **labels** on a package that help you decide the best delivery path.
 ## Four Types of BGP Attributes
 
-The PDF divides attributes into **four categories**:  
+BGP Attributes divides attributes into **four categories**:  
 1. **Well-known mandatory**
 2. **Well-known discretionary**
 3. **Optional transitive**
@@ -274,33 +274,31 @@ If a router doesn’t understand these, it **drops them** and does _not_ pass th
 This is like a note meant only for the local post office.  
 If another post office sees it and doesn’t understand it, they simply remove it.
 ## Key Attributes
-## 🔹 **AS_PATH** (Well-known mandatory)
-
+### 🔹 **AS_PATH** (Well-known mandatory)
 Shows the list of autonomous systems the route has passed through.
 
 Used for: **picking the shortest path**.
-
-### Example
-
+#### Example
 Route A: AS_PATH = 64512 → 64520 → 64530  
 Route B: AS_PATH = 64512 → 64599
 
 Route B has fewer AS hops → **preferred**.
-
----
-
-## 🔹 **NEXT_HOP** (Well-known mandatory)
-
+### 🔹 **NEXT_HOP** (Well-known mandatory)
 The IP address of the next router to send traffic to.
 
 Example:  
 To reach 10.0.0.0/8, send traffic to **192.0.2.1**.
+### 🔹 **ORIGIN** (Well-known mandatory)
+Indicates how the route originated (IGP, EGP, or Incomplete).
+It tells how a route was first put into BGP — in other words, where did this route come from originally?
+The ORIGIN value is one of the early “tie-breakers” in the best-path selection process (step 5 in FortiGate’s list).
 
----
+| ORIGIN Code | Name               | Meaning (in simple words)                                                                                                                                                                                  | How it usually gets set                                                                                                                | Preference (lower = better) |
+| ----------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| **0**       | **IGP**            | The route was learned **inside the same AS** using an internal routing protocol (like OSPF, RIP, static, connected). This is the most trusted way.                                                         | When you redistribute a route from OSPF/static into BGP, or use the `network` command.                                                 | **Best** (wins)             |
+| **1**       | **EGP**            | The route came from an old exterior protocol (EGP – the predecessor of BGP). Almost never seen today.                                                                                                      | Very rare nowadays.                                                                                                                    | Medium                      |
+| **2**       | **Incomplete / ?** | Nobody really knows how this route got into BGP. Usually it was redistributed from somewhere without proper origin info (e.g., redistributed from another BGP speaker or manually created). Least trusted. | When one AS re-advertises a route received from eBGP without changing the origin, or when using `redistribute` without extra settings. | **Worst** (loses)           |
 
-## 🔹 **ORIGIN** (Well-known mandatory)
-
-Indicates how the route originated (IGP, EGP, or Incomplete).  
 Lower values mean “better.”
 
 ---

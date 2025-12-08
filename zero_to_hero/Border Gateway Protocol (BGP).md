@@ -627,7 +627,7 @@ This checks the internal metric (inside your AS) to reach the next hop router.
 - Lower metric = closer = better.
 #### 8. Prefer EBGP routes over IBGP routes
 If all previous rules tie, routes learned from **external neighbors** (EBGP) are preferred over those learned internally (IBGP).
-### 9. If ECMP is enabled: install up to 10 equal-cost routes
+#### 9. If ECMP is enabled: install up to 10 equal-cost routes
 ECMP = Equal Cost Multi-Path.
 
 - If multiple routes tie on all previous rules, FortiGate can install **up to 10** of them.

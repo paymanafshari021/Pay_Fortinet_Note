@@ -141,6 +141,7 @@
 ### The Problem Route Reflectors Solve
 Inside one autonomous system (AS), routers use **iBGP** to exchange BGP routes.
 But iBGP has a rule called **split horizon**:
+
 > **An iBGP router cannot pass along a route it learned from another iBGP router.**  
 > (Otherwise, routing loops could happen.)
 #### What this means:
@@ -233,6 +234,7 @@ Let's break them down using simple words and examples.
 ### 1. RIB-in — “Everything I heard”
 
 The **RIB-in** contains **all the routes a router receives** from its BGP neighbors _before_ any filtering or decisions. It is the raw inbox.
+
 > The RIB-in contains unprocessed routing information learned from inbound update messages.
 
 Example:
@@ -273,6 +275,7 @@ Before sending routes out, the router may apply:
 - outbound filters,
 - route maps,
 - attribute changes.
+
 > RIB-out contains the routing information selected to advertise to peers.
 
 Example:
@@ -315,6 +318,7 @@ These **must** be present in every BGP route advertisement.
 If they’re missing → the route is rejected.
 
 In other words:
+
 > “You must attach these labels to _every_ route.”
 
 Important ones:
@@ -671,6 +675,7 @@ This ensures BGP always picks a single “best path” in a predictable way.
 Let’s break each down with examples.
 ### 1. Scaling Capabilities
 FortiGate does **not** have fixed, hardcoded limits for BGP.
+
 > Limits on neighbors, routes, and policies depend on available system memory.
 #### What this means:
 - You can have many BGP neighbors
@@ -681,6 +686,7 @@ FortiGate does **not** have fixed, hardcoded limits for BGP.
 **❗** By default, when you turn on BGP, FortiGate:
 - Does **not** originate any prefixes
 - Does **not** advertise any routes
+
 > By default, BGP doesn’t originate any prefix. Redistribution or policies are required.
 #### Why?
 FortiGate wants to avoid accidentally advertising internal networks to the outside world.
@@ -688,6 +694,7 @@ FortiGate wants to avoid accidentally advertising internal networks to the outsi
 You have **two main options**:
 #### Option A: Redistribute routes into BGP
 **Protocol redistribution** means:
+
 > Taking routes learned from one routing source (like static routes, connected routes, OSPF, RIP) and injecting them into **BGP** so they can be advertised to BGP peers.
 
 FortiGate does **not** advertise anything in BGP by default.  
@@ -729,11 +736,12 @@ But there’s a rule:
 ####  ❗Rule:
 >  - ❗The prefix must exist as an **active route** in the routing table.
 >  - ❗If it’s not active, FortiGate won’t advertise it.
+
 This can be changed with:
 ```
 set network-import-check disable
 ```
-> ❗Then FortiGate will advertise even if the prefix isn’t active.
+Then FortiGate will advertise even if the prefix isn’t active.
 #### 3.  FortiGate Accepts All Routes by Default
 FortiGate is very open by default.
 

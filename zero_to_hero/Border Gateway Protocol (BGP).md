@@ -780,14 +780,12 @@ end
 ```
 
 Then apply the filter to a neighbor’s incoming routes.
-# SUMMARY
->  Here is the whole FortiGate BGP behavior summarized:
->  - **No hard limits**
-> 	 - Your FortiGate can scale depending on its memory.
-> 	 - Smaller devices = fewer routes, larger = full Internet table.
->  -  **Does not generate routes automatically**
-> 	 - You need to **redistribute** or **declare prefixes** manually.
->  - **Accepts everything by default**
-> 	 - You must **add filters** if you want to control what you receive.
----
-
+## SUMMARY
+Here is the whole FortiGate BGP behavior summarized:
+  - **No hard limits**
+	  - Your FortiGate can scale depending on its memory.
+	  - Smaller devices = fewer routes, larger = full Internet table.
+  -  **Does not generate routes automatically**
+	  - You need to **redistribute** or **declare prefixes** manually.
+ - **Accepts everything by default**
+	 - You must **add filters** if you want to control what you receive.

@@ -1,3 +1,10 @@
+
+# Border Gateway Protocol (BGP)
+#bgp #bfd #Routing-objects
++ Border Gateway Protocol (BGP): https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/750736/bgp
++ Bidirectional Forwarding Detection (BFD): https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/771813/bfd
++ Routing objects: https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/654952/routing-objects
+---
 <!-- Table of Contents arrowType: Index | title: Table of contents  | codeBlocks: n -->
 # Table of contents
 1. [[Border Gateway Protocol (BGP)#Border Gateway Protocol (BGP)|Border Gateway Protocol (BGP)]]
@@ -89,13 +96,6 @@
 	14. [[Border Gateway Protocol (BGP)##Use Case 2 – Loopback Interfaces as BGP Source on FortiGate|Use Case 2 – Loopback Interfaces as BGP Source on FortiGate]]
 
 <!-- End of TOC -->
-# Border Gateway Protocol (BGP)
-#bgp #bfd #Routing-objects
-+ Border Gateway Protocol (BGP): https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/750736/bgp
-+ Bidirectional Forwarding Detection (BFD): https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/771813/bfd
-+ Routing objects: https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/654952/routing-objects
----
-
 
 ---
 ## BGP Overview

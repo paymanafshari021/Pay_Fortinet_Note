@@ -1086,7 +1086,7 @@ This is the #1 best practice in real production networks when you have redundant
 - You advertise the loopback IP via IGP (OSPF usually) or static routes so the peer always knows how to reach it.
 - Even if one physical link dies, the IGP re-converges and traffic to the loopback just takes the other path → BGP session never flaps.
 
-**Real-life example everyone has seen:
+Real-life example everyone has seen:
 You have two firewalls (HA pair or just two routers) connected to the same ISP router with two separate links (or two IPsec tunnels).  
 If you peer BGP using the physical IPs → one link flaps → BGP session drops → routes disappear → outage.  
 If you peer using loopback IPs → link flaps → IGP moves the traffic to the other link → BGP session stays up → zero packet loss.

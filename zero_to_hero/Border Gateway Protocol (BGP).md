@@ -1128,3 +1128,88 @@ If you peer using loopback IPs → link flaps → IGP moves the traffic to the o
    end
    ```
 > You usually need the reverse policy too, or just make it any-any if you're lazy.
+
+---
+## Use Case 3 – The neighbor-group Command on FortiGate
+In huge networks with tons of BGP peers (like SD-WAN setups where a central "hub" talks to 100+ remote "spokes"), you don't want to configure every single peer one-by-one – that's a nightmare. The `neighbor-group` command lets you create a "template" of common settings (like interface, AS number, timers) and apply it to **groups** of peers automatically, based on their IP addresses.
+
+This saves hours of typing and makes scaling easy. It's especially awesome for **SD-WAN overlays**, where remote sites (spokes) dial in dynamically over VPN tunnels or underlays (like MPLS or Internet links), and you want all spokes on the same underlay to inherit the same BGP rules without manual tweaks.
+
+**Key parts broken down simply:**
+1. **Neighbor Group = A reusable template for BGP peers**  
+   - You define a group name (e.g., "SpokeGroup1") and set shared options inside it: remote AS, local interface, keepalive timers, route-maps, etc.  
+   - Any peer you add later automatically gets these settings if it matches the group.
+
+2. **Neighbor-Range = The "who belongs here?" matcher**  
+   - This ties the group to an IP subnet (e.g., 10.1.0.0/24).  
+   - Any BGP peer whose IP is in that range auto-joins the group. Perfect for dynamic setups where spokes get IPs from a pool.
+
+3. **Why SD-WAN?**  
+   - In SD-WAN, the hub (central FortiGate) peers with many spokes over different underlays (e.g., ISP1 tunnels vs. ISP2 tunnels).  
+   - Group by underlay: One group for ISP1 spokes (using interface "ISP1"), another for ISP2.  
+   - Since spokes are often in the **same AS** (iBGP), you can enable `ibgp-multipath` in the group for ECMP load-balancing across all spokes.
+
+**Real-life example: Hub-and-spoke SD-WAN with two ISPs**  
+Imagine a company HQ (hub FortiGate) with SD-WAN to 50 remote offices (spokes). Half connect over ISP1 (IPs in 10.1.0.0/24), half over ISP2 (10.2.0.0/24). All spokes are in AS 65100 (same as hub), so it's iBGP. Without groups, you'd configure 50 individual neighbors – tedious! With neighbor-group, it's 10 lines total.
+
+**Step-by-step config on the hub FortiGate:**
+
+```text
+config router bgp
+    set as 65100
+    set router-id 172.16.1.254
+    set ibgp-multipath enable  # Global ECMP for all iBGP routes (optional, but good for SD-WAN)
+    
+    # Define the template/group for ISP1 spokes
+    config neighbor-group
+        edit "SpokeISP1"
+            set interface "ISP1"          # All these spokes use ISP1 underlay
+            set remote-as 65100           # Same AS = iBGP
+            # Add other common stuff: set keepalive-timer 30, set route-map-in "customer-filter", etc.
+        next
+    end
+    
+    # Define the IP range that auto-applies the group
+    config neighbor-range
+        edit 1
+            set prefix 10.1.0.0 255.255.255.0  # Any peer IP in this subnet...
+            set neighbor-group "SpokeISP1"     # ...gets the SpokeISP1 template
+        next
+    end
+    
+    # Repeat for ISP2
+    config neighbor-group
+        edit "SpokeISP2"
+            set interface "ISP2"
+            set remote-as 65100
+        next
+    end
+    
+    config neighbor-range
+        edit 2
+            set prefix 10.2.0.0 255.255.255.0
+            set neighbor-group "SpokeISP2"
+        next
+    end
+end
+```
+
+**What happens now?**  
+- A new spoke office dials in over ISP1 with IP 10.1.0.50 → FortiGate auto-detects it in the 10.1.0.0/24 range → applies "SpokeISP1" settings instantly (interface ISP1, AS 65100, etc.). No manual config needed!  
+- BGP session comes up, routes flow, and since it's iBGP with multipath, traffic to/from that spoke load-balances over multiple paths.  
+- Check it: `get router info bgp summary` shows the new peer with the group-applied settings.
+
+**Another quick example – Non-SD-WAN, just scaling iBGP**  
+You have 20 branch routers all in AS 65001, IPs in 172.16.10.0/24. Instead of 20 `config neighbor` blocks:  
+- Create one neighbor-group "Branches" (set remote-as 65001, set update-source loop0).  
+- One neighbor-range for 172.16.10.0/24 pointing to "Branches".  
+- Boom – add a new branch? Just plug it in; BGP auto-configures.
+### Quick pros/cons table (why bother?)
+
+| Feature              | Why it's great                          | When to skip it                  |
+|----------------------|-----------------------------------------|----------------------------------|
+| Neighbor-Group       | Reuses config, cuts errors in big setups| Small networks (under 5 peers)  |
+| Neighbor-Range       | Auto-matches dynamic/dial-up IPs        | Static peers with unique IPs    |
+| With iBGP + Multipath| Easy ECMP for load-balancing spokes     | Pure eBGP (different ASes)      |
+
+---

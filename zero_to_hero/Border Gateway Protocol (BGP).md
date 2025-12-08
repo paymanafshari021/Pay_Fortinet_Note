@@ -1127,4 +1127,4 @@ If you peer using loopback IPs → link flaps → IGP moves the traffic to the o
        next
    end
    ```
-> (You usually need the reverse policy too, or just make it any-any if you're lazy in lab.)
+> You usually need the reverse policy too, or just make it any-any if you're lazy.

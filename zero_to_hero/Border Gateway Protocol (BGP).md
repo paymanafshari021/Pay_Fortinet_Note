@@ -1064,3 +1064,79 @@ FortiGate has its own set of "get router info bgp ..." commands. These four are 
 | `get router info routing-table bgp` | "What BGP routes are actually being used?"   | Checking best-path selection, load-balancing, leaks    |
 
 ---
+## Use Case 1 – Configure ECMP With BGP Routes on FortiGate
+
+**What is ECMP?**  
+ECMP = Equal-Cost Multi-Path.  
+In simple terms: when your FortiGate sees **two or more paths that look exactly the same** (same cost, same preference, same everything BGP cares about), instead of picking just one winner, it can put **all** of them into the routing table and share (load-balance) the traffic across them.
+
+By default, BGP is picky and only installs **one** best path, even if the others are identical.  
+So if you have two ISP links and both advertise the same prefixes with identical attributes, all your traffic might go out only one link → one link is bored, the other is crying from overload.
+
+FortiGate fixes this with two simple toggles:
+
+- `set ebgp-multipath enable` → use when the equal paths come from **different ASes** (most common: two different ISPs)
+- `set ibgp-multipath enable` → use when the equal paths come from inside your own AS (route-reflectors, multiple iBGP peers, etc.)
+
+Once enabled, FortiGate will install up to the maximum number of equal paths (controlled by the global `config system ecmp-max-paths` setting, default is 255 on big boxes) and load-balance traffic across them (per-flow hash by default).
+
+**Real-life example #1 – Dual ISP, same prefixes (the classic one everyone wants)**
+
+You have two ISPs:
+
+- ISP1 (AS 65001) advertises 0.0.0.0/0 (default) or full table  
+- ISP2 (AS 65002) advertises the exact same routes
+
+Both paths have identical local-pref (100, same AS-path length, etc.
+
+**Without** ebgp-multipath:
+
+```
+get router info routing-table bgp | grep 1.1.1.1
+B    1.1.1.1/32 [20/0] via 100.64.1.1, wan1, 5d12h
+```
+
+Only one path → all traffic to Cloudflare goes out wan1, wan2 sits idle.
+
+**With** ebgp-multipath enable:
+
+```
+get router info routing-table bgp | grep 1.1.1.1
+B    1.1.1.1/32 [20/0] via 100.64.1.1, wan1, 5d12h
+B>*  1.1.1.1/32 [20/0] via 100.64.2.1, wan2, 5d12h
+```
+
+Now FortiGate load-balances new sessions across both links → you actually use the full bandwidth you paid for.
+
+**Real-life example #2 – The exact scenario in the slide (same BGP next-hop, multiple paths to it)**
+
+You peer with one upstream router (e.g. a cloud provider or partner) but you reach their loopback/peer-IP over **two different underlays** (two MPLS links, two VPN tunnels, two physical links, etc.).
+
+The BGP route shows next-hop 10.100.100.1  
+But to reach 10.100.100.1 you have two equal-cost routes (static, OSPF, SD-WAN members, whatever).
+
+Without multipath → FortiGate only uses one of the underlay paths → 50 % of your bandwidth wasted.
+
+With ebgp-multipath enable → FortiGate can recurse the BGP route over **both** underlay paths → true load balancing to that single next-hop.
+
+The slide shows exactly this: same BGP peer, same next-hop IP, but traffic goes through ISP1 **and** ISP2 because the next-hop resolution now uses ECMP.
+
+**The config is literally one line**
+
+```
+config router bgp
+    set ebgp-multipath enable   # or ibgp-multipath enable
+end
+```
+
+(Do it on both sides if the peer is also FortiGate, but usually only needed on the customer side.)
+
+**Bonus tips every FortiGate admin learns the hard way**
+- Paths must be truly **equal** (same weight, local-pref, AS-path length, MED, etc.). If one has even slightly better attribute, it wins alone.
+- Also set `set ecmp-max-paths 16` (or whatever number you want) under `config system global` if you have more than a few links.
+- Works great with SD-WAN too – SD-WAN rules can then steer specific traffic to preferred links while still using ECMP for the rest.
+- If you use ADVPN or IPsec overlays, this + ibgp-multipath is magic for hub-and-spoke load balancing.
+
+Bottom line: if you paid for two (or more) links and want to actually **use** them both without complicated local-pref games or SD-WAN rules, just turn on ebgp-multipath / ibgp-multipath. It’s one of the most “bang for buck” commands in FortiGate BGP. Most people enable it day one on dual-homed setups.
+
+---

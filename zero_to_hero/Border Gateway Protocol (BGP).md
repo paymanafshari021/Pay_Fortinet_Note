@@ -78,10 +78,9 @@
 		- [[#2.  FortiGate Does Not Advertise Anything by Default#How do you make it advertise routes?|How do you make it advertise routes?]]
 		- [[#2.  FortiGate Does Not Advertise Anything by Default#Option A: Redistribute routes into BGP|Option A: Redistribute routes into BGP]]
 		- [[#2.  FortiGate Does Not Advertise Anything by Default#Option B: Use the network command|Option B: Use the network command]]
-		- [[#2.  FortiGate Does Not Advertise Anything by Default#**❗** Rule:|**❗** Rule:]]
+		- [[#2.  FortiGate Does Not Advertise Anything by Default#❗Rule:|❗Rule:]]
 		- [[#2.  FortiGate Does Not Advertise Anything by Default#3.  FortiGate Accepts All Routes by Default|3.  FortiGate Accepts All Routes by Default]]
 		- [[#2.  FortiGate Does Not Advertise Anything by Default#How Do You Control What You Accept?|How Do You Control What You Accept?]]
-
 
 ---
 ## BGP Overview

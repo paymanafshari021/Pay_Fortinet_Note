@@ -681,7 +681,7 @@ FortiGate does **not** have fixed, hardcoded limits for BGP.
 **❗** By default, when you turn on BGP, FortiGate:
 - Does **not** originate any prefixes
 - Does **not** advertise any routes
-
+> [!NOTE]
 > By default, BGP doesn’t originate any prefix. Redistribution or policies are required.
 #### Why?
 FortiGate wants to avoid accidentally advertising internal networks to the outside world.
@@ -689,7 +689,7 @@ FortiGate wants to avoid accidentally advertising internal networks to the outsi
 You have **two main options**:
 #### Option A: Redistribute routes into BGP
 **Protocol redistribution** means:
-
+> [!NOTE]
 > Taking routes learned from one routing source (like static routes, connected routes, OSPF, RIP) and injecting them into **BGP** so they can be advertised to BGP peers.
 
 FortiGate does **not** advertise anything in BGP by default.  
@@ -714,7 +714,6 @@ config router bgp
     end
 end
 ```
-
 This tells FortiGate:  
 “Take my static routes and announce them in BGP.”
 #### Option B: Use the network command
@@ -728,18 +727,17 @@ config router bgp
     end
 end
 ```
-
 But there’s a rule:
 ####  ❗Rule:
-
-+ **❗**The prefix must exist as an **active route** in the routing table.
-+ **❗**If it’s not active, FortiGate won’t advertise it.
-
+> [!NOTE]
+>  - ❗The prefix must exist as an **active route** in the routing table.
+>  - ❗If it’s not active, FortiGate won’t advertise it.
 This can be changed with:
 ```
 set network-import-check disable
 ```
-**❗** Then FortiGate will advertise even if the prefix isn’t active.
+> [!TIP]
+> ❗Then FortiGate will advertise even if the prefix isn’t active.
 #### 3.  FortiGate Accepts All Routes by Default
 FortiGate is very open by default.
 

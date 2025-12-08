@@ -778,7 +778,7 @@ end
 ```
 
 Then apply the filter to a neighbor’s incoming routes.
-## SUMMARY
+### SUMMARY
 Here is the whole FortiGate BGP behavior summarized:
   - **No hard limits**
 	  - Your FortiGate can scale depending on its memory.
@@ -787,3 +787,4 @@ Here is the whole FortiGate BGP behavior summarized:
 	  - You need to **redistribute** or **declare prefixes** manually.
  - **Accepts everything by default**
 	 - You must **add filters** if you want to control what you receive.
+---

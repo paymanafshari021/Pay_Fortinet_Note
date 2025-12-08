@@ -1324,3 +1324,11 @@ Default timers are usually 50ms x3, but you can tune them if needed under interf
 **When NOT to use it**
 - Very high-scale setups (thousands of peers) – BFD uses a tiny bit of CPU per session.
 - Old hardware or peers that don't support it.
+---
+# BGP States
+
+
+
+
+
+

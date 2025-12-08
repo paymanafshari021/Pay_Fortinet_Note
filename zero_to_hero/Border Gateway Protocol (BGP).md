@@ -1152,7 +1152,6 @@ Bottom line: if you paid for two (or more) links and want to actually **use** th
 ---
 ## Use Case 2 – Loopback Interfaces as BGP Source on FortiGate
 
-**The problem this solves in one sentence:**  
 Physical interfaces go down when the cable flaps, gets shut down, or you move the link to another port → BGP session dies, even if you have another perfectly good path to the same peer.  
 Loopback interfaces **never go down** (they're virtual), so if you run BGP from a loopback IP, the session stays alive as long as there is **any** path between the two routers.
 

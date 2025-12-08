@@ -792,3 +792,275 @@ Here is the whole FortiGate BGP behavior summarized:
  - **Accepts everything by default**
 	 - You must **add filters** if you want to control what you receive.
 ---
+## BGP Route Filtering Options (Access Lists vs. Prefix Lists vs. Route Maps)
+
+In BGP, you often don’t want to accept or advertise **every** route you hear about. You filter them so you only learn the routes you want and only send the routes you’re allowed to send.
+
+There are three main tools to do this on FortiGate (and most routers):
+
+1. **Access Lists** (the simplest)
+2. **Prefix Lists** (simple but smarter about subnet lengths)
+3. **Route Maps** (the powerful one – it can do everything the others do, plus change route attributes)
+
+Here’s the easy breakdown:
+
+### Access Lists (basic IP filter)
+- Works exactly like a normal firewall ACL.
+- You say “permit 10.0.0.0 0.0.255.255” or “permit 10.0.0.0/8”.
+- It only looks at the prefix and the mask you write. It does **exact match** or **wildcard match**.
+- You cannot say “permit anything inside 10.0.0.0/8 that is /24 or smaller” → you have to write every single line.
+
+**Example**  
+You only want to accept the summary 172.16.0.0/12 from a peer, nothing more specific:
+
+```text
+config router access-list
+    edit "only-summary"
+        config rule
+            edit 1
+                set prefix 172.16.0.0 255.240.0.0   ← this is 172.16.0.0/12
+                set action permit
+            next
+            edit 2
+                set action deny
+            next
+        end
+    next
+end
+
+config router bgp
+    config neighbor
+        edit "1.1.1.1"
+            set distribute-list-in "only-summary"
+        next
+    end
+end
+```
+
+Result: Peer can send you 172.16.1.0/24, 172.20.0.0/16, etc. → all denied. Only the exact /12 is accepted.
+### Prefix Lists (better for networks)
+- Designed specifically for filtering routes, not packets.
+- You can use **ge** (greater or equal) and **le** (less or equal) to define a range of prefix lengths.
+
+**Real-life example everyone uses**  
+Your company owns 203.0.113.0/24. You advertise more-specific subnets to customers but you only want to **accept back** the /24 or larger (i.e. never accept someone else’s longer prefixes inside your block).
+
+```text
+config router prefix-list
+    edit "my-block"
+        config rule
+            edit 1
+                set prefix 203.0.113.0 255.255.255.0
+                set ge 24
+                set le 24 ----> only exactly /24 (or you can do le 32 for everything)
+                set action permit
+            next
+            edit 2
+                set action deny
+            next
+        end
+    next
+end
+
+config router bgp
+    config neighbor
+        edit "customer"
+            set prefix-list-in "my-block"
+        next
+    end
+end
+```
+
+This is impossible to do cleanly with an access list – you would need 256 lines!
+### Route Maps (the Swiss Army knife)
+Route maps can:
+- Match using access-list, prefix-list, AS-path, community, etc.
+- Do multiple match statements (match ALL or match ANY depending on how you write it)
+- **Set** or change BGP attributes (local-pref, MED, community, next-hop, etc.)
+- Be used for both in and out direction
+- Also filter or modify routes that come from static/connected/OSPF/etc. when you redistribute them into BGP
+
+**Most common real example – Prefer one ISP over another**
+
+```text
+config router access-list
+    edit "customer-routes"
+        config rule
+            edit 1
+                set prefix 198.51.100.0 255.255.255.0
+                set action permit
+            next
+        end
+    next
+end
+
+config router route-map
+    edit "prefer-ISP1"
+        config rule
+            edit 10
+                set match-ip-address "customer-routes"
+                set set-local-preference 200   ← make these routes more preferred
+            next
+            edit 20
+                set set-community 65100:100   ← tag them
+            next
+        end
+    next
+end
+
+config router bgp
+    config neighbor
+        edit "ISP1-peer"
+            set route-map-in "prefer-ISP1"
+        next
+    end
+end
+```
+
+So when ISP1 sends you the customer prefix 198.51.100.0/24, FortiGate automatically sets local-preference to 200 → you will use ISP1 for that customer even if ISP2 also sends the same prefix.
+
+Another super common example – Only advertise your own prefixes to the Internet, nothing else**
+
+```text
+config router prefix-list
+    edit "my-prefixes"
+        config rule
+            edit 1
+                set prefix 203.0.113.0 255.255.255.0
+                set le 29
+                set action permit
+            next
+        end
+    next
+end
+
+config router route-map
+    edit "out-to-ISP"
+        config rule
+            edit 1
+                set match-ip-address "my-prefixes"
+            next
+            edit 2
+                set action deny   ← deny everything else
+            next
+        end
+    next
+end
+
+config router bgp
+    config neighbor
+        edit "ISP-upstream"
+            set route-map-out "out-to-ISP"
+        next
+    end
+end
+```
+
+This is the standard safe way: you only ever leak your own networks, never customer or transit routes.
+
+### Quick comparison table (exactly what the slide says, but in plain English)
+
+| Tool          | How simple? | What it can match                  | Can it change attributes? | Typical use case                                      |
+|---------------|-------------|------------------------------------|---------------------------|--------------------------------------------------------|
+| Access List   | Very simple | Exact prefix + wildcard mask       | No                        | Very small networks, quick & dirty filters            |
+| Prefix List   | Simple      | Prefix + length range (ge/le)      | No                        | Filtering your own block, customer cones – super common |
+| Route Map     | Powerful    | Anything (prefix, AS-path, community, etc.) + multiple conditions | Yes (local-pref, MED, community, weight, etc.) | Real production networks – policy, preference, tagging |
+
+**Bottom line**  
+- 90 % of the time you will use **prefix-lists** + **route-maps**.  
+- You use **route-maps** when you need to do something clever (change local-preference, prepend AS-path, add communities, etc.).  
+- Access lists are still there for very simple cases or when you already have an ACL for firewalling and want to reuse it.
+---
+## BGP Commands Comparison on FortiGate
+
+FortiGate has its own set of "get router info bgp ..." commands. These four are the ones you'll use 99% of the time.
+1. **get router info bgp summary**  
+   → The "dashboard" or quick health check. One screen tells you everything at a glance.
+
+   What it shows:
+   - Your local AS number
+   - Every neighbor's IP, their AS, how long they've been up
+   - State (Established = good, anything else = problem)
+   - How many prefixes (routes) you've received from them
+   - Packet counters (helps spot if updates are stuck)
+
+   **Real example** – You run this first when someone says "Internet is slow":  
+   ```
+   FGT # get router info bgp summary
+
+   BGP router identifier 172.16.1.1, local AS number 65100
+   BGP table version is 1250
+   2 BGP AS-PATH entries
+   0 BGP community entries
+
+   Neighbor        V    AS   MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+   100.64.1.1      4  65001  8421    8415      1250    0    0 6d12h       12456
+   100.64.2.1      4  65002  1562    1589      1250    0    0 01:23:45    9876
+   ```
+
+   You immediately see: both peers are Established, you've learned ~12k routes from ISP1 and ~9k from ISP2, and one peer has only been up for 83 minutes → probably flapped recently.
+
+2. **get router info bgp neighbors**  
+   → The deep dive into ONE neighbor (or all if you don't specify IP).
+
+   This is the command you run when the summary shows a neighbor is not Established or you want to know why it's misbehaving.
+
+   What it shows:
+   - Peer IP and router-ID
+   - Remote AS
+   - BGP state + how long in that state
+   - Capabilities (graceful restart, 4-byte AS, route-refresh, etc.)
+   - Timers
+   - Last time it sent/received keepalive or update
+   - Often the error if it's stuck in Active/Idle/OpenSent, etc.
+
+   **Real example** – Neighbor stuck in Active? Run:
+   ```
+   get router info bgp neighbors 100.64.1.1
+   ```
+   You'll see something like "No route to host" or "Connect retry timer" running → tells you it's a connectivity or firewall policy issue.
+
+   This command is gold when peering isn't coming up.
+
+3. **get router info bgp network**  
+   → Shows what YOU are advertising into BGP (the "BGP table" from your perspective – your own networks + redistributed routes).
+
+   Basically: "What routes am I telling the world about?"
+
+   Very useful when a customer calls and says "I can't see our prefix 203.0.113.0/24 on the Internet".
+
+   Example output snippet:
+   ```
+   Network            Next Hop        Metric LocPrf Weight Path
+   *> 10.0.0.0/8        0.0.0.0         0         32768 i
+   *> 192.168.1.0/24    0.0.0.0         0         32768 i
+   ```
+
+   The "i" at the end means originated by this router (usually from redistribute connected/static).
+
+4. **get router info routing-table bgp**  
+   → Shows the actual routes installed in the routing table that came from BGP (the ones FortiGate is really using to forward traffic).
+
+   This is different from #3 because BGP might have learned 50,000 routes, but after filters, local-pref, etc., only 12,000 make it into the real routing table.
+
+   **Real example** – You want to check if you're really preferring ISP1 for Netflix traffic:
+   ```
+   FGT # get router info routing-table bgp
+
+   Routing table for VRF=0
+   B    1.0.0.0/8 [200/0] via 100.64.1.1 (recursive via wan1), 3d12h
+   B    8.8.8.8/32 [20/0] via 100.64.2.1 (recursive via wan2), 02:10:22
+   ```
+
+   You see the "B" means BGP, the [20/0] or [200/0] is admin-distance/metric, and which interface it's actually exiting.
+
+### Quick cheat-sheet (every FortiGate BGP admin has this memorized)
+
+| Command                             | What you run when…                           | Typical use case                                       |
+| ----------------------------------- | -------------------------------------------- | ------------------------------------------------------ |
+| `get router info bgp summary`       | "Is BGP basically working?"                  | Daily health check, first command when troubleshooting |
+| `get router info bgp neighbors`     | "Why is this specific peer not working?"     | Peering down, stuck state, capability mismatch         |
+| `get router info bgp network`       | "Are we advertising our prefixes correctly?" | Customer can't see their IP space                      |
+| `get router info routing-table bgp` | "What BGP routes are actually being used?"   | Checking best-path selection, load-balancing, leaks    |
+
+---

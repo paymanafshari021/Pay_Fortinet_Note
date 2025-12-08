@@ -1140,3 +1140,105 @@ end
 Bottom line: if you paid for two (or more) links and want to actually **use** them both without complicated local-pref games or SD-WAN rules, just turn on ebgp-multipath / ibgp-multipath. It’s one of the most “bang for buck” commands in FortiGate BGP. Most people enable it day one on dual-homed setups.
 
 ---
+## Use Case 2 – Loopback Interfaces as BGP Source on FortiGate
+
+**The problem this solves in one sentence:**  
+Physical interfaces go down when the cable flaps, gets shut down, or you move the link to another port → BGP session dies, even if you have another perfectly good path to the same peer.  
+Loopback interfaces **never go down** (they're virtual), so if you run BGP from a loopback IP, the session stays alive as long as there is **any** path between the two routers.
+
+This is the #1 best practice in real production networks when you have redundant links to the same BGP peer (dual-homed to same ISP, MPLS dual-CE, cloud express-route with two tunnels, etc.).
+
+**Why loopbacks are magic for BGP**
+- A loopback interface is always "up/up" – it only goes down if the whole router crashes.
+- You advertise the loopback IP via IGP (OSPF usually) or static routes so the peer always knows how to reach it.
+- Even if one physical link dies, the IGP re-converges and traffic to the loopback just takes the other path → BGP session never flaps.
+
+**Real-life example everyone has seen:
+You have two firewalls (HA pair or just two routers) connected to the same ISP router with two separate links (or two IPsec tunnels).  
+If you peer BGP using the physical IPs → one link flaps → BGP session drops → routes disappear → outage.  
+If you peer using loopback IPs → link flaps → IGP moves the traffic to the other link → BGP session stays up → zero packet loss.
+
+**The three things you MUST do on FortiGate**
+
+1. **Tell BGP to source the session from the loopback interface**
+   ```text
+   config router bgp
+       config neighbor
+           edit "100.64.1.254"          ← this is the peer's loopback IP
+               set update-source loop0   ← THIS is the key line
+               set remote-as 65001
+               ...
+   ```
+
+2. **Enable multihop (because the peer is no longer directly connected)**
+   ```text
+   set ebgp-enforce-multihop enable
+   ```
+   Normally BGP assumes the peer is one hop away. When you source from loopback, the packets leave via a physical interface → the peer sees the packet coming from a different IP than the configured neighbor IP → it expects → it drops it unless you allow multihop.
+
+3. **Create a firewall policy to allow TCP 179 between the loopback and the physical outbound interface**
+   This is the part everyone forgets the first time and spends two hours troubleshooting.
+
+   Example:
+   ```text
+   config firewall policy
+       edit 1
+           set name "Allow BGP from loopback"
+           set srcintf "loop0"
+           set dstintf "wan1"          ← or whatever your outbound interface is
+           set srcaddr "local-loopback-subnet"
+           set dstaddr "peer-loopback"
+           set action accept
+           set service "BGP"           ← TCP 179
+           set schedule "always"
+       next
+   end
+   ```
+   (You usually need the reverse policy too, or just make it any-any if you're lazy in lab.)
+
+**Full realistic config example – Dual FortiGates peering with a Cisco/Juniper upstream over two links**
+
+On your FortiGate:
+```text
+config system interface
+    edit "loop0"
+        set vdom "root"
+        set ip 172.16.1.254 255.255.255.255
+        set type loopback
+    next
+end
+
+config router ospf
+    config area 0.0.0.0
+        config network
+            edit 1
+                set prefix 172.16.1.254 255.255.255.255
+            next
+        end
+    end
+    config ospf-interface ...   ← make sure OSPF advertises the loopback
+end
+
+config router bgp
+    set as 65100
+    set router-id 172.16.1.254
+    config neighbor
+        edit "100.64.1.254"          ← peer's loopback
+            set remote-as 65001
+            set update-source loop0
+            set ebgp-enforce-multihop enable
+        next
+    end
+end
+```
+
+Do the same on the peer side (just reverse IPs/AS).
+
+Now when wan1 dies, OSPF moves 100.64.1.254 via wan2 → BGP packets follow → session stays up forever.
+
+**Bonus real-world wins**
+- In SD-WAN/ADVPN setups, almost everyone uses loopback peering now because spokes come and go, underlays change, but the hub loopback is always reachable.
+- In HA clusters (active-passive or active-active), using loopback + virtual IP means failover doesn't break BGP either.
+- You can even do this for iBGP between your own routers – super stable.
+
+Bottom line: If you ever have more than one path to a BGP peer, **always** use loopback sourcing. It's literally 3 extra lines of config and saves you from 3 a.m. pages when a cable gets kicked. Every serious network engineer does this religiously.

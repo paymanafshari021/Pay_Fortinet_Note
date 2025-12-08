@@ -5,7 +5,7 @@
 + Bidirectional Forwarding Detection (BFD): https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/771813/bfd
 + Routing objects: https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/654952/routing-objects
 ---
-  - [[#BGP Overview|BGP Overview]]
+- [[#BGP Overview|BGP Overview]]
 	- [[#BGP Overview#Purpose and Function|Purpose and Function]]
 	- [[#BGP Overview#Autonomous System Numbers (ASNs)|Autonomous System Numbers (ASNs)]]
 	- [[#BGP Overview#Transport|Transport]]
@@ -51,12 +51,11 @@
 			- [[#LOCAL_PREF (Well-known discretionary)#Where LOCAL_PREF Stands in the Decision Process|Where LOCAL_PREF Stands in the Decision Process]]
 		- [[#Key Attributes#MED — Multi Exit Discriminator (Optional non-transitive)|MED — Multi Exit Discriminator (Optional non-transitive)]]
 			- [[#MED — Multi Exit Discriminator (Optional non-transitive)#Real-World Example (The Classic Use Case)|Real-World Example (The Classic Use Case)]]
-	- [[#BGP Attributes#Very Important Things to Know About MED|Very Important Things to Know About MED]]
-	- [[#BGP Attributes#Quick Comparison: The Big Three Traffic Engineering Tools|Quick Comparison: The Big Three Traffic Engineering Tools]]
-		- [[#Quick Comparison: The Big Three Traffic Engineering Tools#COMMUNITY (Optional transitive)|COMMUNITY (Optional transitive)]]
-	- [[#BGP Attributes#The Most Famous Communities (Used by Almost Every ISP)|The Most Famous Communities (Used by Almost Every ISP)]]
-	- [[#BGP Attributes#Example|Example]]
-	- [[#BGP Attributes#Quick Facts Table|Quick Facts Table]]
+			- [[#MED — Multi Exit Discriminator (Optional non-transitive)#Very Important Things to Know About MED|Very Important Things to Know About MED]]
+			- [[#MED — Multi Exit Discriminator (Optional non-transitive)#Quick Comparison: The Big Three Traffic Engineering Tools|Quick Comparison: The Big Three Traffic Engineering Tools]]
+		- [[#Key Attributes#COMMUNITY (Optional transitive)|COMMUNITY (Optional transitive)]]
+			- [[#COMMUNITY (Optional transitive)#The Most Famous Communities (Used by Almost Every ISP)|The Most Famous Communities (Used by Almost Every ISP)]]
+			- [[#COMMUNITY (Optional transitive)#Quick Facts Table|Quick Facts Table]]
 - [[#Route Selection|Route Selection]]
 	- [[#Route Selection#BGP Route Selection|BGP Route Selection]]
 	- [[#Route Selection#**1. Highest weight**|**1. Highest weight**]]
@@ -601,51 +600,41 @@ To do this, BGP compares route attributes in a **specific order**, called the **
 Think of this as BGP’s **tie-breaker list** — it checks rule #1 first, and only moves to rule #2 if the first rule is tied, and so on.
 ### BGP Route Selection
 
-### **1. Highest weight**
+#### 1. Highest weight
 (Weight is Cisco-proprietary; FortiGate treats it like a custom value.)
 
 - Bigger weight = better route.
 - Useful when **you** want to force traffic a certain way.
-### **2. Highest local preference (LOCAL_PREF)**
-
+#### 2. Highest local preference (LOCAL_PREF)
 Used **inside one AS** to choose the best exit point. 
 
 Higher LOCAL_PREF = more preferred.
-### **3. Prefer routes that originated locally**
-
+#### 3. Prefer routes that originated locally
 If the router itself created a route (for example, through `network` or redistribution), it prefers it over routes learned from neighbors.
-### **4. Shortest AS path**
-
+#### 4. Shortest AS path
 Routes with **fewer AS hops** are considered shorter and preferred.
-### **5. Lowest origin type**
-
+#### 5. Lowest origin type
 Origin types (best to worst):
 1. IGP
 2. EGP
 3. Incomplete
-### **6. Lowest MED (Multi-Exit Discriminator)**
-
+#### 6. Lowest MED (Multi-Exit Discriminator)
 Lower MED = “Enter my AS through this router — it's better.”
-### **7. Lowest IGP metric to the NEXT_HOP**
-
+#### 7. Lowest IGP metric to the NEXT_HOP
 This checks the internal metric (inside your AS) to reach the next hop router.
 - Lower metric = closer = better.
-### **8. Prefer EBGP routes over IBGP routes**
-
+#### 8. Prefer EBGP routes over IBGP routes
 If all previous rules tie, routes learned from **external neighbors** (EBGP) are preferred over those learned internally (IBGP).
-### **9. If ECMP is enabled: install up to 10 equal-cost routes**
-
+### 9. If ECMP is enabled: install up to 10 equal-cost routes
 ECMP = Equal Cost Multi-Path.
 
 - If multiple routes tie on all previous rules, FortiGate can install **up to 10** of them.
 - Traffic is shared across the equal routes.
-### **10. Lowest router ID**
-
+#### 10. Lowest router ID
 Router ID = unique identification for a BGP router.
 
 If absolutely everything else matches, use the router with the **lowest router ID**.
-### Easy Real-Life Analogy
-
+##### Easy Real-Life Analogy
 Imagine you’re picking the best route to drive somewhere.
 
 You evaluate:
@@ -660,7 +649,6 @@ You evaluate:
 9. If two routes tie, use both (ECMP).
 10. If still tied, pick the direction with the lower sign number.
 ### Quick Summary (Super Simple)
-
 BGP compares paths in this order:
 1. Highest weight
 2. Highest LOCAL_PREF
@@ -677,34 +665,31 @@ This ensures BGP always picks a single “best path” in a predictable way.
 
 ---
 ## FortiGate BGP Implementation
-
 **Three key things** you need to understand about how FortiGate handles BGP:
-
 1. **Scaling capabilities**
 2. **How FortiGate originates (or doesn’t originate) prefixes**
 3. **How FortiGate accepts routes**
 
 Let’s break each down with examples.
-### 1. **Scaling Capabilities**
+### 1. Scaling Capabilities
 FortiGate does **not** have fixed, hardcoded limits for BGP.
 > Limits on neighbors, routes, and policies depend on available system memory.
 #### What this means:
-
 - You can have many BGP neighbors
 - Many routes
 - Many filters, route maps, and policies
 - ⚠️**The only real limitation is RAM**
-### 2.  **FortiGate Does Not Advertise Anything by Default**
+### 2.  FortiGate Does Not Advertise Anything by Default
 **❗** By default, when you turn on BGP, FortiGate:
 - Does **not** originate any prefixes
 - Does **not** advertise any routes
 
 > By default, BGP doesn’t originate any prefix. Redistribution or policies are required.
-### Why?
+#### Why?
 FortiGate wants to avoid accidentally advertising internal networks to the outside world.
-### How do you make it advertise routes?
+#### How do you make it advertise routes?
 You have **two main options**:
-### Option A: **Redistribute routes** into BGP
+#### Option A: Redistribute routes into BGP
 **Protocol redistribution** means:
 
 > Taking routes learned from one routing source (like static routes, connected routes, OSPF, RIP) and injecting them into **BGP** so they can be advertised to BGP peers.
@@ -724,7 +709,6 @@ You can redistribute:
 - Routes learned via OSPF, RIP, etc.
 
 Example:
-
 ```
 config router bgp
     config redistribute "static"
@@ -735,7 +719,7 @@ end
 
 This tells FortiGate:  
 “Take my static routes and announce them in BGP.”
-### Option B: **Use the network command**
+#### Option B: Use the network command
 You manually specify prefixes to advertise:
 ```
 config router bgp
@@ -748,7 +732,7 @@ end
 ```
 
 But there’s a rule:
-### **❗** Rule:
+#### **❗** Rule:
 
 + **❗**The prefix must exist as an **active route** in the routing table.
 + **❗**If it’s not active, FortiGate won’t advertise it.
@@ -758,15 +742,15 @@ This can be changed with:
 set network-import-check disable
 ```
 **❗** Then FortiGate will advertise even if the prefix isn’t active.
-### 3.  **FortiGate Accepts All Routes by Default**
+#### 3.  FortiGate Accepts All Routes by Default
 FortiGate is very open by default.
 
 > **❗** By default, all routes received are accepted.
 
 This is convenient but risky in large environments.
-#### Example:
+Example:
 If your ISP sends you 900,000 routes, FortiGate will accept all of them unless you filter.
-### How Do You Control What You Accept?
+#### How Do You Control What You Accept?
 You use:
 - **Prefix-lists**
 - **Route-maps**
@@ -798,15 +782,14 @@ end
 ```
 
 Then apply the filter to a neighbor’s incoming routes.
-### Summary
-Here is the whole FortiGate BGP behavior summarized:
-+ **No hard limits**
-Your FortiGate can scale depending on its memory.  
-Smaller devices = fewer routes, larger = full Internet table.
-+ **Does not generate routes automatically**
-You need to **redistribute** or **declare prefixes** manually.
-+ **Accepts everything by default**
-You must **add filters** if you want to control what you receive.
-
+> [!SUMMARY]
+>  Here is the whole FortiGate BGP behavior summarized:
+>  - **No hard limits**
+> 	 - Your FortiGate can scale depending on its memory.
+> 	 - Smaller devices = fewer routes, larger = full Internet table.
+>  -  **Does not generate routes automatically**
+> 	 - You need to **redistribute** or **declare prefixes** manually.
+>  - **Accepts everything by default**
+> 	 - You must **add filters** if you want to control what you receive.
 ---
 

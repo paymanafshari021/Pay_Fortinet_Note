@@ -1267,3 +1267,60 @@ The slide gives practical fixes – think of them as "tuning your BGP engine":
 | Route Reflectors     | 5+ iBGP routers in AS        | 2-5x fewer sessions  | Scale to 100 branches without config nightmare |
 | BFD/Keepalive Tuning | Mission-critical apps (VoIP) | Sub-second detection | Failover in 0.2s vs. 3min                      |
 | Graceful Restart     | HA clusters/upgrades         | Zero-downtime        | Maintenance without user complaints            |
+
+---
+## Bidirectional Forwarding Detection (BFD)
+
+BFD is a super-fast "ping-like" heartbeat between two routers to check if the path to a BGP peer is still working.  
+It's like having a smoke detector for your BGP session: instead of waiting minutes for BGP's slow built-in timers to notice a fire (link failure), BFD screams "PROBLEM!" in less than a second.
+
+BGP's default way of checking if a neighbor is alive = keepalive packets every 60 seconds + hold-timer 180 seconds (3 missed keepalives = dead).  
+If a link dies, you can wait up to 3 minutes before BGP switches paths → bad for VoIP, video, cloud apps (users complain "Internet died!").
+
+BFD fixes this by sending tiny, lightweight probe packets constantly (every 50–500 milliseconds usually), and if a few are missed in a row, it instantly tells BGP "peer is down – failover NOW!"
+
+**Key advantages (why everyone enables it)**
+- **Super fast detection:** <1 second (often 150–600 ms) vs. minutes with plain BGP timers.
+- **Detects one-way failures:** e.g., your TX cable is cut but RX still works – normal BGP might not notice, but BFD does (because it's bidirectional).
+- **Works on any link:** Physical, VPN tunnel, MPLS, doesn't matter – "independent of the type of media".
+- **Now supports multi-hop on FortiGate:** Old versions only worked for directly connected neighbors (single-hop). Newer FortiOS = works even if the peer is many hops away (perfect with loopback peering from Use Case 2).
+
+**Real-life example #1 – Dual ISP failover (the one that makes bosses happy)**
+You have two ISPs, BGP full table or default routes from both.
+
+Without BFD:
+- ISP1 fiber gets cut at 2 a.m.
+- BGP keeps session up for ~180 seconds thinking everything is fine.
+- All traffic blackholes for 3 minutes → Microsoft Teams calls drop, angry users flood the helpdesk.
+
+With BFD enabled (50 ms interval, detect multiplier 3 = 150 ms detection):
+- Fiber cut → BFD misses 3 packets → detects failure in 150 ms.
+- BGP session drops instantly → routes withdrawn → traffic switches to ISP2 in under 1 second.
+- Users never notice (maybe one ping lost). You sleep through the night.
+
+**Real-life example #2 – SD-WAN or ADVPN overlays**
+Spokes peer with hub over IPsec tunnels (loopback peering).  
+A tunnel flaps or underlay drops.
+
+Without BFD → slow detection → spoke thinks hub is dead → routing chaos.
+
+With BFD (multi-hop) → tunnel blip detected in 300 ms → BGP reroutes over backup tunnel → zero downtime.
+
+**How to enable it on FortiGate (the PDF doesn't show config, but it's one line)**
+```text
+config router bgp
+    config neighbor
+        edit "100.64.1.254"   # peer loopback or IP
+            set capability-dynamic enable
+            set bfd enable        # <--- THIS LINE (does the magic)
+        next
+    end
+end
+```
+
+Both sides need it for bidirectional mode (but it works one-way too).  
+Default timers are usually 50ms x3, but you can tune them if needed under interface settings or globally.
+
+**When NOT to use it**
+- Very high-scale setups (thousands of peers) – BFD uses a tiny bit of CPU per session.
+- Old hardware or peers that don't support it.

@@ -731,7 +731,7 @@ end
 ```
 
 But there’s a rule:
-#### **❗** Rule:
+####  ❗Rule:
 
 + **❗**The prefix must exist as an **active route** in the routing table.
 + **❗**If it’s not active, FortiGate won’t advertise it.

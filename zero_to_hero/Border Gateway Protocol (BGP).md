@@ -780,7 +780,7 @@ end
 ```
 
 Then apply the filter to a neighbor’s incoming routes.
-> [!SUMMARY]
+SUMMARY
 >  Here is the whole FortiGate BGP behavior summarized:
 >  - **No hard limits**
 > 	 - Your FortiGate can scale depending on its memory.

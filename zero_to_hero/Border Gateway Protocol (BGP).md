@@ -5,7 +5,7 @@
 + Bidirectional Forwarding Detection (BFD): https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/771813/bfd
 + Routing objects: https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/654952/routing-objects
 ---
-- [[#BGP Overview|BGP Overview]]
+  - [[#BGP Overview|BGP Overview]]
 	- [[#BGP Overview#Purpose and Function|Purpose and Function]]
 	- [[#BGP Overview#Autonomous System Numbers (ASNs)|Autonomous System Numbers (ASNs)]]
 	- [[#BGP Overview#Transport|Transport]]
@@ -33,29 +33,27 @@
 		- [[#Route Reflector Clusters#With a Route Reflector:|With a Route Reflector:]]
 		- [[#Route Reflector Clusters#Multi-Cluster Example|Multi-Cluster Example]]
 - [[#RIBs (Routing Information Bases)|RIBs (Routing Information Bases)]]
-	- [[#RIBs (Routing Information Bases)#1. **RIB-in — “Everything I heard”**|1. **RIB-in — “Everything I heard”**]]
-	- [[#RIBs (Routing Information Bases)#2. **Local RIB — “What I decide to keep”**|2. **Local RIB — “What I decide to keep”**]]
-	- [[#RIBs (Routing Information Bases)#3. **RIB-out — “What I choose to send out”**|3. **RIB-out — “What I choose to send out”**]]
+	- [[#RIBs (Routing Information Bases)#1. RIB-in — “Everything I heard”|1. RIB-in — “Everything I heard”]]
+	- [[#RIBs (Routing Information Bases)#2. Local RIB — “What I decide to keep”|2. Local RIB — “What I decide to keep”]]
+	- [[#RIBs (Routing Information Bases)#3. RIB-out — “What I choose to send out”|3. RIB-out — “What I choose to send out”]]
 	- [[#RIBs (Routing Information Bases)#Putting It All Together|Putting It All Together]]
 - [[#BGP Attributes|BGP Attributes]]
 	- [[#BGP Attributes#Four Types of BGP Attributes|Four Types of BGP Attributes]]
-	- [[#BGP Attributes#1. **Well-Known Mandatory Attributes**|1. **Well-Known Mandatory Attributes**]]
-	- [[#BGP Attributes#Important ones:|Important ones:]]
-	- [[#BGP Attributes#2. **Well-Known Discretionary Attributes**|2. **Well-Known Discretionary Attributes**]]
-	- [[#BGP Attributes#3. **Optional Transitive Attributes**|3. **Optional Transitive Attributes**]]
-	- [[#BGP Attributes#4. **Optional Non-Transitive Attributes**|4. **Optional Non-Transitive Attributes**]]
+	- [[#BGP Attributes#1. Well-Known Mandatory Attributes|1. Well-Known Mandatory Attributes]]
+	- [[#BGP Attributes#2. Well-Known Discretionary Attributes|2. Well-Known Discretionary Attributes]]
+	- [[#BGP Attributes#3. Optional Transitive Attributes|3. Optional Transitive Attributes]]
+	- [[#BGP Attributes#4. Optional Non-Transitive Attributes|4. Optional Non-Transitive Attributes]]
 	- [[#BGP Attributes#Key Attributes|Key Attributes]]
-	- [[#BGP Attributes#🔹 **AS_PATH** (Well-known mandatory)|🔹 **AS_PATH** (Well-known mandatory)]]
-	- [[#BGP Attributes#Example|Example]]
-	- [[#BGP Attributes#🔹 **NEXT_HOP** (Well-known mandatory)|🔹 **NEXT_HOP** (Well-known mandatory)]]
-	- [[#BGP Attributes#🔹 **ORIGIN** (Well-known mandatory)|🔹 **ORIGIN** (Well-known mandatory)]]
-	- [[#BGP Attributes#🔹 **LOCAL_PREF** (Well-known discretionary)|🔹 **LOCAL_PREF** (Well-known discretionary)]]
-	- [[#BGP Attributes#Where LOCAL_PREF Stands in the Decision Process|Where LOCAL_PREF Stands in the Decision Process]]
-	- [[#BGP Attributes#🔹 **MED** — Multi Exit Discriminator (Optional non-transitive)|🔹 **MED** — Multi Exit Discriminator (Optional non-transitive)]]
-	- [[#BGP Attributes#Real-World Example (The Classic Use Case)|Real-World Example (The Classic Use Case)]]
+		- [[#Key Attributes#AS_PATH (Well-known mandatory)|AS_PATH (Well-known mandatory)]]
+		- [[#Key Attributes#NEXT_HOP (Well-known mandatory)|NEXT_HOP (Well-known mandatory)]]
+		- [[#Key Attributes#ORIGIN(Well-known mandatory)|ORIGIN(Well-known mandatory)]]
+		- [[#Key Attributes#LOCAL_PREF (Well-known discretionary)|LOCAL_PREF (Well-known discretionary)]]
+			- [[#LOCAL_PREF (Well-known discretionary)#Where LOCAL_PREF Stands in the Decision Process|Where LOCAL_PREF Stands in the Decision Process]]
+		- [[#Key Attributes#MED — Multi Exit Discriminator (Optional non-transitive)|MED — Multi Exit Discriminator (Optional non-transitive)]]
+			- [[#MED — Multi Exit Discriminator (Optional non-transitive)#Real-World Example (The Classic Use Case)|Real-World Example (The Classic Use Case)]]
 	- [[#BGP Attributes#Very Important Things to Know About MED|Very Important Things to Know About MED]]
 	- [[#BGP Attributes#Quick Comparison: The Big Three Traffic Engineering Tools|Quick Comparison: The Big Three Traffic Engineering Tools]]
-	- [[#BGP Attributes#🔹 **COMMUNITY** (Optional transitive)|🔹 **COMMUNITY** (Optional transitive)]]
+		- [[#Quick Comparison: The Big Three Traffic Engineering Tools#COMMUNITY (Optional transitive)|COMMUNITY (Optional transitive)]]
 	- [[#BGP Attributes#The Most Famous Communities (Used by Almost Every ISP)|The Most Famous Communities (Used by Almost Every ISP)]]
 	- [[#BGP Attributes#Example|Example]]
 	- [[#BGP Attributes#Quick Facts Table|Quick Facts Table]]
@@ -87,7 +85,6 @@
 	- [[#FortiGate BGP Implementation#How Do You Control What You Accept?|How Do You Control What You Accept?]]
 	- [[#FortiGate BGP Implementation#Summary|Summary]]
 
-  
 ---
 ## BGP Overview
 - Border Gateway Protocol (BGP) is a standardized **Exterior Gateway Protocol (EGP)**. 
@@ -497,7 +494,7 @@ Result:
 - Routes advertised over the NJ link → MED = 100 → **less preferred**
 
 The ISP sees the lower MED on the NYC path and automatically sends all your inbound traffic there. If the NYC link fails, the ISP automatically fails over to NJ.
-### Very Important Things to Know About MED
+##### Very Important Things to Know About MED
 
 | Fact                                              | What It Means in Practice                                                             |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------- |
@@ -507,7 +504,7 @@ The ISP sees the lower MED on the NYC path and automatically sends all your inbo
 | Step 6 in FortiGate’s decision list               | It’s quite late — Weight, Local_Pref, AS_PATH, Origin all win over MED.               |
 | Lower = better (opposite of Local_Pref)           | Local_Pref: higher = better (outbound), MED: lower = better (inbound)                 |
 
-### Quick Comparison: The Big Three Traffic Engineering Tools
+##### Quick Comparison: The Big Three Traffic Engineering Tools
 
 | Tool          | Direction it Controls | Scope                     | Preference Rule     | Who Sees It?                  |
 |---------------|------------------------|---------------------------|---------------------|--------------------------------|
@@ -528,7 +525,7 @@ Think of it like putting colored stickers on letters you send:
 - Red sticker = “This is customer traffic – treat it nicely!”  
 - Blue sticker = “This is backup link – only use if everything else is dead.”  
 - Black sticker = “Do NOT announce this prefix to anyone else!”
-### The Most Famous Communities (Used by Almost Every ISP)
+##### The Most Famous Communities (Used by Almost Every ISP)
 
 | Community Value         | Meaning (what the receiver usually does)                              | Real-World Example |
 |-------------------------|-----------------------------------------------------------------------|--------------------|
@@ -539,7 +536,7 @@ Think of it like putting colored stickers on letters you send:
 | **no-export** (well-known) | Do NOT send this route outside your own AS                          | You announce an internal subnet by mistake → slap no-export on it |
 | **no-advertise** (well-known) | Do NOT send this route to ANY BGP neighbor (even inside your AS)  | Super private prefixes |
 
-### Example
+Example
 
 You have two internet links:
 - Primary ISP (AS 65001) – fast and expensive  
@@ -584,7 +581,7 @@ Result:
 - Backup ISP receives your prefixes with community 65001:80 → sets Local_Pref 80 → only used if primary disappears
 
 This is how almost every company does **inbound traffic engineering** when they can’t use MED or AS-path prepending is too aggressive.
-### Quick Facts Table
+##### Quick Facts Table
 
 | Feature               | COMMUNITY                                      |
 |-----------------------|--------------------------------------------------|

@@ -1,4 +1,4 @@
-FortiSwitch
-FortiWLAN
-Google Fortinet
+`FortiSwitch`
+`FortiWLAN`
+`Google Fortinet`
 

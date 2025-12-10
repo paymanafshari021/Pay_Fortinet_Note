@@ -1664,7 +1664,7 @@ It shows **which routes (prefixes)** your FortiGate is **sending TO a specific B
 
 Think of it like: 
 **“Here is the list of networks that I (the FortiGate) am telling my neighbor about.”**
-### Why This Is Important
+## Why This Is Important
 When two routers form a BGP session, each router **advertises network routes** to the other.  
 If the neighbor does NOT receive the expected routes, traffic routing will fail.
 
@@ -1674,7 +1674,7 @@ This command helps you check:
 - Did policy filters remove anything?
 - Is the next hop correct?
 - Are the attributes correct (weight, local preference, AS path)?
-### Breaking Down the Output
+## Breaking Down the Output
 Your PDF includes this example output:
 ```
 # get router info bgp neighbors 100.64.2.254 advertised-routes
@@ -1723,7 +1723,7 @@ These symbols appear before the prefix:
 Meaning:
 - `*` = The route is valid
 - `>` = This is the **best** route being advertised
-### Putting It All Together
+## Putting It All Together
 Imagine your output says:
 ```
 *> 10.10.10.0/24   192.168.1.1   xxx   100   0    65010 i
@@ -1735,18 +1735,18 @@ This means:
 - Weight = 0 (default)
 - AS Path = 65010 → This route is coming from within your AS
 - `*>` means it’s valid and chosen as the best route
-### Why You Use This Command
+## Why You Use This Command
 This command helps you answer questions like:
-#### Is the FortiGate actually advertising the route?
+### Is the FortiGate actually advertising the route?
 If the route doesn't appear here → The neighbor will not learn it.
-#### Is the correct next-hop being shared?
+### Is the correct next-hop being shared?
 Wrong next-hop = neighbor cannot reach the network.
-#### Did outbound BGP filters remove the route?
+### Did outbound BGP filters remove the route?
 If filters remove it, it simply won’t show up.
-#### Is the local AS path correct?
+### Is the local AS path correct?
 This affects how neighbors choose routes.
-### Troubleshooting Example
-#### Problem:
+## Troubleshooting Example
+### Problem:
 A remote peer says:  
 “I’m not receiving your default route (0.0.0.0/0).”
 #### You run the command:

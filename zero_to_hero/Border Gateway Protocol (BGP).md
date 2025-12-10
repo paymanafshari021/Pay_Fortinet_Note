@@ -1746,19 +1746,19 @@ If filters remove it, it simply won’t show up.
 #### ✔ Is the local AS path correct?
 This affects how neighbors choose routes.
 ### Troubleshooting Example
-#### ◾ Problem:
+#### Problem:
 A remote peer says:  
 “I’m not receiving your default route (0.0.0.0/0).”
-#### ◾ You run the command:
+#### You run the command:
 ```
 get router info bgp neighbors 100.64.2.254 advertised-routes
 ```
-#### ◾ If it shows:
+#### If it shows:
 ```
 *> 0.0.0.0/0 100.64.2.1 ...
 ```
 Then **FortiGate IS advertising it**, so the problem is on the remote side.
-#### ◾ If it shows nothing
+#### If it shows nothing
 Then FortiGate is NOT advertising it.
 Possible causes:
 - The prefix is misconfigured

@@ -1529,7 +1529,7 @@ This section helps you understand:
 - _How many messages_ were exchanged
 - _What routes_ were accepted or announced
 - _Why_ the connection may have dropped in the past
-### Neighbor IP + AS Numbers
+## Neighbor IP + AS Numbers
 Example from the PDF:
 ```
 BGP neighbor is 100.64.1.254, remote AS 100, local AS 65100
@@ -1541,7 +1541,7 @@ BGP neighbor is 100.64.1.254, remote AS 100, local AS 65100
 
 **Simple example:**  
 It’s like saying “I (company 65100) am peering with company 100 at IP 100.64.1.254.”
-### BGP State (Most Important Field)
+## BGP State (Most Important Field)
 Example:
 ```
 BGP state = Established, up for 00:49:26
@@ -1564,7 +1564,7 @@ Keepalive interval is 60 seconds
 **Simple example:**  
 It’s like two people agreeing:  
 “We will say ‘I’m here’ every minute. If we don’t hear anything for 3 minutes, we hang up.”
-### Capabilities Supported
+## Capabilities Supported
 Example from the PDF:
 ```
 Address family IPv4 Unicast: advertised and received
@@ -1580,7 +1580,7 @@ This shows what types of routes the neighbor can exchange, such as:
 
 **Simple example:**  
 Think of it like saying “This neighbor can talk about IPv4 networks and IPv6 networks.”
-### Message Counters (Sent / Received)
+## Message Counters (Sent / Received)
 Example:
 ```
 Received 12 messages
@@ -1594,7 +1594,7 @@ Notifications: 7 sent
     
 **Example:**  
 If _Sent_ goes up but _Received_ stays at 0, the neighbor is not responding.
-### Prefix Information (Routes)
+## Prefix Information (Routes)
 Example output:
 ```
 1 accepted prefixes, 1 announced prefixes
@@ -1604,7 +1604,7 @@ Meaning:
 - You sent the neighbor **1 route**
 
 If this shows 0, the neighbor may be misconfigured or filtered.
-### Connection History
+## Connection History
 Example:
 ```
 Connections established 1; dropped 0
@@ -1618,7 +1618,7 @@ Error: Bad Peer AS
 
 **Simple example:**  
 If your neighbor says “My AS is 200” but you expect “100,” BGP will reset the session.
-### Putting It All Together
+## Putting It All Together
 **The BGP Neighbors section tells you:**
 
 |What It Shows|Why It Matters|

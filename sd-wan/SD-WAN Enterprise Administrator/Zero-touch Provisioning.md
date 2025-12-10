@@ -24,7 +24,7 @@
     - **FortiManager auto-recognizes** each site.
     - Loads the **desired configuration** automatically.
 
-![](attachments/01.png)
+![](fortinet-repo/sd-wan/SD-WAN%20Enterprise%20Administrator/attachments/01.png)
 ![](attachments/02.png)
 ![](attachments/03.png)
 ### **Device Blueprint Overview**

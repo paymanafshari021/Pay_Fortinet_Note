@@ -5,100 +5,6 @@
 + Bidirectional Forwarding Detection (BFD): https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/771813/bfd
 + Routing objects: https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/654952/routing-objects
 ---
-- [[#BGP Overview|BGP Overview]]
-	- [[#BGP Overview#Purpose and Function|Purpose and Function]]
-	- [[#BGP Overview#Autonomous System Numbers (ASNs)|Autonomous System Numbers (ASNs)]]
-	- [[#BGP Overview#Transport|Transport]]
-- [[#BGP Components|BGP Components]]
-	- [[#BGP Components#BGP Speaker or Peer|BGP Speaker or Peer]]
-	- [[#BGP Components#BGP Session|BGP Session]]
-- [[#BGP Session Types|BGP Session Types]]
-	- [[#BGP Session Types#Internal BGP (iBGP)|Internal BGP (iBGP)]]
-	- [[#BGP Session Types#External BGP (eBGP)|External BGP (eBGP)]]
-- [[#AS Types|AS Types]]
-	- [[#AS Types#Stub AS|Stub AS]]
-	- [[#AS Types#Multihomed AS|Multihomed AS]]
-	- [[#AS Types#Transit AS|Transit AS]]
-- [[#Split Horizon|Split Horizon]]
-- [[#Route Reflectors|Route Reflectors]]
-	- [[#Route Reflectors#The Problem Route Reflectors Solve|The Problem Route Reflectors Solve]]
-		- [[#The Problem Route Reflectors Solve#What this means:|What this means:]]
-		- [[#The Problem Route Reflectors Solve#Why this is a problem:|Why this is a problem:]]
-	- [[#Route Reflectors#What Route Reflectors Do|What Route Reflectors Do]]
-	- [[#Route Reflectors#Route Reflector Clients|Route Reflector Clients]]
-		- [[#Route Reflector Clients#How it works:|How it works:]]
-	- [[#Route Reflectors#Route Reflector Clusters|Route Reflector Clusters]]
-		- [[#Route Reflector Clusters#Simple Example|Simple Example]]
-		- [[#Route Reflector Clusters#Without RRs:|Without RRs:]]
-		- [[#Route Reflector Clusters#With a Route Reflector:|With a Route Reflector:]]
-		- [[#Route Reflector Clusters#Multi-Cluster Example|Multi-Cluster Example]]
-- [[#RIBs (Routing Information Bases)|RIBs (Routing Information Bases)]]
-	- [[#RIBs (Routing Information Bases)#1. RIB-in — “Everything I heard”|1. RIB-in — “Everything I heard”]]
-	- [[#RIBs (Routing Information Bases)#2. Local RIB — “What I decide to keep”|2. Local RIB — “What I decide to keep”]]
-	- [[#RIBs (Routing Information Bases)#3. RIB-out — “What I choose to send out”|3. RIB-out — “What I choose to send out”]]
-	- [[#RIBs (Routing Information Bases)#Putting It All Together|Putting It All Together]]
-- [[#BGP Attributes|BGP Attributes]]
-	- [[#BGP Attributes#Four Types of BGP Attributes|Four Types of BGP Attributes]]
-	- [[#BGP Attributes#1. Well-Known Mandatory Attributes|1. Well-Known Mandatory Attributes]]
-	- [[#BGP Attributes#2. Well-Known Discretionary Attributes|2. Well-Known Discretionary Attributes]]
-	- [[#BGP Attributes#3. Optional Transitive Attributes|3. Optional Transitive Attributes]]
-	- [[#BGP Attributes#4. Optional Non-Transitive Attributes|4. Optional Non-Transitive Attributes]]
-	- [[#BGP Attributes#Key Attributes|Key Attributes]]
-		- [[#Key Attributes#ASPATH (Well-known mandatory)|ASPATH (Well-known mandatory)]]
-		- [[#Key Attributes#NEXTHOP (Well-known mandatory)|NEXTHOP (Well-known mandatory)]]
-		- [[#Key Attributes#ORIGIN(Well-known mandatory)|ORIGIN(Well-known mandatory)]]
-		- [[#Key Attributes#LOCALPREF (Well-known discretionary)|LOCALPREF (Well-known discretionary)]]
-			- [[#LOCALPREF (Well-known discretionary)#Where LOCALPREF Stands in the Decision Process|Where LOCALPREF Stands in the Decision Process]]
-		- [[#Key Attributes#MED — Multi Exit Discriminator (Optional non-transitive)|MED — Multi Exit Discriminator (Optional non-transitive)]]
-			- [[#MED — Multi Exit Discriminator (Optional non-transitive)#Real-World Example (The Classic Use Case)|Real-World Example (The Classic Use Case)]]
-			- [[#MED — Multi Exit Discriminator (Optional non-transitive)#Very Important Things to Know About MED|Very Important Things to Know About MED]]
-			- [[#MED — Multi Exit Discriminator (Optional non-transitive)#Quick Comparison: The Big Three Traffic Engineering Tools|Quick Comparison: The Big Three Traffic Engineering Tools]]
-		- [[#Key Attributes#COMMUNITY (Optional transitive)|COMMUNITY (Optional transitive)]]
-			- [[#COMMUNITY (Optional transitive)#The Most Famous Communities (Used by Almost Every ISP)|The Most Famous Communities (Used by Almost Every ISP)]]
-			- [[#COMMUNITY (Optional transitive)#Quick Facts Table|Quick Facts Table]]
-- [[#Route Selection|Route Selection]]
-	- [[#Route Selection#BGP Route Selection|BGP Route Selection]]
-		- [[#BGP Route Selection#1. Highest weight|1. Highest weight]]
-		- [[#BGP Route Selection#2. Highest local preference (LOCALPREF)|2. Highest local preference (LOCALPREF)]]
-		- [[#BGP Route Selection#3. Prefer routes that originated locally|3. Prefer routes that originated locally]]
-		- [[#BGP Route Selection#4. Shortest AS path|4. Shortest AS path]]
-		- [[#BGP Route Selection#5. Lowest origin type|5. Lowest origin type]]
-		- [[#BGP Route Selection#6. Lowest MED (Multi-Exit Discriminator)|6. Lowest MED (Multi-Exit Discriminator)]]
-		- [[#BGP Route Selection#7. Lowest IGP metric to the NEXTHOP|7. Lowest IGP metric to the NEXTHOP]]
-		- [[#BGP Route Selection#8. Prefer EBGP routes over IBGP routes|8. Prefer EBGP routes over IBGP routes]]
-		- [[#BGP Route Selection#9. If ECMP is enabled: install up to 10 equal-cost routes|9. If ECMP is enabled: install up to 10 equal-cost routes]]
-		- [[#BGP Route Selection#10. Lowest router ID|10. Lowest router ID]]
-			- [[#10. Lowest router ID#Easy Real-Life Analogy|Easy Real-Life Analogy]]
-	- [[#Route Selection#Quick Summary (Super Simple)|Quick Summary (Super Simple)]]
-- [[#FortiGate BGP Implementation|FortiGate BGP Implementation]]
-	- [[#FortiGate BGP Implementation#1. Scaling Capabilities|1. Scaling Capabilities]]
-		- [[#1. Scaling Capabilities#What this means:|What this means:]]
-	- [[#FortiGate BGP Implementation#2. FortiGate Does Not Advertise Anything by Default|2. FortiGate Does Not Advertise Anything by Default]]
-		- [[#2. FortiGate Does Not Advertise Anything by Default#Why?|Why?]]
-		- [[#2. FortiGate Does Not Advertise Anything by Default#How do you make it advertise routes?|How do you make it advertise routes?]]
-		- [[#2. FortiGate Does Not Advertise Anything by Default#Option A: Redistribute routes into BGP|Option A: Redistribute routes into BGP]]
-		- [[#2. FortiGate Does Not Advertise Anything by Default#Option B: Use the network command|Option B: Use the network command]]
-		- [[#2. FortiGate Does Not Advertise Anything by Default#❗Rule:|❗Rule:]]
-		- [[#2. FortiGate Does Not Advertise Anything by Default#3. FortiGate Accepts All Routes by Default|3. FortiGate Accepts All Routes by Default]]
-		- [[#2. FortiGate Does Not Advertise Anything by Default#How Do You Control What You Accept?|How Do You Control What You Accept?]]
-	- [[#FortiGate BGP Implementation#SUMMARY|SUMMARY]]
-- [[#BGP Route Filtering Options (Access Lists vs. Prefix Lists vs. Route Maps)|BGP Route Filtering Options (Access Lists vs. Prefix Lists vs. Route Maps)]]
-	- [[#BGP Route Filtering Options (Access Lists vs. Prefix Lists vs. Route Maps)#Access Lists (basic IP filter)|Access Lists (basic IP filter)]]
-	- [[#BGP Route Filtering Options (Access Lists vs. Prefix Lists vs. Route Maps)#Prefix Lists (better for networks)|Prefix Lists (better for networks)]]
-	- [[#BGP Route Filtering Options (Access Lists vs. Prefix Lists vs. Route Maps)#Route Maps (the Swiss Army knife)|Route Maps (the Swiss Army knife)]]
-	- [[#BGP Route Filtering Options (Access Lists vs. Prefix Lists vs. Route Maps)#Quick comparison table (exactly what the slide says, but in plain English)|Quick comparison table (exactly what the slide says, but in plain English)]]
-- [[#BGP Commands Comparison on FortiGate|BGP Commands Comparison on FortiGate]]
-	- [[#BGP Commands Comparison on FortiGate#Quick cheat-sheet (every FortiGate BGP admin has this memorized)|Quick cheat-sheet (every FortiGate BGP admin has this memorized)]]
-- [[#Use Case 1 – Configure ECMP With BGP Routes on FortiGate|Use Case 1 – Configure ECMP With BGP Routes on FortiGate]]
-- [[#Use Case 2 – Loopback Interfaces as BGP Source on FortiGate|Use Case 2 – Loopback Interfaces as BGP Source on FortiGate]]
-- [[#Use Case 3 – The neighbor-group Command on FortiGate|Use Case 3 – The neighbor-group Command on FortiGate]]
-	- [[#Use Case 3 – The neighbor-group Command on FortiGate#Quick pros/cons table (why bother?)|Quick pros/cons table (why bother?)]]
-- [[#BGP Convergence on FortiGate|BGP Convergence on FortiGate]]
-		- [[#Quick pros/cons table (why bother?)#Ways to Speed It Up (The Optimization Tips from the Slide)|Ways to Speed It Up (The Optimization Tips from the Slide)]]
-	- [[#BGP Convergence on FortiGate#Quick Optimization Table (Prioritize These for Your Network)|Quick Optimization Table (Prioritize These for Your Network)]]
-- [[#Bidirectional Forwarding Detection (BFD)|Bidirectional Forwarding Detection (BFD)]]
-
----
 ```table-of-contents
 title: 
 style: nestedList # TOC style (nestedList|nestedOrderedList|inlineFirstLevel)
@@ -1871,3 +1777,258 @@ It helps verify:
 It's essential for confirming that your network is being advertised properly to peers.
 
 ---
+Below is a **simple explanation of the “Prefixes Advertised by All BGP Peers” section** from your PDF, using easy language and examples.  
+Citations reference your uploaded file.
+
+---
+# **Prefixes Advertised by All BGP Peers
+
+This information comes from the command:
+```
+get router info bgp network
+```
+This command displays **all BGP routes that your FortiGate has learned**, from **every neighbor** and from **its own configuration**.
+
+Think of it like a **master list** of all BGP routes your FortiGate knows about.
+## What This Command Shows You
+
+It gives you:
+- All prefixes your FortiGate knows from BGP
+- Who the next hop is
+- Which prefix is the “best” route
+- What AS path is associated with each prefix
+- Whether the prefix came from another protocol (redistribution), or from the network command
+- Special status codes
+- The origin of each route (IGP, EGP, incomplete)
+
+These details help you understand **how BGP chose routes** and **why certain prefixes appear in the routing table**.
+### Example
+
+```
+# get router info bgp network
+
+Network            Next Hop         LocPrf Weight Path
+* i0.0.0.0/0       100.64.2.254     100     0     ? <-/->
+*> 100.64.2.1                       32768   0     ? <-/1>
+*> 4.2.2.1/32      100.64.2.1       32768   0     ? <-/1>
+*>i8.8.8.8/32      100.64.2.254     100     0     ? <-/1>
+*>i10.20.30.0/24   172.16.54.115    100     0     i <-/1>
+```
+
+Let’s break down the important parts.
+## Key Concepts Explained Simply
+### Network
+The **prefix** (network) being advertised.
+
+Examples:
+- `0.0.0.0/0` → default route
+- `8.8.8.8/32` → a single host route
+- `10.20.30.0/24` → a local network
+### Next Hop
+The IP address your FortiGate should forward traffic to in order to reach that network.
+
+Example:  
+`100.64.2.254` → send traffic to this device for that route.
+### Status Codes
+Symbols that show whether the route is valid and if it is the best path.
+
+Common symbols:
+
+- `*` = valid
+- `>` = best route chosen
+- `i` = internal route (advertised via the **network** command)
+
+Example from the PDF:  
+`*>i10.20.30.0/24` → This is valid, best, and advertised with the `network` command.
+### Origin Codes
+
+These explain **where the route originally came from**.
+
+Codes shown in PDF:
+
+- `i` = IGP (came from your own `network` command)
+- `?` = incomplete (came from **redistribution** of another routing protocol)
+
+Examples:
+`*>i10.20.30.0/24`
+→ This route was configured manually under `router bgp > network`.
+`* i0.0.0.0/0`
+→ Redistribution from another protocol such as static/connected.
+### Path (AS Path)
+Shows the list of Autonomous Systems the route passes through.
+
+Example:  
+`<- /1>` → Means the next-hop came through AS 1 (simplified display in FortiGate output).
+### LocPrf (Local Preference)
+Higher = more preferred **inside your AS**.
+
+Examples:
+- `100` → normal internal preference
+- `32768` → highest preference (route from inside your FortiGate)
+## Why This Command Is Useful
+
+It helps you understand:
+
+✔ What BGP routes you have learned from any neighbor  
+✔ Which route BGP chooses when multiple neighbors advertise the same prefix  
+✔ If routes are coming from `network` statements or from redistribution  
+✔ How traffic will be forwarded  
+✔ Why a specific prefix is (or isn’t) chosen
+## **Simple Examples**
+
+### Example 1: You learn a default route from a neighbor
+```
+*> 0.0.0.0/0   100.64.2.254   100   0   ?
+```
+Meaning:
+
+- Your FortiGate learned a default route from neighbor `100.64.2.254`
+- It is the **best route**
+- It came through redistribution (`?`)
+### Example 2: Multiple paths to the same prefix
+Imagine you see:
+```
+*  10.1.1.0/24   100.1.1.2
+*> 10.1.1.0/24   200.1.1.2
+```
+Meaning:
+
+- Two neighbors advertise the same prefix
+- FortiGate picked the second one (`200.1.1.2`) as the best (`>`)
+- BGP selected it based on attributes (AS path, local pref, MED, etc.)
+### Example 3: Route from your own FortiGate network command
+```
+*>i 192.168.20.0/24  0.0.0.0
+```
+Meaning:
+
+- You added `network 192.168.20.0 255.255.255.0` in BGP settings
+- FortiGate is advertising this route to others
+- Origin code `i` = IGP/network command
+- It is the best route
+## Simple Summary
+
+**“Prefixes Advertised by All BGP Peers”** shows:
+- Every BGP prefix your FortiGate has learned
+- The best routes selected
+- Where the routes came from
+- Which next hop to use
+- The AS path
+- Whether the prefixes were advertised via network command or redistribution
+
+It’s like the **complete BGP route database** used by your FortiGate to make routing decisions.
+
+---
+# BGP Event Logging
+
+**BGP Event Logging** allows the FortiGate to record important events related to BGP.  
+These logs help you understand what is happening with BGP **without needing real-time debug**, which is more complex.
+
+In simple words:
+**BGP Event Logging keeps a history of important BGP activities so you can troubleshoot problems more easily.**
+## What Does BGP Event Logging Show
+According to the PDF, event logging includes:
+
+- **Neighbor up/down events**  
+    → When a BGP connection comes up or goes down
+- **RIB updates**  
+    → Changes in routes (prefixes)
+- **BGP message exchange**  
+    → When UPDATE, KEEPALIVE, or OPEN messages are sent/received
+- **Errors connecting to neighbors**  
+    → For example, wrong AS number, no route to host, TCP failure
+
+These logs appear in:  
+**GUI → Log & Report → System Events → Router Events**
+### Key Concept #1: BGP Events Are Logged Automatically
+The PDF says BGP event logging is **enabled by default**.  
+That means you do not need to manually activate it.
+
+This is helpful because you always have a record of:
+
+- When BGP sessions came up
+- When they dropped
+- When route updates happened
+- When errors occurred
+## Key Concept #2: You Can Turn Logging Off (Not Recommended)
+You can disable BGP event logging:
+```
+config router bgp
+    set log-neighbour-change disable
+end
+```
+But this is not recommended because you lose important troubleshooting information.  
+### **Key Concept #3: You Can View All BGP Events in the GUI**
+The PDF shows that you can see all BGP logs under:  
+**Log & Report → System Events → Router Events**
+
+This makes troubleshooting easier because you don’t need CLI debug.
+### Why BGP Event Logging Is Useful
+
+#### Detect connection problems
+Example:  
+“Neighbor 100.64.2.254 Down”  
+→ This tells you if the peer went offline.
+#### Detect configuration mistakes
+Example:  
+“Notification Error: Bad Peer AS”  
+→ The neighbor is using the wrong AS number.
+#### Detect routing changes
+Example:  
+“RIB Update: Prefix 0.0.0.0/0 added”  
+→ You received a default route from a neighbor.
+#### Detect flapping (up/down repeated events)
+If the same neighbor goes up/down repeatedly, you can quickly see the pattern.
+## Simple, Real-World Examples
+
+### Example 1: Neighbor Goes Down
+Log message may show:
+
+**“BGP: Neighbor 192.168.1.2 Down”**
+
+Meaning:
+- The BGP session dropped
+- Possibly a link failure or firewall issue
+- You know exactly when the problem started
+### Example 2: Route Change
+Log may show:
+
+**“RIB Update: New prefix 10.10.20.0/24 added”**
+
+Meaning:
+
+- Your neighbor just advertised a new route
+- The network is now reachable through BGP
+### Example 3: BGP Error
+Log may show:
+
+**“OPEN Message Error: Bad Peer AS”**
+
+Meaning:
+
+- The remote peer used an AS number different from what you configured
+- BGP session was reset because of mismatch
+### Example 4: Neighbor Comes Back Up
+Log may show:
+
+**“Neighbor 100.64.1.254 Up”**
+
+Meaning:
+
+- BGP session has been restored
+- Routes are being exchanged again
+## Simple Summary
+**BGP Event Logging** keeps a record of important BGP activities, such as:
+
+- Neighbor up/down
+- Route (RIB) changes
+- BGP message exchanges
+- Errors and connection problems
+
+It is:
+- **On by default**
+- **Helpful for troubleshooting**
+- **Viewable in the GUI** under Router Events
+- **Configurable** (can be disabled, but not recommended)
+
+This feature helps you quickly understand what went wrong (or right) in the BGP process **without turning on full debug**.

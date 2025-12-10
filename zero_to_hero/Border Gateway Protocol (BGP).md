@@ -1737,13 +1737,13 @@ This means:
 - `*>` means it’s valid and chosen as the best route
 ### Why You Use This Command
 This command helps you answer questions like:
-#### ✔ Is the FortiGate actually advertising the route?
+#### Is the FortiGate actually advertising the route?
 If the route doesn't appear here → The neighbor will not learn it.
-#### ✔ Is the correct next-hop being shared?
+#### Is the correct next-hop being shared?
 Wrong next-hop = neighbor cannot reach the network.
-#### ✔ Did outbound BGP filters remove the route?
+#### Did outbound BGP filters remove the route?
 If filters remove it, it simply won’t show up.
-#### ✔ Is the local AS path correct?
+#### Is the local AS path correct?
 This affects how neighbors choose routes.
 ### Troubleshooting Example
 #### Problem:

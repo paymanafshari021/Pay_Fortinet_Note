@@ -2032,3 +2032,5 @@ It is:
 - **Configurable** (can be disabled, but not recommended)
 
 This feature helps you quickly understand what went wrong (or right) in the BGP process **without turning on full debug**.
+
+---

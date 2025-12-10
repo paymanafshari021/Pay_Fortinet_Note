@@ -1654,3 +1654,126 @@ This means:
 - You are not connected
 - The neighbor may be using the wrong AS number
 - No routes can be exchanged
+---
+# Prefixes Advertised by the Local FortiGate
+This section comes from the command:
+```
+get router info bgp neighbors <neighbor-ip> advertised-routes
+```
+It shows **which routes (prefixes)** your FortiGate is **sending TO a specific BGP neighbor**.
+
+Think of it like: 
+**“Here is the list of networks that I (the FortiGate) am telling my neighbor about.”**
+### Why This Is Important
+When two routers form a BGP session, each router **advertises network routes** to the other.  
+If the neighbor does NOT receive the expected routes, traffic routing will fail.
+
+This command helps you check:
+
+- Did the FortiGate actually advertise the routes?
+- Did policy filters remove anything?
+- Is the next hop correct?
+- Are the attributes correct (weight, local preference, AS path)?
+### Breaking Down the Output
+Your PDF includes this example output:
+```
+# get router info bgp neighbors 100.64.2.254 advertised-routes
+
+Network      Next Hop      Metric LocPrf Weight RouteTag Path
+*> 0.0.0.0/0    100.64.2.1            xxx       0        0    100 i <-/->
+```
+Let’s explain each part.
+### Network
+This is the **prefix** the FortiGate is advertising.
+
+Example:  
+`0.0.0.0/0` → This is the **default route** (send all traffic here).
+### Next Hop
+The IP address the neighbor should use to reach that network.
+
+Example:  
+`100.64.2.1` → The neighbor should forward traffic to this IP to reach `0.0.0.0/0`.
+### LocPrf (Local Preference)
+The priority the router gives this route _inside_ its own AS.  
+Higher Local Preference = more preferred.
+
+Example:  
+`LocPrf = 0` → This route has the default preference.
+### Weight
+A FortiGate-specific value used internally to prefer routes.  
+Higher weight = more preferred.
+
+Example:  
+`Weight = 0` → This is the default.
+### Path (AS Path)
+The AS numbers that traffic must pass through to reach the network.
+
+Example:  
+`100 i` means:
+- AS 100 appears in the path
+- `i` = the route came from an **IGP** internally (network command)
+
+_Why it matters_  
+Shorter AS paths are usually preferred by BGP.
+### Status Codes
+These symbols appear before the prefix:
+```
+*> 
+```
+Meaning:
+- `*` = The route is valid
+- `>` = This is the **best** route being advertised
+### Putting It All Together
+Imagine your output says:
+```
+*> 10.10.10.0/24   192.168.1.1   xxx   100   0    65010 i
+```
+This means:
+- You (FortiGate) **advertise 10.10.10.0/24** to the neighbor
+- The neighbor should send traffic to **192.168.1.1**
+- Local preference = 100 (normal priority)
+- Weight = 0 (default)
+- AS Path = 65010 → This route is coming from within your AS
+- `*>` means it’s valid and chosen as the best route
+### Why You Use This Command
+This command helps you answer questions like:
+#### ✔ Is the FortiGate actually advertising the route?
+If the route doesn't appear here → The neighbor will not learn it.
+#### ✔ Is the correct next-hop being shared?
+Wrong next-hop = neighbor cannot reach the network.
+#### ✔ Did outbound BGP filters remove the route?
+If filters remove it, it simply won’t show up.
+#### ✔ Is the local AS path correct?
+This affects how neighbors choose routes.
+### Troubleshooting Example
+#### ◾ Problem:
+A remote peer says:  
+“I’m not receiving your default route (0.0.0.0/0).”
+#### ◾ You run the command:
+```
+get router info bgp neighbors 100.64.2.254 advertised-routes
+```
+#### ◾ If it shows:
+```
+*> 0.0.0.0/0 100.64.2.1 ...
+```
+Then **FortiGate IS advertising it**, so the problem is on the remote side.
+#### ◾ If it shows nothing
+Then FortiGate is NOT advertising it.
+Possible causes:
+- The prefix is misconfigured
+- Outbound filters removed it
+- network-import-check blocked it
+- Wrong routing configuration
+### Simple
+**“Prefixes Advertised by the Local FortiGate” shows exactly what networks your FortiGate is telling BGP neighbors about.**  
+It helps verify:
+- Which routes are being advertised
+- What next-hop is used
+- What BGP attributes are attached
+- Whether filters removed routes
+- Whether BGP is functioning correctly
+
+It's essential for confirming that your network is being advertised properly to peers.
+
+---

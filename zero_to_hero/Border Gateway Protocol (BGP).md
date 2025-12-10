@@ -1512,3 +1512,145 @@ Because it immediately shows:
 - Are there signs of problems (Active, Idle, etc.)?
 
 It’s the fastest way to get the “health check” of all BGP connections.
+
+---
+# BGP Neighbors
+The **BGP Neighbors** information comes from the command:
+```
+get router info bgp neighbors
+```
+This command shows **detailed information** about each BGP peer (neighbor).  
+Think of it like a full “profile page” of the other router you are connected to.
+
+This section helps you understand:
+- _Who_ your BGP neighbor is
+- _Whether_ the session is established
+- _What capabilities_ the neighbor supports
+- _How many messages_ were exchanged
+- _What routes_ were accepted or announced
+- _Why_ the connection may have dropped in the past
+### Neighbor IP + AS Numbers
+Example from the PDF:
+```
+BGP neighbor is 100.64.1.254, remote AS 100, local AS 65100
+```
+**Meaning:**
+- Your router is talking to **100.64.1.254**
+- The neighbor belongs to **AS 100**
+- Your router belongs to **AS 65100**
+
+**Simple example:**  
+It’s like saying “I (company 65100) am peering with company 100 at IP 100.64.1.254.”
+### BGP State (Most Important Field)
+Example:
+```
+BGP state = Established, up for 00:49:26
+```
+**Meaning:**
+- “Established” = the BGP session is healthy
+- It has been up for 49 minutes
+
+If you see states like **Idle**, **Active**, **OpenSent**, etc., the connection is **not working yet**.
+### Timers: Hold Time & Keepalive
+Example:
+```
+Hold time is 180 seconds
+Keepalive interval is 60 seconds
+```
+**Meaning:**
+- The routers expect a “heartbeat” message every 60 seconds
+- If nothing is heard for 180 seconds, the session is declared dead
+
+**Simple example:**  
+It’s like two people agreeing:  
+“We will say ‘I’m here’ every minute. If we don’t hear anything for 3 minutes, we hang up.”
+### Capabilities Supported
+Example from the PDF:
+```
+Address family IPv4 Unicast: advertised and received
+Address family VPNv4 Unicast: advertised
+Address family IPv6 Unicast: advertised
+```
+**Meaning:**  
+This shows what types of routes the neighbor can exchange, such as:
+- IPv4 routes
+- IPv6 routes
+- VPNv4 (MPLS/VPN) routes
+- EVPN routes (Ethernet VPN)
+
+**Simple example:**  
+Think of it like saying “This neighbor can talk about IPv4 networks and IPv6 networks.”
+### Message Counters (Sent / Received)
+Example:
+```
+Received 12 messages
+Sent 12 messages
+Notifications: 7 sent
+```
+**Meaning:**
+- Shows how much communication is happening
+- “Notifications” often indicate errors  
+    (e.g., wrong AS number, invalid OPEN message)
+    
+**Example:**  
+If _Sent_ goes up but _Received_ stays at 0, the neighbor is not responding.
+### Prefix Information (Routes)
+Example output:
+```
+1 accepted prefixes, 1 announced prefixes
+```
+Meaning:
+- The neighbor sent you **1 useful route**
+- You sent the neighbor **1 route**
+
+If this shows 0, the neighbor may be misconfigured or filtered.
+### Connection History
+Example:
+```
+Connections established 1; dropped 0
+Last Reset: 00:08:08, due to BGP Notification sent
+Error: Bad Peer AS
+```
+**Meaning:**
+- Connection was established once
+- It has never dropped
+- The last reset happened due to a mistake, such as the peer using the wrong AS number
+
+**Simple example:**  
+If your neighbor says “My AS is 200” but you expect “100,” BGP will reset the session.
+### Putting It All Together
+**The BGP Neighbors section tells you:**
+
+|What It Shows|Why It Matters|
+|---|---|
+|Neighbor IP + AS|Confirms you are talking to the right router|
+|BGP State|Tells whether the session is healthy|
+|Timers|Ensures heartbeat signals are working|
+|Capabilities|Shows what types of routes can be exchanged|
+|Messages sent/received|Helps detect communication problems|
+|Accepted/announced prefixes|Shows if routing info is flowing correctly|
+|Connection drops / errors|Helps find configuration mistakes|
+### **Simple Example Scenario**
+#### ✔ Healthy Neighbor
+```
+State = Established
+Accepted prefixes = 5
+Announced prefixes = 3
+Up for 3 hours
+```
+This means:
+- Connection good
+- You received 5 routes
+- You advertised 3
+- Session is stable
+#### ✘ Problem Example
+```
+State = Active
+Received = 0
+Notifications sent = 3
+Error: Bad Peer AS
+```
+This means:
+- You are not connected
+- The neighbor may be using the wrong AS number
+- No routes can be exchanged

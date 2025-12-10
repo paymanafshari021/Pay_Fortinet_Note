@@ -1429,7 +1429,7 @@ It tells you:
 - Whether something is wrong
 
 It’s the _first_ command you normally use when troubleshooting BGP.
-# Key Fields in BGP Summary
+## Key Fields in BGP Summary
 Here’s the output shown:
 ```
 Neighbor        V   AS   MsgRcvd MsgSent TblVer InQ OutQ Up/Down   State/PfxRcd
@@ -1471,17 +1471,17 @@ This column shows either:
 - The **number of prefixes** received (if session is Established)
 
 **Examples:**
-#### ✔ **If the session is up (Established)**
+#### If the session is up (Established
 
 `2` means the neighbor sent you **2 routes**.
-#### ✘ **If the session is NOT up**
+#### If the session is NOT up
 It will show a state, like:
 - `Active` — trying to connect
 - `Idle` — not starting yet
 - `Connect` — trying TCP connection
 
 This field is one of the fastest ways to troubleshoot.
-### **Putting It All Together: Simple Example**
+## **Putting It All Together: Simple Example**
 Imagine you run `get router info bgp summary` and see:
 ```
 Neighbor        AS   Up/Down    State/PfxRcd
@@ -1504,7 +1504,7 @@ This means:
 - BGP is **NOT established**
 - It is stuck in **Active**, meaning it cannot complete TCP port 179 connection
 - You likely have a routing or firewall issue
-### **Why the BGP Summary Is Important**
+## **Why the BGP Summary Is Important**
 Because it immediately shows:
 - Are we talking to the neighbor?
 - Are we exchanging routes?

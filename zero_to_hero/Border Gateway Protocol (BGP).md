@@ -1631,7 +1631,7 @@ If your neighbor says “My AS is 200” but you expect “100,” BGP will rese
 |Accepted/announced prefixes|Shows if routing info is flowing correctly|
 |Connection drops / errors|Helps find configuration mistakes|
 ### **Simple Example Scenario**
-#### ✔ Healthy Neighbor
+#### Healthy Neighbor
 ```
 State = Established
 Accepted prefixes = 5
@@ -1643,7 +1643,7 @@ This means:
 - You received 5 routes
 - You advertised 3
 - Session is stable
-#### ✘ Problem Example
+#### Problem Example
 ```
 State = Active
 Received = 0

@@ -1397,7 +1397,7 @@ Possible reasons:
 - AS numbers don’t match
 - Router IDs conflicting
 - Message dropped by firewall
-#### If you see: Idle
+### If you see: Idle
 BGP is not even trying yet—often because:
 
 - Configuration error
@@ -1405,11 +1405,110 @@ BGP is not even trying yet—often because:
 - Previous error triggered a retry timer
 ### Quick Visual Summary
 
-|BGP State|What It Means|Easy Example|
-|---|---|---|
-|**Idle**|Not trying yet / waiting|Phone in your pocket|
-|**Connect**|Dialing (TCP attempt)|Calling your friend|
-|**Active**|Dial failed, trying again|Redialing|
-|**OpenSent**|Waiting for peer’s OPEN|Saying hello|
-|**OpenConfirm**|Waiting for Keepalive|“Can you hear me?”|
-|**Established**|Session UP, exchanging routes|Conversation begins|
+| BGP State       | What It Means                 | Easy Example         |
+| --------------- | ----------------------------- | -------------------- |
+| **Idle**        | Not trying yet / waiting      | Phone in your pocket |
+| **Connect**     | Dialing (TCP attempt)         | Calling your friend  |
+| **Active**      | Dial failed, trying again     | Redialing            |
+| **OpenSent**    | Waiting for peer’s OPEN       | Saying hello         |
+| **OpenConfirm** | Waiting for Keepalive         | “Can you hear me?”   |
+| **Established** | Session UP, exchanging routes | Conversation begins  |
+
+---
+# BGP Summary
+The **BGP Summary** command:
+```
+get router info bgp summary
+```
+shows you a **quick, high-level overview** of your BGP status.  
+It tells you:
+- Who your neighbors are
+- Whether the sessions are up
+- How many routes (prefixes) they sent you
+- How long they’ve been connected
+- Whether something is wrong
+
+It’s the _first_ command you normally use when troubleshooting BGP.
+# Key Fields in BGP Summary
+Here’s the output shown:
+```
+Neighbor        V   AS   MsgRcvd MsgSent TblVer InQ OutQ Up/Down   State/PfxRcd
+100.64.1.254    4   100     18      20      1     0    0  00:02:55        1
+100.64.2.254    4   100     18      18      1     0    0  00:02:56        2
+```
+Below is what each column means **in simple language**.
+### Neighbor
+The IP address of the BGP peer.
+
+**Example:**  
+`100.64.1.254` is the router you are talking to via BGP.
+### V (Version
+The BGP version.  
+FortiGate always uses **version 4**, so this normally shows `4`.
+### AS (Autonomous System number
+The remote peer’s AS number.
+
+**Example:**  
+If this shows `100`, then the neighbor belongs to AS 100.
+### MsgRcvd / MsgSent
+Number of BGP messages **received** and **sent**.
+
+This helps verify that the routers are communicating.
+
+**Example:**  
+If MsgRcvd increases over time, it means your peer is sending updates and keepalives.
+### Up/Down
+How long the BGP session has been UP (or the time since it went down).
+
+**Example:**  
+`00:02:55` = the neighbor has been successfully connected for 2 minutes 55 seconds.
+
+If it says **never**, the session has **never** been established.
+### State/PfxRcd
+This column shows either:
+- The **BGP state** (Idle, Active, etc.)  
+    **OR**
+- The **number of prefixes** received (if session is Established)
+
+**Examples:**
+#### ✔ **If the session is up (Established)**
+
+`2` means the neighbor sent you **2 routes**.
+#### ✘ **If the session is NOT up**
+It will show a state, like:
+- `Active` — trying to connect
+- `Idle` — not starting yet
+- `Connect` — trying TCP connection
+
+This field is one of the fastest ways to troubleshoot.
+### **Putting It All Together: Simple Example**
+Imagine you run `get router info bgp summary` and see:
+```
+Neighbor        AS   Up/Down    State/PfxRcd
+10.1.1.2        65010  00:10:22      5
+```
+This means:
+
+- You are peering with **10.1.1.2**
+- That router belongs to **AS 65010**
+- The BGP session has been up for **10 minutes**
+- It sent you **5 routes**  
+    → Everything is working fine.
+
+Now imagine you see this:
+```
+Neighbor        AS   Up/Down    State/PfxRcd
+10.1.1.2        65010  00:00:22    Active
+```
+This means:
+- BGP is **NOT established**
+- It is stuck in **Active**, meaning it cannot complete TCP port 179 connection
+- You likely have a routing or firewall issue
+### **Why the BGP Summary Is Important**
+Because it immediately shows:
+- Are we talking to the neighbor?
+- Are we exchanging routes?
+- How long has the session been stable?
+- Are there signs of problems (Active, Idle, etc.)?
+
+It’s the fastest way to get the “health check” of all BGP connections.

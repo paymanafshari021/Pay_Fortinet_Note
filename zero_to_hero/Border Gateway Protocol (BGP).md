@@ -1325,4 +1325,92 @@ Default timers are usually 50ms x3, but you can tune them if needed under interf
 - Very high-scale setups (thousands of peers) – BFD uses a tiny bit of CPU per session.
 - Old hardware or peers that don't support it.
 ---
+# BGP States
 ![Alt text](attachments/01.png)
+# BGP States
+When two routers try to form a BGP connection (called _peering_), they move through several steps called **states**.  
+Think of it like two people trying to start a conversation over the phone: dialing, ringing, saying hello, etc.
+
+Here are the states and what they mean:
+## 1. Idle (Doing nothing yet
+This is the **starting point**.  
+The router is waiting to begin the connection, or it may be retrying after an error.
+
+**Example:**  
+You want to call your friend, but your phone is still in your pocket. You haven’t dialed yet.
+## 2. Connect (Trying to start the TCP connection
+BGP uses **TCP port 179**.  
+In this state, the router is trying to build that TCP connection.
+
+**Example:**  
+You dial your friend’s number, and the phone is trying to connect (ringing).
+## 3. Active (Trying again because Connect failed
+If Connect doesn’t succeed, the router goes to **Active**, which means:  
+“I didn’t connect. I’ll try again.”
+
+**Example:**  
+You dial your friend, but the call fails. You try again.
+
+If it keeps bouncing between **Connect ↔ Active**, that usually means:
+- No route to the neighbor
+- TCP port 179 is blocked
+- An interface is down
+## 4. OpenSent (Waiting for OPEN message
+The TCP connection is up!  
+Now BGP sends an **OPEN message** (contains AS number, router ID, etc.) and waits for the peer’s OPEN.
+
+**Example:**  
+Your friend answers the phone, and you both start saying “Hello, this is me…”
+## 5. OpenConfirm (Waiting for Keepalive
+The routers exchanged OPEN messages and now expect a **Keepalive** to confirm everything is good.
+
+**Example:**  
+You said “Hello,” your friend said “Hello,” and now you wait for a “Yes, I hear you clearly.”
+## 6. Established (SUCCESS
+The BGP session is fully up.  
+The routers now exchange routes (UPDATE messages).
+
+**Example:**  
+The call is connected, and you start your conversation.
+
+This is the state you _want_ to see.
+## Why BGP States Matter
+If a BGP neighbor is not in the **Established** state, it means the routers are **not** exchanging routes.
+In the summary commands, you’ll see:
+
+- A state like `Idle`, `Active`, etc., _if not established_
+- A number (prefixes received) _if established_  
+    (Example: `State/PfxRcd: 2` means 2 prefixes received)
+## Examples of Problems & What the State Tells You
+
+### **If you see: Active**
+Likely TCP cannot connect.
+
+Possible reasons:
+- No route to neighbor
+- Firewall blocking port 179
+- Wrong IP address  
+    (This is shown in the PDF with “No route to host”.)
+### If you see: OpenSent or OpenConfirm for too long
+The OPEN or Keepalive messages are not exchanged properly.
+
+Possible reasons:
+- AS numbers don’t match
+- Router IDs conflicting
+- Message dropped by firewall
+### If you see: Idle
+BGP is not even trying yet—often because:
+
+- Configuration error
+- Admin disabled the neighbor
+- Previous error triggered a retry timer
+### Quick Visual Summary
+
+|BGP State|What It Means|Easy Example|
+|---|---|---|
+|**Idle**|Not trying yet / waiting|Phone in your pocket|
+|**Connect**|Dialing (TCP attempt)|Calling your friend|
+|**Active**|Dial failed, trying again|Redialing|
+|**OpenSent**|Waiting for peer’s OPEN|Saying hello|
+|**OpenConfirm**|Waiting for Keepalive|“Can you hear me?”|
+|**Established**|Session UP, exchanging routes|Conversation begins|

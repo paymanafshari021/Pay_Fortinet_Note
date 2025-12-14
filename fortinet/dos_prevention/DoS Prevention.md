@@ -129,3 +129,4 @@ config firewall DoS-policy
 end
 ```
 ### Remove Quarantine Attacker
+Dashboard > Network > Quarantine

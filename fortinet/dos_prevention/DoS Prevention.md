@@ -10,62 +10,11 @@ config firewall DoS-policy
         set dstaddr "<Public IP>"
         set service "ALL_ICMP"
         config anomaly
-            edit "tcp_syn_flood"
-                set threshold 2000
-            next
-            edit "tcp_port_scan"
-                set threshold 1000
-            next
-            edit "tcp_src_session"
-                set threshold 5000
-            next
-            edit "tcp_dst_session"
-                set threshold 5000
-            next
-            edit "udp_flood"
-                set threshold 2000
-            next
-            edit "udp_scan"
-                set threshold 2000
-            next
-            edit "udp_src_session"
-                set threshold 5000
-            next
-            edit "udp_dst_session"
-                set threshold 5000
-            next
             edit "icmp_flood"
                 set status enable
                 set log enable
                 set action block
                 set threshold 250
-            next
-            edit "icmp_sweep"
-                set threshold 100
-            next
-            edit "icmp_src_session"
-                set threshold 300
-            next
-            edit "icmp_dst_session"
-                set threshold 1000
-            next
-            edit "ip_src_session"
-                set threshold 5000
-            next
-            edit "ip_dst_session"
-                set threshold 5000
-            next
-            edit "sctp_flood"
-                set threshold 2000
-            next
-            edit "sctp_scan"
-                set threshold 1000
-            next
-            edit "sctp_src_session"
-                set threshold 5000
-            next
-            edit "sctp_dst_session"
-                set threshold 5000
             next
         end
     next
@@ -78,7 +27,105 @@ sudo hping3 -i u100 -l <Public IP>
 ---
 ## TCP syn-flood DoS Prevention
 
+Ein **TCP SYN-Flood-Angriff** ist eine **Denial-of-Service (DoS)**-Attacke:
+
+- Der Angreifer schickt sehr viele **SYN-Anfragen** (Verbindungsanfragen) an einen Server.
+- Der Server antwortet jeweils mit **SYN-ACK** und wartet auf die Bestätigung (**ACK**).
+- Diese Bestätigung kommt **nie**.
+- Dadurch bleiben viele **halboffene Verbindungen** bestehen.
+- Die Ressourcen des Servers werden blockiert → **legitime Nutzer kommen nicht mehr durch**.
+```
+config firewall DoS-policy
+    edit 0
+        set name "no tcp sync-flood"
+        set interface "<WAN Interface>"
+        set srcaddr "all"
+        set dstaddr "<Public IP>"
+        set service "ALL_TCP"
+        config anomaly
+            edit "tcp_syn_flood"
+                set status enable
+                set log enable
+                set action block
+                set threshold 10
+            next
+        end
+    next
+end
+```
 ### Test
 ```
 sudo hping3 -i u100 -S -p 80 <Public IP>
 ```
+---
+## Port Scan Policy
+```
+config firewall DoS-policy
+    edit 0
+        set name "disable port scans"
+        set interface "<WAN Interface>"
+        set srcaddr "all"
+        set dstaddr "<Public IP>"
+        set service "ALL"
+        config anomaly
+            edit "tcp_port_scan"
+                set status enable
+                set log enable
+                set action block
+                set threshold 5
+            next
+            edit "udp_scan"
+                set status enable
+                set log enable
+                set action block
+                set threshold 5
+            next
+            edit "sctp_scan"
+                set status enable
+                set log enable
+                set action block
+                set threshold 5
+            next
+        end
+    next
+end
+```
+---
+## Adding Quarantine
+```
+config firewall DoS-policy
+    edit 4
+        set name "disable port scans"
+        set interface "<WAN Interface>"
+        set srcaddr "all"
+        set dstaddr "<Public IP>"
+        set service "ALL"
+        config anomaly
+            edit "tcp_port_scan"
+                set status enable
+                set log enable
+                set action block
+                set quarantine attacker # Quarantine Attacker
+                set quarantine-expiry 4m
+                set threshold 5
+            next
+            edit "udp_scan"
+                set status enable
+                set log enable
+                set action block
+                set quarantine attacker # Quarantine Attacker
+                set quarantine-expiry 4m
+                set threshold 5
+            next
+            edit "sctp_scan"
+                set status enable
+                set log enable
+                set action block
+                set quarantine attacker # Quarantine Attacker
+                set quarantine-expiry 4m
+                set threshold 5
+        end
+    next
+end
+```
+### Remove Quarantine Attacker

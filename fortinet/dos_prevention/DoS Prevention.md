@@ -173,5 +173,50 @@ end
 ```
 ### Test
 ```
-fping -g start-IP end-IP -a
+fping -g <start-IP> <end-IP> -a
+```
+---
+## ICMP Source Session
+
+**“ICMP Source Session”** ist **kein standardisierter Netzwerkbegriff**. Meist wird damit **eine ICMP-basierte Kommunikation (Session) gemeint, bei der die Source-IP relevant oder manipuliert ist**. Je nach Kontext kann es Folgendes bedeuten:
+
+**1. ICMP mit gefälschter Source-IP (Spoofing)**
+
+- ICMP-Pakete werden mit einer **gefälschten Absenderadresse** gesendet.
+- Ziel: **Anonymität**, Umgehung von Filtern oder **Reflexionsangriffe**.
+- ICMP selbst ist **verbindungslos**, daher gibt es technisch keine echte „Session“.
+
+**2. ICMP-basierte Kommunikation / Tunneling**
+
+- ICMP wird missbraucht, um **Daten zu übertragen** (z. B. durch Firewalls).
+- Sieht wie Ping aus, ist aber eine **verdeckte Session**.
+
+**3. Falsche Bezeichnung**
+
+- Oft wird „Session“ fälschlich benutzt für **ICMP Request/Reply-Austausch** (Ping).
+
+**Kurzfassung:** ICMP hat **keine echten Sessions**. „ICMP Source Session“ meint meist **ICMP-Verkehr mit besonderem Fokus auf die Absenderadresse** (oft Spoofing oder Tunneling).
+
+```
+config firewall DoS-policy
+    edit 6
+        set name "limit icmp source"
+        set interface "vlan191"
+        set srcaddr "all"
+        set dstaddr "all"
+        set service "ALL_ICMP"
+        config anomaly
+            edit "icmp_src_session"
+                set status enable
+                set log enable
+                set action block
+                set threshold 50
+            next
+        end
+    next
+end
+```
+### Test
+```
+fping -g <start-IP> <end-IP> -a
 ```

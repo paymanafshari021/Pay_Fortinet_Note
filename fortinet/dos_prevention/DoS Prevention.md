@@ -130,3 +130,48 @@ end
 ```
 ### Remove Quarantine Attacker
 Dashboard > Network > Quarantine
+
+---
+## ICMP_Sweep
+
+An **ICMP sweep** (also called a **ping sweep**) is a **network reconnaissance technique** used to discover which IP addresses in a range are **active**.
+
+**How it works:**
+
+- The attacker sends **ICMP Echo Request (ping)** packets to many IP addresses.
+- Hosts that are online reply with **ICMP Echo Reply**.
+- This reveals which systems are **alive** on the network.
+
+**Purpose:**
+
+- Used for **network mapping** before an attack.
+- Can also be used by administrators for **legitimate network discovery**.
+
+**Security impact:**
+
+- Helps attackers identify potential targets.
+- Large ICMP sweeps may trigger **IDS/IPS alerts** or be blocked by firewalls.
+
+```
+config firewall DoS-policy
+    edit 5
+        set name "no icmp sweep"
+        set interface "<Inside>"
+        set srcaddr "all"
+        set dstaddr "all"
+        set service "ALL"
+        config anomaly
+            edit "icmp_sweep"
+                set status enable
+                set log enable
+                set action block
+                set threshold 20
+            next
+        end
+    next
+end
+```
+### Test
+```
+fping -g start-IP end-IP -a
+```

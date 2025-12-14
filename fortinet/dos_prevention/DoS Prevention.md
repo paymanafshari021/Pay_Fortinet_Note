@@ -1,12 +1,11 @@
 #dos #ddos #Prevention
 # DoS Prevention
 ## ICMP Flooding DoS Prevention
-
 ```
 config firewall DoS-policy
-    edit 2
+    edit 0
         set name "no icmp flooding"
-        set interface "virtual-wan-link"
+        set interface "<WAN Interface>"
         set srcaddr "all"
         set dstaddr "<Public IP>"
         set service "ALL_ICMP"
@@ -72,8 +71,14 @@ config firewall DoS-policy
     next
 end
 ```
-Test
+### Test
 ```
-sudo hping3 -i u100 -l <IP Address>
+sudo hping3 -i u100 -l <Public IP>
 ```
 ---
+## TCP syn-flood DoS Prevention
+
+### Test
+```
+sudo hping3 -i u100 -S -p 80 <Public IP>
+```

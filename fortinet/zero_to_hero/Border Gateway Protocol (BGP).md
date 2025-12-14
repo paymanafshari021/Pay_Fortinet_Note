@@ -1326,7 +1326,7 @@ Default timers are usually 50ms x3, but you can tune them if needed under interf
 - Old hardware or peers that don't support it.
 ---
 # BGP States
-![Alt text](attachments/01.png)
+![Alt text](repo_github/fortinet/zero_to_hero/attachments/01.png)
 When two routers try to form a BGP connection (called _peering_), they move through several steps called **states**.  
 Think of it like two people trying to start a conversation over the phone: dialing, ringing, saying hello, etc.
 

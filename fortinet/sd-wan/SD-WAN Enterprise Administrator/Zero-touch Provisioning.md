@@ -25,8 +25,8 @@
     - Loads the **desired configuration** automatically.
 
 ![](fortinet-repo/sd-wan/SD-WAN%20Enterprise%20Administrator/attachments/01.png)
-![](attachments/02.png)
-![](attachments/03.png)
+![](repo_github/fortinet/sd-wan/SD-WAN%20Enterprise%20Administrator/attachments/02.png)
+![](repo_github/fortinet/sd-wan/SD-WAN%20Enterprise%20Administrator/attachments/03.png)
 ### **Device Blueprint Overview**
 - A device blueprint defines parameters for a specific device model.
 - Multiple blueprints can exist for the same model.
@@ -71,4 +71,4 @@
     - Break connectivity between FortiGate and FortiManager.
     - Cause ZTP process failure.
 
-![](attachments/04.png)
+![](04.png)

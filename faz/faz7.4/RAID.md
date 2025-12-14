@@ -6,7 +6,7 @@ FortiAnalyzer units with multiple drives support several RAID configurations. Re
 
 ---
 
-![](attachments/02.png)
+![](repo_github/faz/faz7.4/attachments/02.png)
 ![](fortinet-repo/faz/faz7.4/attachments/01.png)
 #### **Linear RAID**
 

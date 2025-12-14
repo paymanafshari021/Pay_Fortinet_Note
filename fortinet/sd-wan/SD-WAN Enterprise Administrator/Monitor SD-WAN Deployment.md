@@ -1,4 +1,4 @@
-![](attachments/07.png)
+![](07.png)
 ### **Default Behavior**
 - FortiManager shows device and interface statistics for the **past 10 minutes only**.
 ### **Enable Extended Monitoring**
@@ -18,7 +18,7 @@ end
   end
 ```
 
-![](attachments/08.png)
+![](08.png)
 ### **Purpose**
 - The **SD-WAN monitor template view** provides a **map-based visualization** of all devices linked to an SD-WAN overlay template.
 ### **Map Elements**
@@ -43,8 +43,8 @@ end
     - Static & dynamic routing tables
     - IPsec VPN table
 
-![](attachments/09.png)
-![](attachments/10.png)
+![](09.png)
+![](10.png)
 #### **Purpose of Analytics and Reporting**
 
 - FortiAnalyzer relies on logs from devices for analytics and reporting.

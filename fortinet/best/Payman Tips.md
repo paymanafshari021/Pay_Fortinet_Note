@@ -106,14 +106,14 @@ config log memory filter
     set local-traffic enable
 end
 ```
-## Configure log retention on FortiGates with disks
+# Configure log retention on FortiGates with disks
 ```
 config log disk setting
 	set status enable
 	set maximum-log-age 0
 end
 ```
-## Local-In Policies for management
+# Local-In Policies for management
 Create a group called, for example, "GRP_ALLOWED_SOURCES_MGMT_LOCAL_IN" with all your relevant hosts and subnets
 ```
  config firewall local-in-policy
@@ -136,11 +136,12 @@ Create a group called, for example, "GRP_ALLOWED_SOURCES_MGMT_LOCAL_IN" with all
     next
 end
 ```
-## Changes services as necessary
+---
+# Changes services as necessary
 
-  Use trusted hosts in addition to local-in policies
-  Use Network Protocol Enforcement in Application Control profiles
-  Apply where necessary. Be careful with HTTP/HTTPS, because legitimate programs use it.
+Use trusted hosts in addition to local-in policies
+Use Network Protocol Enforcement in Application Control profiles
+Apply where necessary. Be careful with HTTP/HTTPS, because legitimate programs use it.
 ```
 config application list
     edit "<PROFILE>"
@@ -178,7 +179,8 @@ config application list
     next
 end
 ```
-Route RFC1918 addresses in a blackhole
+---
+# Route RFC1918 addresses in a blackhole
 ```
 config firewall address
 edit "N_RFC-1918-10_8"
@@ -209,7 +211,8 @@ next
 end
 
 ```
- ## Small things for hardening
+ ---
+# Small things for hardening
 ```
 config system global
 set admin-https-ssl-versions tlsv1-2 tlsv1-3
@@ -225,7 +228,8 @@ set auto-install-config disable
 set auto-install-image disable
 end
 ```
-Use Threat Feeds
+---
+# Use Threat Feeds
 ```
 config system external-resource
     edit "EXT_TF_EMERGINGTHREAT_BLOCK_IPs"
@@ -269,31 +273,7 @@ next
 end
 ```
 ---
-
-| **Name**                           | **URL**                                                                                            | **Type / Notes**                           |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| Emerging Threats – Block IPs       | `https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt`                                 | General malicious IPs                      |
-| Emerging Threats – Compromised IPs | `https://rules.emergingthreats.net/blockrules/compromised-ips.txt`                                 | Known compromised hosts                    |
-| Feodo Tracker Recommended          | `https://feodotracker.abuse.ch/downloads/ipblocklist_recommended.txt`                              | Botnet C2 servers                          |
-| FireHOL Level 1                    | `https://raw.githubusercontent.com/ktsaou/blocklist-ipsets/master/firehol_level1.netset`           | Low-false-positive general blocklist       |
-| Blocklist.de – All                 | `https://lists.blocklist.de/lists/all.txt`                                                         | Attacks detected by blocklist.de honeypots |
-| CINS Bad Guys                      | `https://cinsscore.com/list/ci-badguys.txt`                                                        | High-risk attackers from CINS Score        |
-| C2 Tracker                         | `https://raw.githubusercontent.com/montysecurity/C2-Tracker/main/data/all.txt`                     | Command-and-control servers                |
-| Abuse.ch SSL Blacklist             | `https://sslbl.abuse.ch/blacklist/sslipblacklist.txt`                                              | Malware using SSL certificates             |
-| IPSum                              | `https://raw.githubusercontent.com/stamparm/ipsum/master/ipsum.txt`                                | Aggressive IP reputation list              |
-| DigitalSide Threat-Intel           | `https://osint.digitalside.it/Threat-Intel/lists/latesturls.txt`                                   | Malicious URLs & associated IPs            |
-| Blocklist.de – SSH                 | `https://lists.blocklist.de/lists/ssh.txt`                                                         | Attackers hitting SSH                      |
-| Blocklist.de – Mail                | `https://lists.blocklist.de/lists/mail.txt`                                                        | SMTP/email attackers                       |
-| Blocklist.de – FTP                 | `https://lists.blocklist.de/lists/ftp.txt`                                                         | FTP attackers                              |
-| Blocklist.de – Web                 | `https://lists.blocklist.de/lists/apache.txt`                                                      | Apache/web server attacks                  |
-| FireHOL Level 2                    | `https://raw.githubusercontent.com/ktsaou/blocklist-ipsets/master/firehol_level2.netset`           | More aggressive blocklist                  |
-| FireHOL Level 3                    | `https://raw.githubusercontent.com/ktsaou/blocklist-ipsets/master/firehol_level3.netset`           | Very aggressive blocklist                  |
-| Malicious IP (GitHub)              | `https://raw.githubusercontent.com/romainmarcoux/malicious-ip/main/malicious.ip`                   | Community malicious IP list                |
-| Malicious Outgoing IP (GitHub)     | `https://raw.githubusercontent.com/romainmarcoux/malicious-outgoing-ip/main/malicious_outgoing.ip` | Outbound threat IPs                        |
-| ThreatHive Blocklist               | `https://threathive.net/hiveblocklist.txt`                                                         | Real-time honeypot-based blocklist         |
-| IsMalicious Free                   | `https://ismalicious.com/blocklist.txt`                                                            | Large aggregated threat feed               |
-
-## Block ISDB objects
+# Block ISDB objects
 ```
 config firewall internet-service-group
 edit "ISDB-BLOCK-SOURCE"

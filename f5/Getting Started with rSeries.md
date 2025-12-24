@@ -195,6 +195,7 @@ The F5OS platform layer supports two distinct types of networking:
     - The F5OS platform layer management plane is **fully isolated** from the in-band data plane,.
     - The F5OS out-of-band IP address is accessible _only_ through the out-of-band management network and cannot be accessed via the in-band network.
     - **Tenant Management:** R series tenants automatically inherit the management VLAN from the F5OS platform layer, and each tenant is assigned a unique management IP address within that inherited VLAN.
+    
 2. **In-Band Network (Data Plane):**
     
     - This network is used exclusively for the **data plane**.
@@ -205,7 +206,6 @@ The F5OS platform layer supports two distinct types of networking:
 ### Port Group and Pipeline Group Theory
 
 These concepts define how the physical hardware resources and available bandwidth are organized and utilized.
-
 #### Port Group
 
 A **port group** organizes the physical ports on the rSeries platform.
@@ -232,14 +232,55 @@ A **pipeline group** manages the fundamental hardware processing layers.
 
 ### Lab Walkthrough: R 2800 Configuration
 
-The lab demonstration used two R 2800 devices (Host One and Host Two) configured with the **8 x 10 gig port group profile**,.
+The lab walkthrough detailed the step-by-step configuration of the in-band data and HA networks on two F5 R 2800 devices (Host One and Host Two), using the F5OS platform layer.
 
-The objective was to complete three tasks:
+The objective was to complete three tasks: set up the Data VLAN LAG, set up the HA VLAN LAG, and create/assign the necessary VLANs.
 
-1. **Set up Data VLAN LAG:** Ports 1 and 2 were used for the in-band data LAG uplink, connected to a network switch with dynamic LACP configured on both the F5 host and the switch side,.
-2. **Set up HA VLAN LAG:** Ports 3 and 4 were used for the in-band HA LAG, physically interconnected between Host One and Host Two,. Like the Data LAG, this was configured as a dynamic LACP LAG, noting that the HA LAG will not come up until the peer configuration is completed,.
-3. **Create and Assign VLANs:** The necessary VLANs were created and assigned to the appropriate LAGs:
-    - **VLANs 230 and 231** (for publishing/client side and reverse proxy/server side, respectively) were assigned to the **Data LAG**,.
-    - **VLAN 4001** (for High Availability) was assigned to the **HA LAG**,.
+### Initial Lab Setup and Prerequisites
 
-The lab successfully configured LACP LAGs for data and HA on both hosts, with an aggregated bandwidth of 20 Gbps each,.
+1. **Hardware:** The lab utilized two F5 R 2800 devices, named F5 Host One lab.AE and F5 Host Two lab.AE.
+2. **Management Configuration:** The devices were previously configured with management IPs 10.105.15 (Host One) and 10.105.16 (Host Two).
+3. **Port Group Profile:** The **8 x 10 gig port group profile** was applied, allowing all ports (1 through 8) to function at 10 Gbps speed,.
+4. **Physical Connections:**
+    - **Data LAG:** Ports 1 and 2 were used for the in-band data LAG uplink, connected to a network switch. Dynamic LACP was configured on the network switch side.
+    - **HA LAG:** Ports 3 and 4 were used for the in-band HA LAG, physically interconnected between F5 Host One and F5 Host Two,.
+
+---
+
+### Step-by-Step Configuration
+
+#### Task 1: Setting up the Data VLAN LAG
+
+This configuration was performed on both Host One and Host Two:
+
+1. **Log in to F5OS** on Host One (and repeat for Host Two).
+2. Navigate to the **LAG configuration** section and click "add lag".
+3. Enter the LAG name as **`data_lag`**.
+4. Set the LAG type to **LACP** (for dynamic LAG).
+5. Add **ports 1 and 2** as configured port members.
+6. Click save and close.
+7. **Verification:** After waiting a few seconds for LACP negotiation, the `data_lag` came up on both hosts with an aggregated bandwidth of **20 Gbps**.
+
+#### Task 2: Setting up the HA VLAN LAG
+
+This configuration was also performed on both Host One and Host Two:
+
+1. Navigate to the **LAG configuration** section and click "add lag".
+2. Enter the LAG name as **`HA_LAG`**.
+3. Set the LAG type to **LACP** (for dynamic LAG).
+4. Add **ports 3 and 4** as configured members.
+5. Click save and close.
+6. **Verification:** The `HA_LAG` did not come up until the peer configuration was completed on Host Two. Once configured on both sides, the `HA_LAG` came up on both hosts with an aggregated bandwidth of **20 Gbps**.
+
+#### Task 3: Creating VLANs and Assigning them to LAGs
+
+This configuration was performed on both Host One and Host Two:
+
+1. **Create VLANs:** Navigate to the VLAN configuration section and click "add vlan",.
+    - Create **VLAN ID 230**, named **`PUB`** (for client-side/publishing),,.
+    - Create **VLAN ID 231**, named **`RP`** (for server-side/reverse proxy),,.
+    - Create **VLAN ID 4001**, named **`HA`** (for High Availability),,.
+2. **Assign Data VLANs:** Edit the **`data_lag`**,. Select VLAN 230 and VLAN 231, and then save and close,.
+3. **Assign HA VLAN:** Edit the **`HA_LAG`**,. Select VLAN 4001, and then save and close,.
+
+This final step assigned the necessary data and HA VLANs to their respective Link Aggregation Groups on both F5 rSeries hosts.

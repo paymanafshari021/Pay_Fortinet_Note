@@ -179,4 +179,67 @@ After the F5OS platform is upgraded, the next step is to prepare for tenant depl
 
 - **Upload:** To import the tenant image, navigate to **Tenant Management** and click **Tenant Images**. Click **Upload**, locate and select the downloaded tenant image.
 - **Verification:** The system will upload the image and then verify it, which takes a couple of minutes. Once the image status shows **ready**, the tenant image is available for deployment on the rSeries platform.
+
 > **Note on TMOS Support:** When migrating from iSeries to rSeries, it is important to know the minimum supported TMOS version. For lower-end rSeries 2000 and 4000 models, the minimum supported TMOS version is 15.1.6 and later. For higher-end rSeries 5000 and 10000 models, the minimum supported version is 15.1.5 and later. If replacing iSeries hardware, the iSeries must be running 15.1.6 or above to successfully migrate the configuration to rSeries.
+
+## F5OS rSeries Networking Architecture
+
+Chapter provides a detailed examination of the **F5OS rSeries networking architecture**, covering the separation of data and management planes, the concepts of port groups and pipeline groups, and a lab demonstration of configuring LAGs (Link Aggregation Groups) and VLANs.
+### F5OS Networking Architecture (Out-of-Band vs. In-Band)
+
+The F5OS platform layer supports two distinct types of networking:
+
+1. **Out-of-Band Network (Management Plane):**
+    
+    - This network is used exclusively for the **management plane**.
+    - The F5OS platform layer management plane is **fully isolated** from the in-band data plane,.
+    - The F5OS out-of-band IP address is accessible _only_ through the out-of-band management network and cannot be accessed via the in-band network.
+    - **Tenant Management:** R series tenants automatically inherit the management VLAN from the F5OS platform layer, and each tenant is assigned a unique management IP address within that inherited VLAN.
+2. **In-Band Network (Data Plane):**
+    
+    - This network is used exclusively for the **data plane**.
+    - All data plane networking is configured at the **F5OS host layer**.
+    - F5OS utilizes **Link Aggregation Groups (LAGs)**, and VLANs are created and assigned to these LAGs.
+    - When tenants are created, they only inherit the VLANs they are **explicitly permitted to access** based on their specific requirements. The F5OS layer does not have any in-band data plane IP address configured.
+
+### Port Group and Pipeline Group Theory
+
+These concepts define how the physical hardware resources and available bandwidth are organized and utilized.
+
+#### Port Group
+
+A **port group** organizes the physical ports on the rSeries platform.
+
+- It sets up possible combinations that dictate **which ports to use**, **what speed each port should run at**, the type of cable/connector used, and which ports are active or disabled.
+- It is crucial to ensure that the total configured bandwidth **does not exceed the device capacity** (e.g., 100 Gbps),.
+- The valid combinations are analogous to "valid serving combinations" in the source's birthday cake analogy, where the cake represents the available bandwidth.
+
+**F5 R 2800 Port Group Profiles Example:** The R 2800 features 4 copper ports (1/10 gig) and 4 fiber ports (1/10/25 gig). Three configuration profiles are supported:
+
+1. **Profile 1 (8 x 10 gig mode):** Ports 1–4 (copper) and 5–8 (SFP) operate at **10 gig each**. The total bandwidth is 80 Gbps, and 25 gig ports cannot be used.
+2. **Profile 2 (4 x 10 gig + 2 x 25 gig mode):** Ports 1–4 operate at 10 gig; Ports 5–6 operate at **25 gig each**. Ports 7 and 8 are disabled. Total bandwidth is 90 Gbps.
+3. **Profile 3 (4 x 25 gig mode):** Ports 1–4 (copper) are disabled; Ports 5–8 operate at **25 Gbps each** (only four SFP ports are active). Total bandwidth remains within the limit.
+
+#### Pipeline Group
+
+A **pipeline group** manages the fundamental hardware processing layers.
+
+- Each pipeline supports a maximum bandwidth of **100 Gbps**.
+- A pipeline group can contain a maximum of **two pipelines**, and every F5 rSeries device must have at least one pipeline.
+- **Hardware Isolation:** Pipelines provide physical **hardware level isolation** by dividing the internal architecture into separate data processing pipelines, each with dedicated resources (like CPU cores and network interfaces). This allows for strict separation of traffic, such as dividing the hardware between Data Center and DMZ networks,.
+- **Model Constraint:** Lower-end models (R 2000 and R 4000) only support a **single pipeline**, meaning hardware level separation is not possible on these models.
+- **LAG Constraint:** A critical constraint is that when creating a LAG, all member ports must belong to the **same pipeline**.
+
+### Lab Walkthrough: R 2800 Configuration
+
+The lab demonstration used two R 2800 devices (Host One and Host Two) configured with the **8 x 10 gig port group profile**,.
+
+The objective was to complete three tasks:
+
+1. **Set up Data VLAN LAG:** Ports 1 and 2 were used for the in-band data LAG uplink, connected to a network switch with dynamic LACP configured on both the F5 host and the switch side,.
+2. **Set up HA VLAN LAG:** Ports 3 and 4 were used for the in-band HA LAG, physically interconnected between Host One and Host Two,. Like the Data LAG, this was configured as a dynamic LACP LAG, noting that the HA LAG will not come up until the peer configuration is completed,.
+3. **Create and Assign VLANs:** The necessary VLANs were created and assigned to the appropriate LAGs:
+    - **VLANs 230 and 231** (for publishing/client side and reverse proxy/server side, respectively) were assigned to the **Data LAG**,.
+    - **VLAN 4001** (for High Availability) was assigned to the **HA LAG**,.
+
+The lab successfully configured LACP LAGs for data and HA on both hosts, with an aggregated bandwidth of 20 Gbps each,.

@@ -169,7 +169,7 @@ After the F5OS platform is upgraded, the next step is to prepare for tenant depl
 
 - **Location:** The tenant OS image is downloaded from the F5 support portal (Downloads).
 - **Selection:** Select the product group as **BIG-IP** and the product line as **BIG-IP virtual edition**. 
-	- Since the **<ins>tenant OS</ins>** is deployed on rSeries appliances, select the option labeled **tenant fios**.
+	- Since the **<ins>tenant OS</ins>** is deployed on rSeries appliances, select the option labeled **tenant f5os**.
 - **Tenant Image Size:** When selecting the image, options like micro, small, medium, and large are available.
     - **Micro and Small** images include only the base system and limited BIG-IP modules (LTM and DNS), with remaining components downloaded during deployment.
     - **Medium and Large** images support all BIG-IP modules.
@@ -179,7 +179,4 @@ After the F5OS platform is upgraded, the next step is to prepare for tenant depl
 
 - **Upload:** To import the tenant image, navigate to **Tenant Management** and click **Tenant Images**. Click **Upload**, locate and select the downloaded tenant image.
 - **Verification:** The system will upload the image and then verify it, which takes a couple of minutes. Once the image status shows **ready**, the tenant image is available for deployment on the rSeries platform.
-
----
-
-**Note on TMOS Support:** When migrating from iSeries to rSeries, it is important to know the minimum supported TMOS version. For lower-end rSeries 2000 and 4000 models, the minimum supported TMOS version is 15.1.6 and later. For higher-end rSeries 5000 and 10000 models, the minimum supported version is 15.1.5 and later. If replacing iSeries hardware, the iSeries must be running 15.1.6 or above to successfully migrate the configuration to rSeries.
+> **Note on TMOS Support:** When migrating from iSeries to rSeries, it is important to know the minimum supported TMOS version. For lower-end rSeries 2000 and 4000 models, the minimum supported TMOS version is 15.1.6 and later. For higher-end rSeries 5000 and 10000 models, the minimum supported version is 15.1.5 and later. If replacing iSeries hardware, the iSeries must be running 15.1.6 or above to successfully migrate the configuration to rSeries.

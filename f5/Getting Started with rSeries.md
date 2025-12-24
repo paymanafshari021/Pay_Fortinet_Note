@@ -168,7 +168,8 @@ After the F5OS platform is upgraded, the next step is to prepare for tenant depl
 #### 1. Downloading the Tenant OS Image
 
 - **Location:** The tenant OS image is downloaded from the F5 support portal (Downloads).
-- **Selection:** Select the product group as **BIG-IP** and the product line as **BIG-IP virtual edition**. Since the tenant OS is deployed on rSeries appliances, select the option labeled **tenant fios**.
+- **Selection:** Select the product group as **BIG-IP** and the product line as **BIG-IP virtual edition**. 
+	- Since the **<ins>tenant OS</ins>** is deployed on rSeries appliances, select the option labeled **tenant fios**.
 - **Tenant Image Size:** When selecting the image, options like micro, small, medium, and large are available.
     - **Micro and Small** images include only the base system and limited BIG-IP modules (LTM and DNS), with remaining components downloaded during deployment.
     - **Medium and Large** images support all BIG-IP modules.

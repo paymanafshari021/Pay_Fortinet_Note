@@ -284,3 +284,74 @@ This configuration was performed on both Host One and Host Two:
 3. **Assign HA VLAN:** Edit the **`HA_LAG`**,. Select VLAN 4001, and then save and close,.
 
 This final step assigned the necessary data and HA VLANs to their respective Link Aggregation Groups on both F5 rSeries hosts.
+
+---
+## Tenant OS Deployment Preparation in F5 rSeries
+
+The preparation steps ensure that resources, networking, and deployment modes are correctly defined for the tenants (which are the guest operating systems running on the F5OS host).
+ 
+Here is a comprehensive explanation of the prerequisites discussed:
+### 1. Tenant Names and Management IP Addresses
+
+Defining the tenant identity and management access is the first step. The lab design for this learning series planned to deploy two tenants: one on Host One and one on Host Two.
+
+- **Tenant on Host One:** Named **`prod_LB1`**, with the management IP address **10.105.2.21**.
+- **Tenant on Host Two:** Named **`prod_LB2`**, with the management IP address **10.105.2.31**.
+
+### 2. Tenant OS Availability
+
+To deploy the BIG-IP tenant, the required tenant image must be downloaded from the F5 website and imported to the rSeries host. This preparation was completed in Chapter 03 of the learning series, ensuring the tenant OS is available on both rSeries hosts.
+
+### 3. Tenant Networking Layer
+
+The tenant must be connected to the existing in-band (data) and HA networks, which were configured at the F5OS host layer in Chapter 04 of the learning series.
+
+- **Data LAG and VLANs:** The data Link Aggregation Group (LAG) must be configured. Based on the lab design, two data VLANs were required: **VLAN 230** (for the client side) and **VLAN 231** (for the server side), both assigned to the data LAG.
+- **HA LAG and VLAN:** The High Availability (HA) LAG must also be configured, along with the corresponding HA VLAN. The lab used **VLAN 4001** for HA, which was assigned to the HA LAG.
+
+### 4. Tenant MAC Block Size
+
+The MAC block size determines the number of unique MAC addresses available within a tenant. These addresses are primarily assigned to virtual servers within the tenant.
+
+**MAC Block Size Options:**
+
+|Option|Allocated MAC Addresses|
+|:--|:--|
+|Option 1|1 MAC address|
+|Small|8 MAC addresses|
+|Medium|16 MAC addresses|
+|Large|32 MAC addresses|
+
+**Choosing a MAC Block Size:** The number of virtual servers configured is **not directly limited** by the MAC block size, as in standard routed mode, multiple virtual servers can share the same MAC address assigned to the tenant interfaces.
+
+However, more MAC addresses are required for **special deployment cases**, such as deploying the F5 tenant in **transparent mode** or **Layer 2 inline mode**, where the F5 device is not the gateway. In these cases, each virtual server needs a unique MAC address for proper traffic handling and return path consistency.
+
+For production deployment, it is always recommended to choose **medium or large** MAC block sizes. Allocating a larger MAC block size provides more flexibility for scaling virtual servers or handling special deployment scenarios without any negative impact or resource loss, even if not all addresses are used.
+
+### 5. Resource Provisioning
+
+Resource provisioning defines how vCPUs and DRAM (memory) are allocated to the tenant. Two options are available:
+
+- **Recommended Option:** The system only allows you to select the number of **virtual CPUs** (vCPUs) for the tenant, and the **DRAM is automatically allocated** by the system based on the vCPU count. This option does not provide flexibility to manually adjust DRAM allocation.
+- **Advanced Option:** This option allows for the manual configuration of **both vCPUs and DRAM**. This provides flexibility for customizing CPU and DRAM allocation beyond the default recommendations, which may be preferred if DRAM needs adjustment based on the specific modules installed on the tenant.
+
+### 6. Understanding and Changing the Tenant Deployment State
+
+Changing the tenant deployment state must be done with extra care as it can impact the tenant's availability. There are three available states:
+
+|Deployment State|Description|Caution|
+|:--|:--|:--|
+|**Configured**|This state is only for **initial deployment**. Tenant settings are configured, but **no system resources** (CPU, memory, storage) are yet allocated.|Do not change a provisioned or deployed tenant back to the configured state, as this will stop the running tenant, **delete the tenant’s virtual disk** (removing all configuration and runtime data), and release all allocated resources. This action effectively resets the tenant's state.|
+|**Provisioned**|**System resources** (CPU, memory, disk space) are allocated, and the **virtual disk is created and retained**. However, the tenant is **not actively running**.|Changing from deployed to provisioned gracefully shuts down the tenant while **preserving the virtual disk and all configuration data**. This state is useful for pausing the tenant (e.g., during host upgrades) without losing its data.|
+|**Deployed**|This is the **fully operational state** where the tenant is active and running. The tenant utilizes the allocated resources to process traffic.|A tenant can move to the deployed state from either the configured state (which allocates resources and starts the tenant) or the provisioned state (which starts the tenant using already allocated resources).|
+
+### 7. Enabling Crypto Acceleration
+
+Enabling crypto acceleration is necessary to ensure optimal performance. F5 rSeries uses **built-in hardware acceleration** to offload intensive cryptographic tasks, such as SSL/TLS encryption and decryption. This process improves cryptographic speed and efficiency, reduces CPU usage, and improves overall traffic processing performance. It is recommended to always ensure this feature is enabled.
+
+### 8. Appliance Mode
+
+Understanding the difference between normal mode and appliance mode helps determine the resource allocation strategy.
+
+- **Normal Mode:** A single tenant performs multiple tasks simultaneously, such as running LTM (Load Balancing) and ASM (Application Security) together.
+- **Appliance Mode:** The tenant is designed to perform a **specific, single task** (e.g., only application security). This tenant uses dedicated resources for that specific job, which simplifies management and helps keep the performance steady.

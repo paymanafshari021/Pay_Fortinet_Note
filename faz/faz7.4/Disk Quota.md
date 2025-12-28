@@ -13,7 +13,7 @@ The FortiAnalyzer system reserves between 5% to 20% disk space for compression f
 diag log device
 ```
 
-![[diaglogdevice.png]]
+![][diaglogdevice.png]
 
 ---
 To make sure the disk (storage space) doesn’t get full, it uses a system called **disk quota enforcement**.  

@@ -339,11 +339,11 @@ Resource provisioning defines how vCPUs and DRAM (memory) are allocated to the t
 
 Changing the tenant deployment state must be done with extra care as it can impact the tenant's availability. There are three available states:
 
-|Deployment State|Description|Caution|
-|:--|:--|:--|
-|**Configured**|This state is only for **initial deployment**. Tenant settings are configured, but **no system resources** (CPU, memory, storage) are yet allocated.|Do not change a provisioned or deployed tenant back to the configured state, as this will stop the running tenant, **delete the tenant’s virtual disk** (removing all configuration and runtime data), and release all allocated resources. This action effectively resets the tenant's state.|
-|**Provisioned**|**System resources** (CPU, memory, disk space) are allocated, and the **virtual disk is created and retained**. However, the tenant is **not actively running**.|Changing from deployed to provisioned gracefully shuts down the tenant while **preserving the virtual disk and all configuration data**. This state is useful for pausing the tenant (e.g., during host upgrades) without losing its data.|
-|**Deployed**|This is the **fully operational state** where the tenant is active and running. The tenant utilizes the allocated resources to process traffic.|A tenant can move to the deployed state from either the configured state (which allocates resources and starts the tenant) or the provisioned state (which starts the tenant using already allocated resources).|
+| Deployment State | Description                                                                                                                                                      | Caution                                                                                                                                                                                                                                                                                        |
+| :--------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Configured**   | This state is only for **initial deployment**. Tenant settings are configured, but **no system resources** (CPU, memory, storage) are yet allocated.             | Do not change a provisioned or deployed tenant back to the configured state, as this will stop the running tenant, **delete the tenant’s virtual disk** (removing all configuration and runtime data), and release all allocated resources. This action effectively resets the tenant's state. |
+| **Provisioned**  | **System resources** (CPU, memory, disk space) are allocated, and the **virtual disk is created and retained**. However, the tenant is **not actively running**. | Changing from deployed to provisioned gracefully shuts down the tenant while **preserving the virtual disk and all configuration data**. This state is useful for pausing the tenant (e.g., during host upgrades) without losing its data.                                                     |
+| **Deployed**     | This is the **fully operational state** where the tenant is active and running. The tenant utilizes the allocated resources to process traffic.                  | A tenant can move to the deployed state from either the configured state (which allocates resources and starts the tenant) or the provisioned state (which starts the tenant using already allocated resources).                                                                               |
 
 ### 7. Enabling Crypto Acceleration
 
@@ -355,3 +355,65 @@ Understanding the difference between normal mode and appliance mode helps determ
 
 - **Normal Mode:** A single tenant performs multiple tasks simultaneously, such as running LTM (Load Balancing) and ASM (Application Security) together.
 - **Appliance Mode:** The tenant is designed to perform a **specific, single task** (e.g., only application security). This tenant uses dedicated resources for that specific job, which simplifies management and helps keep the performance steady.
+
+## BIG-IP Tenant Deployment on rSeries Hosts
+
+The deployment of Tenant01 (`prod_LB1`) on rSeries Host01 and Tenant02 (`prod_LB2`) on rSeries Host02 follows a detailed process involving defining settings, provisioning resources, and transitioning the tenant through deployment states. This process is a continuation of the preparation steps outlined in Chapter 05.
+
+### Deployment of Tenant01 (`prod_LB1`) on rSeries Host01
+
+The steps below detail the creation and deployment of the first tenant:
+
+#### 1. Tenant Creation and Initial Configuration (Configured State)
+
+After logging into the rSeries host, the deployment starts by confirming the BIG-IP tenant image is available in the Tenant Images section. Then, the following settings are configured in the Tenant Deployment section:
+
+|Setting|Value|Detail|
+|:--|:--|:--|
+|**Tenant Name**|`prod_LB1`|The name chosen for Tenant One.|
+|**Tenant Type**|BIG-IP|Specifies the type of guest OS being deployed.|
+|**Tenant Image**|17.1.2.2|The previously imported BIG-IP tenant image is selected.|
+|**Management IP**|10.105.2.21|The tenant's unique management IP address is set.|
+|**Subnet Mask / Prefix**|255.255.255.0 / /24|Configured for the management network.|
+|**Default Gateway**|10.105.1.1|The management default gateway is configured.|
+|**Data VLANs**|230 and 231|Selected for data traffic.|
+|**HA VLAN**|4001|Selected for High Availability traffic.|
+|**MAC Block Size**|Large|Provides 32 MAC addresses, offering more flexibility for scaling virtual servers in special deployments.|
+|**Deployment Option**|Recommended|This allows choosing the number of vCPUs, with the system automatically assigning the memory. (It is noted that the Advanced Mode, which allows flexible vCPU and memory configuration, is highly recommended for production environments for module configuration adjustments).|
+|**vCPU**|4|Four vCPUs are selected using the Recommended option.|
+|**Virtual Disk Size**|160GB|The large tenant image requires a minimum disk size of 142GB, so 160GB is assigned to ensure smooth operation.|
+|**Initial Status**|Configured|The tenant settings are saved in the F5OS configuration, but no system resources (CPU, memory, storage) are yet allocated.|
+|**Crypto Acceleration**|Enabled|This is enabled to offload SSL/TLS tasks to the rSeries hardware accelerator.|
+|**Appliance Mode**|Disabled|This tenant is not intended for a specific isolated task.|
+
+Once all settings are done, clicking "save and close" places the tenant in the **Configured** state.
+
+#### 2. Provisioning Resources
+
+The tenant must be moved from the Configured state to the Provisioned state to allocate resources:
+
+1. Click **edit** the tenant to change the deployment state from **Configured** to **Provisioned**.
+2. Click "save and close," and confirm the update.
+3. The tenant status changes to **Provisioning**. During this phase (typically 1 to 2 minutes), the system allocates vCPU, memory, and the virtual disk.
+4. The status updates to **Provisioned successfully** once resources are allocated.
+
+#### 3. Deployment and System Boot
+
+The final step is to start the tenant using the allocated resources:
+
+1. Click **edit** the tenant again to change the deployment state from **Provisioned** to **Deployed**.
+2. Click "save and close," and confirm the update.
+3. The system starts the tenant using the provisioned resources.
+4. The system transitions the tenant status from provisioned to **Deployed** as the tenant begins the boot process.
+
+#### 4. Verification
+
+While the tenant is booting, the management IP address (10.105.2.21) is pinged. Once ping replies are received, the tenant is up and reachable through the network. Opening the management IP in a browser confirms that the tenant graphical user interface is accessible, validating the successful deployment of Tenant01 on Host01.
+
+### Deployment of Tenant02 on rSeries Host02
+
+The second tenant, `prod_LB2`, is required to set up High Availability (HA) with Tenant01.
+
+- The **exact same steps** used to create Tenant01 on Host01 are followed to create Tenant02 on rSeries Host02.
+- The configuration results in Tenant02 being successfully created, up, and running.
+- Accessing the Tenant02 graphical user interface through a browser confirms the successful deployment.

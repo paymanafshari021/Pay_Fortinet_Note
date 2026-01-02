@@ -18,7 +18,7 @@ https://docs.fortinet.com/document/fortianalyzer/7.4.8/administration-guide/5067
 > [!CAUTION] 
 > **Licensing:** The cluster adopts the smallest managed-device limit among member licenses.
 
-![](fortinet-repo/faz/faz7.4/attachments/03.png)
+![](fortinet-repo/fortinet/faz/faz7.4/attachments/03.png)
 
 ---
 

@@ -240,9 +240,3 @@ Many FortiAnalyzer features and logs are restricted to the ADOM in which they re
 All Fortinet devices within a **Security Fabric** can be assigned to an ADOM of the **Fabric type**. This specific configuration enables **rapid data processing** and optimized log correlation across the Fabric. For large-scale environments like Managed Security Service Providers (**MSSPs**), administrators can use CLI commands to calculate log rates and volumes **per ADOM** to ensure disk quotas are correctly configured.
 
 To understand ADOMs, imagine a **large apartment complex**: the building manager (**Super_User**) can access the entire property, but individual tenants (**Administrators**) are restricted to their specific units (**ADOMs**). Each unit has its own utility bill (**disk space allocation**), its own set of house rules (**data policies**), and its own private filing cabinet (**SIEM database and reports**), ensuring that one tenant's activities and records are kept completely separate from the others.
-##
-##
-##
-##
-##
-##

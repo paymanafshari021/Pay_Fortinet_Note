@@ -23,7 +23,7 @@ VPC peering is a networking feature that enables two VPC networks to connect pri
 
 **Benefits of VPC Peering for Security**
 
-![](attachments/01.png)
+![](fortinet-repo/fortinet/google_cloud%20(nf)/02%20Google%20Cloud%20Components/attachments/01.png)
 - **Recommended Practice:** VPC peering is the **Fortinet recommended practice** if a FortiGate must protect many networks, as it reduces the number of network interfaces (NICs) required on the FortiGate instance.
 - **Cost-Effectiveness and Flexibility:** Peered security hub architecture is more cost-effective than deploying multi-NIC instances, offering the flexibility to secure up to 25 LAN segments using a single internal NIC.
 

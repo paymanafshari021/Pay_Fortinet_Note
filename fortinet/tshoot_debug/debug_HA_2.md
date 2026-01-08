@@ -1,7 +1,7 @@
 # HA 
 #ha #Fortinet #Debug 
 
-![Alt text](HA_Override_en.png)
+![Alt text](attachments/HA_Override_en.png)
 
 Force a failover
 ```

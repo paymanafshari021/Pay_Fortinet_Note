@@ -22,7 +22,7 @@
   - Fortinet proprietary **exchange-interface-ip** attribute
 	  - Administrator manually assigns the IP address on the spoke and hub sides
 ---
-![](11.png)
+![](attachments/11.png)
 ## IPsec Dynamic Tunnel Establishment (Dial-Up VPN)
 - Enables branches to establish IPsec tunnels with a central server without pre-configuring every remote endpoint.
 - Common in **hub-and-spoke topologies**.
@@ -68,7 +68,7 @@ end
 - Assigns IPs to clients from the administrator-defined range.
 - Configures branches as dial-up clients.
 ---
-![](12.png)
+![](attachments/12.png)
 ## IKE Mode Config vs. IPsec Exchange Interface
 
 - **IKE Mode Config** (default in examples):
@@ -113,7 +113,7 @@ end
 - **Spokes**: Enable `net-device`
 - ⚠️ **Important restriction**: If SD-WAN is configured on the hub, FortiOS blocks the use of dynamic (dial-up) IPsec tunnels as SD-WAN members
 ---
-![](13.png)
+![](attachments/13.png)
 ## Routing in SD-WAN Overlay Networks
 - After defining overlay tunnels, a routing protocol must be selected.
 #### Supported Protocols
@@ -126,7 +126,7 @@ end
 - **BGP** (specifically **IBGP**) offers the most flexibility and advanced route-selection fine-tuning.
 - **BGP/IBGP** is the most commonly used protocol on overlay networks, especially in SD-WAN and ADVPN deployments.
 ---
-![](14.png)
+![](attachments/14.png)
 ## SD-WAN Overlay IBGP Routing Options
 #### Overview
 When selecting IBGP as the overlay routing protocol, two implementation types are available:
@@ -149,7 +149,7 @@ When selecting IBGP as the overlay routing protocol, two implementation types ar
   - ADVPN shortcut monitoring
   - Node identification in the overlay
 ---
- ![](15.png)
+ ![](attachments/15.png)
 ### ADVPN Shortcut Route Learning Options in FortiGate SD-WAN
 FortiGate provides two methods for spokes to learn each other's routes when ADVPN shortcuts are enabled. Both can be combined with **BGP per overlay** or **BGP on loopback** topologies.
 #### Route Reflection (Historical Design)

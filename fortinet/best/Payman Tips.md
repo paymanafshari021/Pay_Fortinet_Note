@@ -309,3 +309,5 @@ set logtraffic all
 next
 end
 `````
+
+disable ssl vpn

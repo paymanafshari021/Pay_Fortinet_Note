@@ -1,5 +1,13 @@
 # HA 
 #ha #Fortinet #Debug 
+```
+get system ha statu
+diagnose sys ha reset-uptime
+diagnose sys ha checksum recalculate
+execute ha manage <id> <username>
+```
+
+
 
 ![Alt text](attachments/HA_Override_en.png)
 

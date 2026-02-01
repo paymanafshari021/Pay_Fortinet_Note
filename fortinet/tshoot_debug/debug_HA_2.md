@@ -20,7 +20,7 @@ Check the HA uptime difference
 diag sys ha dump-by vcluster
 ```
 
-![Alt text](HA_Override_dis.png)
+![Alt text](attachments/HA_Override_dis.png)
 Shows HA mode, roles, sync status, and failover reasons.
 ```
 get system ha statu

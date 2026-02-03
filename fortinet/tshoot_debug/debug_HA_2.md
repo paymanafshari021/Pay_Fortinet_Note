@@ -4,6 +4,8 @@
 get system ha statu
 diagnose sys ha reset-uptime
 diagnose sys ha checksum recalculate
+execute ha failover set 1
+execute ha failover unset 1
 execute ha manage <id> <username>
 ```
 

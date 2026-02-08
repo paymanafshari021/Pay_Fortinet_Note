@@ -1,44 +1,35 @@
 ```
-version: '3.8'
+version: '3'
+
+volumes:
+  mariadb:
 
 services:
-  db:
-    image: mariadb:10.11
-    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+  mariadb:
+    image: mariadb:latest
     restart: always
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-file-per-table=1 --innodb-read-only-compressed=0
     volumes:
-      - db_data:/var/lib/mysql
+      - mariadb:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=your_secure_root_pass
-      - MYSQL_PASSWORD=your_nextcloud_db_pass
+      - MYSQL_ROOT_PASSWORD=<Password>
+      - MYSQL_PASSWORD=<Password>
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
 
-  redis:
-    image: redis:alpine
-    restart: always
-
   app:
-    image: nextcloud:production
+    image: nextcloud:latest
     restart: always
     ports:
       - 8080:80
     depends_on:
-      - db
-      - redis
+      - mariadb
     volumes:
-      - /home/paadmin/nextcloud/data:/var/www/html
+      - /home/paadmin/nextcloud/var/www/html:/var/www/html
       - /mnt/usb:/mnt/usb
     environment:
-      - MYSQL_HOST=db
-      - MYSQL_PASSWORD=your_nextcloud_db_pass
+      - MYSQL_PASSWORD=<Password>
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
-      - REDIS_HOST=redis
-      # Optimization for Pi memory management
-      - PHP_MEMORY_LIMIT=512M
-      - PHP_UPLOAD_LIMIT=512M
-
-volumes:
-  db_data:
+      - MYSQL_HOST=mariadb
 ```

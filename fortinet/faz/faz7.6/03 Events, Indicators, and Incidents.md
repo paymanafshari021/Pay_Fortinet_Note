@@ -1,4 +1,4 @@
-## Event Status Management and Classification Triages
+## FortiAnalyzer Event Status Management and Classification Triages
 
 In FortiAnalyzer, the **event status** is a metadata field configured within an event handler that determines if a security team needs to take further action. Administrators can **manually specify** the status in the handler's advanced settings or enable the **"Allow FortiAnalyzer to choose"** option to let the system assign it automatically based on log details.
 
@@ -10,9 +10,7 @@ According to the sources, there are **four possible statuses** for an event:
 - **Blank**: This indicates the event falls into a scenario other than the three listed above. A blank status often occurs when an event is associated with **conflicting logs**, such as those containing both "allow" and "block" actions.
 
 To understand event status, imagine a **hospital triage system**: An **Unhandled** status is like a patient who just arrived and needs immediate surgery; **Contained** is like a patient moved to an isolation ward to prevent spreading a virus; **Mitigated** is a patient who has already been treated and is no longer in danger; and a **Blank** status is like a patient with inconclusive test results who needs a different kind of classification.
-
----
-## Indicator Intelligence and Mitigation Strategies
+## FortiAnalyzer Indicator Intelligence and Mitigation Strategies
 
 **Indicators** are specific data points extracted by FortiAnalyzer from events that could be **harmful or malicious**. There are three primary types of indicators: **IP addresses, URLs, and domains**.
 
@@ -40,9 +38,7 @@ If an indicator is deemed a threat, analysts can take direct action from FortiAn
 - **Quarantining**: Analysts can trigger the **quarantine of affected endpoints** directly from the incident analysis page.
 
 To understand indicators, imagine a **security guard at a high-end gala**: The **events** are general reports of people acting strangely, but **indicators** are the specific "fingerprints" left behind, such as a **suspicious ID card (IP address)** or a **sketchy business card (URL)**. **Enrichment** is like the guard running those items through a global police database to see if they belong to known criminals, allowing the guard to then **block** those individuals from future entry.
-
----
-## Indicator Enrichment and Threat Intelligence Analysis
+## FortiAnalyzer Indicator Enrichment and Threat Intelligence Analysis
 
 **Indicator enrichment** is a specialized feature in FortiAnalyzer that provides SOC analysts with **comprehensive threat intelligence** and context regarding identified IP addresses, domains, and URLs. By enriching these artifacts, analysts gain a deeper understanding of security incidents, allowing them to make **more informed and effective decisions** during investigations.
 

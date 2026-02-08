@@ -52,26 +52,5 @@ If you need to move the traffic to the secondary unit for maintenance, use these
 If you see a "Checksum Mismatch," the units have different configurations.
 
 - **`diagnose sys ha checksum recalculate`**: Tells the FortiGate to stop, take a breath, and re-read its own config to generate a fresh hash.
-    
 - **`execute ha synchronize start`**: Forces the Secondary to pull the configuration from the Primary.
-    
 - **`execute ha manage <id> <admin_user>`**: Allows you to jump from the Primary CLI to the Secondary CLI without needing a separate console cable.
-    
-
----
-
-### 5. Quick Cheat Sheet Summary
-
-```bash
-# Check if synced
-get system ha status | grep -i sync
-
-# See why a unit is Primary
-diagnose sys ha dump-by vcluster
-
-# Force a sync (run on the unit that is out of sync)
-execute ha synchronize start
-
-# Jump to the slave unit (usually ID 0 or 1)
-execute ha manage 0 admin
-```

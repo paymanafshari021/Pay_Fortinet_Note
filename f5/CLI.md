@@ -1,3 +1,5 @@
+```
+
 run /util bash -c "tail /var/log/audit"
 logger -p local0.info "F5-AUDIT-TEST-TO-SPLUNK-9515"
 
@@ -37,3 +39,5 @@ tmsh modify sys syslog {
         }
     }
 }
+
+```

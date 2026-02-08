@@ -8,34 +8,49 @@ execute ha failover set 1
 execute ha failover unset 1
 execute ha manage <id> <username>
 ```
+## Primary FortiGate Election - Override Enabled
 
-
-
-![Alt text](attachments/HA_Override_en.png)
-
-Force a failover
+```
+config system ha
+	set override enable
+end
+```
++ Connected monitored ports
++ Priority
++ HA uptime
++ Serial number
+### Force a failover
 ```
 diagnose sys ha reset-uptime
 ```
-Check the HA uptime difference
+### Check the HA uptime difference
 ```
 diag sys ha dump-by vcluster
 ```
 
-![Alt text](HA_Override_dis.png)
-Shows HA mode, roles, sync status, and failover reasons.
+## Primary FortiGate Election - Override Disabled
+```
+config system ha
+	set override enable
+end
+```
++ Connected monitored ports
++ HA uptime
++ Priority
++ Serial number
+### Shows HA mode, roles, sync status, and failover reasons.
 ```
 get system ha statu
 ```
-Recalculates checksums to fix false sync errors.
+### Recalculates checksums to fix false sync errors.
 ```
 diagnose sys ha checksum recalculate
 ```
-Forces configuration sync from primary to secondary.
+### Forces configuration sync from primary to secondary.
 ```
 execute ha synchronize start
 ```
-Connects to secondary unit CLI (use `execute ha manage ?` for IDs).
+### Connects to secondary unit CLI (use `execute ha manage ?` for IDs).
 ```
 execute ha manage <id> <username>
 ```

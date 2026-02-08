@@ -28,6 +28,7 @@ diagnose sys ha reset-uptime
 diag sys ha dump-by vcluster
 ```
 
+<<<<<<< HEAD
 ## Primary FortiGate Election - Override Disabled
 ```
 config system ha
@@ -39,6 +40,10 @@ end
 + Priority
 + Serial number
 ### Shows HA mode, roles, sync status, and failover reasons.
+=======
+![Alt text](attachments/HA_Override_dis.png)
+Shows HA mode, roles, sync status, and failover reasons.
+>>>>>>> 0d3641a715c7a6da1e47f46f3e23562207e76ffe
 ```
 get system ha statu
 ```

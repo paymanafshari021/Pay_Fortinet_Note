@@ -5,9 +5,9 @@
 Before making changes, you need to know who is who and if they are talking to each other.
 
 - **`get system ha status`**
-- The primary health check. It shows the cluster mode, which unit is the Primary, and sync status.
+	- The primary health check. It shows the cluster mode, which unit is the Primary, and sync status.
 - **`diagnose sys ha dump-by vcluster`**
-- Essential for checking **uptime differences**. FortiGate uses a 5-minute (300s) window for uptime; if the difference is less than that, it's considered a "tie."
+	- Essential for checking **uptime differences**. FortiGate uses a 5-minute (300s) window for uptime; if the difference is less than that, it's considered a "tie."
 ---
 
 ### 2. The Election Logic (The "Why")

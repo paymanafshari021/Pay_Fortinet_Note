@@ -21,8 +21,10 @@ How the FortiGate decides who becomes the Primary depends entirely on the **Over
 |3|Device Priority|HA Uptime|
 |4|Serial Number|Serial Number|
 
-> **Note:** Your snippet mentioned `set override enable` for both. 
-> To disable it, use `set override disable`. 
+> **Note:** Your snippet mentioned `set override enable` for both.
+> 
+> To disable it, use `set override disable`.
+> 
 > Enabling override makes **Priority** the king of the election.
 
 ---

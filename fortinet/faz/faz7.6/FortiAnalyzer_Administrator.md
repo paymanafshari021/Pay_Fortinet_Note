@@ -1,4 +1,4 @@
-# Automation, IR and Advanced Threat Detection
+## Automation, IR and Advanced Threat Detection
 **Automation**, **Incident Response (IR)**, and **Advanced Threat Detection** are identified as additional key features of FortiAnalyzer designed to enhance network security and streamline operations.
 ### **Automation**
 The automation feature in FortiAnalyzer is designed to handle **routine tasks** to free up administrative resources. Key aspects include:
@@ -35,7 +35,7 @@ This feature focuses on identifying sophisticated and emerging threats using glo
 *   **SOC Automation Service:** 
     + This service includes advanced analytics, third-party log parsers, and premium reports to empower security teams to investigate incidents swiftly.Based on the sources provided, FortiAnalyzer offers several flexible **deployment options** to suit different organizational needs, network topologies, and infrastructure requirements.
 
-# Deployment Options
+## Deployment Options
 ### **Physical Appliances**
 Hardware appliances are designed for organizations that prefer **on-premises deployments** and have specific requirements for storage and processing. 
 *   **Scalability:** 
@@ -57,8 +57,8 @@ This is a **Software-as-a-Service (SaaS)** offering from Fortinet.
     * It allows organizations to use FortiAnalyzer capabilities **without managing the underlying infrastructure**.
 *   **Key Features:** 
     * It offers **easy deployment and management**, as well as **auto-scaling** functionality to adjust to changing deployment needs.
-
-Based on the sources provided, **FortiAnalyzer** leverages several **FortiGuard services** to enhance its threat intelligence, analysis, and reporting capabilities. These services provide real-time updates and automated content to help security teams identify and respond to threats more effectively.
+## FortiGuard services
+**FortiAnalyzer** leverages several **FortiGuard services** to enhance its threat intelligence, analysis, and reporting capabilities. These services provide real-time updates and automated content to help security teams identify and respond to threats more effectively.
 
 ### **Key FortiGuard Services in FortiAnalyzer**
 
@@ -83,7 +83,7 @@ Based on the sources provided, **FortiAnalyzer** leverages several **FortiGuard 
 *   **License Monitoring:** 
     *    You can verify the validity and expiry details of these service contracts using specific CLI commands, such as `diagnose fmupdate dbcontract fds`.
 
-# Database Language Support
+## Database Language Support
 **SQL (Structured Query Language)** is the primary database language supported and used by FortiAnalyzer for logging and reporting.
 
 ### **Database Engine and Migration**
@@ -100,7 +100,7 @@ Starting with version **7.6.0**, FortiAnalyzer has shifted its underlying storag
     *    By default, the **SQL database is disabled** when FortiAnalyzer is in collector mode. Logs requiring the database are unavailable unless SQL is manually enabled via the CLI.
 *   **Knowledge Requirement:** 
     *    To take full advantage of advanced reporting, administrators need a basic understanding of SQL syntax and datasets. SQL queries in FortiAnalyzer are **not case sensitive**.
-# FortiAnalyzer Fabric
+## FortiAnalyzer Fabric
 The **FortiAnalyzer Fabric** is a specialized architecture that enables **centralized viewing** of devices, incidents, and events across multiple FortiAnalyzer devices. It is specifically designed for high-volume environments that require multiple FortiAnalyzer nodes to handle the log load while maintaining a single management interface.
 
 ### **Operation Modes**
@@ -140,7 +140,83 @@ To maximize the efficiency of the Fabric, FortiAnalyzer allows you to group all 
     *    It provides an accurate, consolidated picture of security threats across the entire network under a single interface.
 *   **Redundancy:** 
     *    Logging remains independent; if a root FortiGate or the supervisor is down, leaf devices continue to log to their respective FortiAnalyzer members.
+# Security Recommendations
 
+### **Deployment and Network Security**
+*   **Trusted Network Deployment:** 
+    * Always deploy FortiAnalyzer in a **protected and trusted private network**; it should never be deployed outside the network.
+*   **Secure Communication:** 
+    *   Use only secure methods for administration, such as **HTTPS for the GUI** and **SSH for the CLI**, even within a private network. Avoid HTTP and Telnet, as they use plaintext and are vulnerable to packet sniffing.
+*   **Restrict Access via Ports:** 
+    *   Open only the **ports necessary** for your specific network requirements and consult the official documentation to minimize attack surfaces.
+*   **Encrypted Log Transfer:** 
+    *   Ensure log communication between FortiGate and FortiAnalyzer is protected through **encryption using OFTP over SSL** (port TCP/514).
+
+### **Administrative Access Controls**
+*   **Password Management:** 
+    *   **Change the default administrator password** 
+        *   immediately during initial setup.
+    *   **Enable and enforce a global password policy** 
+        *   that requires a minimum length and specific character types (numbers, special characters).
+    *   Store your administrator password in a **secure location**, as there is no password recovery option without erasing system settings.
+*   **Trusted Hosts:** 
+    *   Configure **trusted hosts** for every administrative user to restrict logins to specific, authorized IP addresses or subnets.
+*   **Principle of Least Privilege:** 
+    *   Never give an administrator more privileges than they require. Use **Administrative Profiles** (such as Standard_User or Restricted_User) and **ADOMs** to limit what devices and settings an individual can access.
+*   **Monitoring Activity:** 
+    *   Regularly **monitor administrator sessions and event logs** to audit configuration changes and source them to specific individuals.
+
+### **Operational Best Practices and Data Integrity**
+*   **Prevent Log Tampering:** 
+    *   Configure **log checksums** (MD5 or MD5-auth) to record hash values and authentication codes, ensuring logs have not been modified in storage or during transmission.
+
+## Controlling and Restricting Access
+### **Default Administrative Profiles**
+FortiAnalyzer includes four preinstalled profiles to help categorize user roles:
+
+* **Super_User**: 
+  * Has full access to all system settings, device privileges, and all ADOMs.
+* **Standard_User**: 
+  * Provides read-write access to device-level privileges but no access to system settings.
+* **Restricted_User**: 
+  * Offers read-only access to device privileges and removes access to management extensions.
+* **No_Permission_User**: 
+  * Grants no privileges; used for temporarily disabling an account.
+* You can allow the administrator to use the FortiAI feature by enabling FortiAI on the administrator profile. **FortiAI** can be applied only to local users and not single sign-on (SSO) users. You need a valid FortiAI license for this feature to be available on the administrator profile
+## Administrative Domains (ADOMs)
+**Administrative Domains (ADOMs)** in FortiAnalyzer interact with **FortiGate Virtual Domains (VDOMs)** to provide granular control over how log data is managed and accessed.
+
+The way they operate together depends on the **global ADOM mode** configured on the FortiAnalyzer:
+
+### **Normal Mode (Default)**
+In this mode, the relationship between the physical device and the ADOM is strict.
+*   **Single Assignment:** 
+    *   You cannot assign individual VDOMs from the same FortiGate to different ADOMs.
+*   **Grouping:** 
+    *   You must assign the entire **physical FortiGate device and all of its VDOMs to a single ADOM**.
+*   **Management:** 
+    *   This provides a simpler management scenario but less granularity for multi-tenant environments.
+
+### **Advanced Mode**
+Advanced mode is designed for environments requiring more complex, granular data separation.
+*   **VDOM Splitting:** 
+    *   You can assign **individual VDOMs from the same physical FortiGate to different FortiAnalyzer ADOMs**.
+*   **Granular Analysis:** 
+    *   This allows administrators to use **FortiView, Event Management, and Reports** to analyze data for specific VDOMs independently of the rest of the physical device.
+*   **Complexity:** 
+    *   While more flexible, this mode results in more **complicated management scenarios**.
+
+### **Key Considerations for Operation**
+*   **Access Restriction:** 
+    *   If your network uses VDOMs, enabling ADOMs on FortiAnalyzer allows you to **limit an administrator's access** to logs from only specific VDOMs rather than the whole device.
+*   **Security Fabric Integration:** 
+    *   All FortiGate devices (including those with multiple VDOMs) within a Security Fabric can be grouped into a single **Fabric ADOM** to facilitate rapid data processing and automatic log correlation.
+*   **Registration:** 
+    *   When a FortiGate with VDOMs is registered, it initially appears under the **root ADOM** until it is authorized and assigned to its designated custom ADOM.
+*   **Permissions:** 
+    *   Configuring these relationships requires **Super_User** access, as ADOMs are disabled by default.
+
+## Disk Quota
 
 ---
 # Data Sheet
@@ -149,4 +225,8 @@ To maximize the efficiency of the Fabric, FortiAnalyzer allows you to group all 
 diag fmupdate dbcontract fds
 # monitor the migration progress on the GUI banner
 diag sql status migrate-db
+# viewing administrator login status
+diag system admin-session status
+# verify the upgrade history on your FortiAnalyzer 
+diag cdb upgrade summary
 ```

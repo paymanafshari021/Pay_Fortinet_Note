@@ -16,7 +16,7 @@ A lightweight, real-time network monitoring tool designed to track the availabil
 - **PowerShell 5.1** or higher.
 - **Network Permissions:** You must have permission to send ICMP Echo Requests (Pings) to the target hosts.
 
-## etup & Usage
+## Setup & Usage
 
 1. **Create the Script File:**
     - Create a new folder (e.g., `C:\NetworkMonitor`).

@@ -47,8 +47,9 @@ $hosts = "server-01.lan", "server-02.lan", "etc..."
 ## Example Log Output
 The log file will look like this:
 
-> `[2026-02-18 10:00:00] DOWN: de-ber-p-fc.saturn.lan`
-> `[2026-02-18 10:05:30] RECOVERED: de-ber-p-fc.saturn.lan (Total Downtime: 5m 30s)`
+> `[2026-02-18 10:00:00] DOWN: server-01.lan`
+> 
+> `[2026-02-18 10:05:30] RECOVERED: server-01.lan (Total Downtime: 5m 30s)`
 ## Code
 ```powershell
 $hosts = "batman.gotham.dmz", 

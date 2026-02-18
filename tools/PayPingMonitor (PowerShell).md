@@ -21,7 +21,8 @@ A lightweight, real-time network monitoring tool designed to track the availabil
 1. **Create the Script File:**
     - Create a new folder (e.g., `C:\NetworkMonitor`).
     - Create a new text file named `Monitor.ps1`.
-    - Paste the provided PowerShell code into this file and save it. [Code]([Pay_Fortinet_Note/tools/PayPingMonitor (PowerShell).md at main · paymanafshari021/Pay_Fortinet_Note · GitHub](https://github.com/paymanafshari021/Pay_Fortinet_Note/blob/main/tools/PayPingMonitor%20\(PowerShell\).md#code)
+    - Paste the provided PowerShell code into this file and save it. 
+	    - [Code]([https://pages.github.com/](https://github.com/paymanafshari021/Pay_Fortinet_Note/blob/main/tools/PayPingMonitor%20\(PowerShell\).md#code))
 2. **Run the Monitor:**
     - Right-click `Monitor.ps1` and select **Run with PowerShell**.
     - _Alternatively_, open a PowerShell terminal, navigate to the folder, and type:

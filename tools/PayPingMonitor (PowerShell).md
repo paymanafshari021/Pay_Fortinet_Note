@@ -1,5 +1,5 @@
 
-# Saturn Network Monitor (PowerShell)
+# PayPingMonitor
 
 A lightweight, real-time network monitoring tool designed to track the availability of server hosts. It provides a live dashboard, visual alerts for outages, and keeps a detailed log of downtime duration.
 

@@ -54,7 +54,7 @@ The log file will look like this:
 ```powershell
 $hosts = "batman.gotham.dmz", 
          "kratos.midgard.lan", 
-         "10.10.10.1",
+         "10.10.10.1"
 
 $logFile = "Outage_Log.txt"
 $outageTracker = @{} # Stores host start times: { "hostname" = DateTime }

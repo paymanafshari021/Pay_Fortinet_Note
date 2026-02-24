@@ -431,6 +431,88 @@ Before initiating the upgrade, you should perform the following best practices:
 
 Once the upgrade is complete for all members, use the **Cluster Status** page in the GUI or the CLI command `diagnose ha status` to verify that all devices are "In-Sync" and that their roles are correctly assigned. You should also run `diagnose log device` again to confirm that **ADOM disk quotas** remain correct after the migration.
 
+### Basic Connectivity and Network Settings
+
+These commands help verify if the FortiAnalyzer and logging devices can communicate over the network.
+
+- **`execute ping <remote_IP>`**: 
+	- Tests basic network connectivity between FortiAnalyzer and another device.
+- **`get system interface`**: 
+	- Displays the status, speed, and IP addresses of network interfaces.
+- **`get system status`**: 
+	- Shows the general status of the device, including firmware version and system time, which are critical for log compatibility.
+- **`show system route`**: 
+	- Displays configured static route entries.
+- **`diagnose system print route`**: 
+	- Shows the complete routing table, including directly connected routes.
+- **`show system dns`**: 
+	- Displays configured DNS server addresses.
+- **`show system ntp`**: 
+	- Shows network time protocol settings.
+
+### Device and ADOM Status
+
+Use these commands to determine which devices are registered and if the Administrative Domains (ADOMs) are correctly configured.
+
+- **`diagnose dvm device list`**: 
+	- Lists all registered and unregistered devices or VDOMs.
+- **`diagnose dvm adom list`**: 
+	- Lists which ADOMs are currently enabled and configured.
+- **`diagnose test application oftpd 3`**: 
+	- Displays which devices and specific IP addresses are currently connected to the FortiAnalyzer.
+- **`diagnose log device`**: 
+	- Provides a summary of device log usage and is used to verify that ADOM disk quotas are correct.
+
+### Communication and Log Reception Troubleshooting
+
+These commands allow you to monitor log traffic in real-time and verify that the system is actively receiving data.
+
+- **`diagnose sniff packet <interface> <filter> <level> <count>`**: A built-in packet sniffer used to see if log packets are reaching the FortiAnalyzer interfaces.
+- **`diagnose debug application oftpd 8`**: 
+	- Provides detailed information on current log activity and is used to verify that FortiAnalyzer is receiving logs from a device.
+- **`diagnose fortilogd lograte`**: 
+	- Displays the current raw log receive rate.
+- **`diagnose fortilogd msgrate`**: 
+	- Shows the log message receive rate per second.
+- **`diagnose fortilogd lograte-device [filter]`**: 
+	- Breaks down the log receive rate for a specific device.
+- **`diagnose fortilogd lograte-adom {all | adom-name}`**: 
+	- Calculates the log rate for all ADOMs or a specific one.
+
+### Process Debugging and System Health
+
+If communication is established but logs are still not appearing, use these commands to check the health of the background daemons.
+
+- **`get system performance`**: 
+	- Monitors CPU, memory, and disk usage to ensure the system is not nearing capacity, which can halt log collection.
+- **`diagnose debug enable`**: 
+	- Enables the display of debug messages on the CLI.
+- **`diagnose debug application <process> <level>`**: 
+	- Enables debugging for a specific process (e.g., `oftpd`, `sqlplugind`, `uploadd`) at a specified verbosity level.
+- **`diagnose debug info`**: 
+	- Displays the current active debug levels.
+- **`execute tac report`**: 
+	- Generates a comprehensive dump of all diagnostic commands for troubleshooting with technical support.
+- **`diagnose sql status sqlplugind`**: 
+	- Displays the status of SQL database insertions.
+
+### Troubleshooting from the FortiGate Side
+
+Log collection issues often require running commands on the sending FortiGate device.
+
+- **`show log fortianalyzer setting`**: 
+	- Verifies if the FortiGate is correctly configured to send logs to the FortiAnalyzer's IP.
+- **`show log fortianalyzer filter`**: 
+	- Checks if the logging filters are enabled.
+- **`diagnose log test`**: 
+	- Generates dummy logs to test if the FortiGate is capable of sending them and if the FortiAnalyzer receives them.
+- **`diagnose test application miglogd 6`**: 
+	- Displays FortiGate logging statistics, including cache sizes.
+- **`diagnose log kernel-stats`**: 
+	- Shows if logs are being dropped because the cache is full.
+- **`set faz-disk-buffer-size <integer>`**: 
+	- Configures the size of the disk buffer on FortiGates with SSDs to handle periods when the FortiAnalyzer is unreachable.
+
 ---
 # Monitoring and Troubleshooting
 ```bash
@@ -460,4 +542,5 @@ diag ha force-cfg-resync
 diag ha load-balance
 # This command must be run on the **master (primary)** device to **restart the initial log synchronization process**
 diag ha restart-init-sync
+
 ```

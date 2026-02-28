@@ -775,7 +775,536 @@ Global auto-delete policy **and** per-device log quotas run independently:
 - Use size + daily rolling for clean organization.  
 - Set global deletion age carefully to match compliance needs and avoid surprises.
 
+## SQL Hard Cache (hcach / hcache)
 
+## What Is hcache?
+
+**SQL Hard Cache (hcache)** is a proprietary caching mechanism in **FortiAnalyzer** that improves report performance by storing **precompiled log data** as **persistent SQL database tables on disk**.
+
+Unlike temporary caches, hcache tables:
+
+- Are stored persistently on disk
+- Are not automatically removed after a set time
+- Must be updated or rebuilt when new logs arrive
+
+**Reports > Report Definitions > All Reports**
+## How hcache Improves Performance
+
+### Report Generation
+
+- When generating reports, FortiAnalyzer builds charts and datasets from **hcache tables**.
+- If the required hcache already exists and no new logs were added:
+    - The report runs **significantly faster**.
+
+### First-Time Report Execution
+
+- If hcache does **not exist**, FortiAnalyzer must:
+    
+    1. Build the hcache table
+    2. Then generate the report
+
+This increases the initial report generation time.
+
+### Extended Log Filtering
+
+- When enabled, specific log fields are cached.
+- This improves filtering speed for complex report queries.
+# Auto-Cache Feature
+
+## What Is Auto-Cache?
+
+**Auto-cache** automatically keeps hcache updated when new logs arrive.
+
+When enabled:
+
+- FortiAnalyzer builds and updates hcache automatically
+- New log tables are generated proactively
+### Important Notes
+
+- ✅ **Scheduled reports automatically use hcache**
+- ⚠️ Building hcache consumes:
+    - CPU
+    - Memory
+    - Disk I/O
+
+Complex reports that process large datasets can significantly impact system resources.
+# Optimization Techniques
+
+## Report Grouping (CLI)
+
+If similar reports run across multiple devices, use:
+
+```
+configure system report group
+```
+
+Purpose:
+
+- Group reports together
+- Reduce total number of hcache tables
+- Improve auto-cache completion time
+- Reduce system resource usage
+# Monitoring and Troubleshooting hcache
+
+## Check hcache Status
+
+```
+diagnose sql hcache status
+```
+
+Shows the current state of hcache.
+## Check hcache Size
+
+```
+diagnose sql show hcache-size
+```
+
+Displays total disk space used by hcache.
+## Verify hcache Build Performance
+
+```
+diagnose test application sqlrptcached 2
+```
+
+Indicates whether hcache creation can keep up with incoming logs.
+## Manually Trigger hcache Build
+
+```
+execute sql-report hcache-build <ADOM-name>
+```
+
+Manually starts hcache build for a specific ADOM.
+## Key Points to Remember
+
+- hcache = persistent precompiled SQL tables
+- Speeds up repeated report generation
+- First run is slower if hcache is not built
+- Auto-cache keeps hcache updated automatically
+- Scheduled reports always use hcache
+- High CPU/memory usage during build
+- CLI commands are commonly tested
+# Debugging – Summary
+
+## Enabling / Disabling Debug
+
+```
+diagnose debug enable
+diagnose debug disable
+```
+
+## Debug Levels
+
+- Range: **0–255**
+- **Level 8** provides the most detailed output (commonly used for troubleshooting).
+## Debugging a Specific Application/Process
+
+```
+diagnose debug application <process> <level>
+```
+
+You must specify:
+
+- The process name
+- The debug level
+## Check Current Debug Settings
+
+To see current debug status and levels:
+```
+diagnose debug info
+```
+This shows:
+
+- CLI debug level
+- Whether console output is enabled
+- Timestamp settings
+- Application debug levels
+
+# Key Exam Points
+
+- Debug must be **enabled** to see output.
+- Level **8** = most detailed (commonly tested).
+- `diagnose debug info` verifies current settings.
+- `execute tac report` generates a full diagnostic dump.
+- Timestamps should be enabled during troubleshooting.
+
+# Report Debugging
+## Core Process: `sqlreportd`
+
+The **sqlreportd** process is responsible for all report generation on FortiAnalyzer. It sends queries to **sqlpugiund** to fetch data.
+## Debugging Commands
+
+### Check Process Status
+
+```bash
+diagnose sql status sqlreportd
+```
+### List Generated Reports
+
+```bash
+execute sql-report list <ADOM>
+```
+
+- Shows recent reports (last 7 days by default)
+- Displays report name + unique ID
+### View Report Content
+
+```bash
+execute sql-report view report-data <ADOM> "<report-name_ID>"
+```
+## Report Queue Management
+
+|Command|Purpose|
+|---|---|
+|`diagnose report status`|Check the report queue (pending/running reports)|
+|`diagnose report clean`|**Wipe the queue** if it's causing hangs or slowdowns|
+
+> ⚠️ Too many queued reports can cause FortiAnalyzer to **hang or become slow**
+### Queue Status Output Includes:
+- Max pending reports
+- Current pending/running counts
+- Semaphore state
+- Longest running report info
+## Run a Report from CLI (for Debugging)
+
+```bash
+execute sql-report run <ADOM> <name/title>
+```
+
+- Prompts you to select from available report templates
+- Useful for **capturing live debug output**
+- Available reports include: Security Analysis, Threat Report, IPS Report, Bandwidth & Applications, Top 20 Categories, etc.
+## Quick Reference Summary
+
+```
+sqlreportd         → Core report generation process
+diagnose sql       → Check process health
+sql-report list    → See generated reports
+diagnose report status → Check queue
+diagnose report clean  → Clear stuck queue
+sql-report run     → Manually trigger + debug
+```
+# Alert Email Debugging
+## Core Process: `fazmaild`
+
+The **fazmaild** daemon handles **all email sending tasks** on FortiAnalyzer, including:
+
+- Report emails
+- Event Management alert mails
+## Debugging Commands
+
+### Enable Debug Logging for fazmaild
+
+```bash
+diagnose debug application fazmaild 8
+```
+
+- Shows **all reports and event management mails** sent by FortiAnalyzer
+- Level `8` = detailed debug output
+### Test Connection to Mail Server
+
+```bash
+diagnose test connection mailserver "Mailserver:10.0.2.254"
+```
+
+- Verifies FortiAnalyzer can **reach the mail server**
+- Useful for troubleshooting email delivery failures
+## Alert Email Statistics Commands
+
+|Command|Purpose|
+|---|---|
+|`diagnose test application fazmaild 0`|Basic status|
+|`diagnose test application fazmaild 1`|Additional info|
+|`diagnose test application fazmaild 2`|**Full email count statistics**|
+
+### Sample Output of `fazmaild 2`:
+
+```
+total sent mail count:        0
+total failed sendmail count:  0
+total discard mail count:     0
+last sendmail time:           Wed Dec 31 16:00:00 1969
+last request time:            Fri Oct 11 12:56:20 2024
+queue:                        0/5000
+queue timeout:                1800 seconds
+```
+## Quick Summary
+
+```
+fazmaild          → Email sending daemon
+fazmaild 8        → Debug all sent emails
+mailserver test   → Verify mail server connectivity
+fazmaild 2        → View email send statistics & queue status
+```
+
+> ⚠️ If the queue fills up (max 5000) or timeout occurs (1800s), email delivery may fail — use `fazmaild 2` to monitor.
+
+
+# Upload Process Debugging
+
+## Core Process: `uploadd`
+
+The **uploadd** process is responsible for **uploading logs and reports to a remote server**.
+## Debugging Commands
+
+### Enable Debug for uploadd
+
+```bash
+diagnose debug application uploadd 0
+```
+
+- Useful for debugging:
+    - **Rolled log uploads**
+    - **Failed FTP uploads**
+
+### Check Upload Queue Status
+
+```bash
+diagnose upload status
+```
+
+Shows detailed info including:
+
+- Upload mode (e.g., BACKUP)
+- Schedule timing
+- Queue stats: `log[0] / bkup[0] / m1[0] / m2[0]`
+- Prepare / Dispatch / Reprepare states
+- Per-server status: done / abandoned / retry / hit / miss / overload
+- RPT file stats
+- Cloud storage status
+## Queue Operations
+
+|Command|Purpose|
+|---|---|
+|`diagnose upload status`|View running upload queue status|
+|`diagnose upload clear`|**Clear/wipe the upload queue**|
+
+> ⚠️ **Real-world use case:** If 10,000 log files need to be converted to CSV and uploaded, the process can take a very long time. Running `diagnose upload clear` is the fastest way to resolve the bottleneck.
+
+## Status Output Breakdown
+
+```
+upload mode: BACKUP
+schedule: 23 hours 46 minutes 43 seconds later
+
+queue:     log[0] / bkup[0] / m1[0] / m2[0]
+prepare:   done[x] / failed[0] / locate err[0]
+dispatch:  done[x] / failed[0]
+
+Server stats per server:
+  done / abandoned / retry / hit / miss / overload
+
+RPT file stats:
+  queue[0] / done[0] / abandoned[0] / retry[0]
+
+Cloud storage: upload[0] / retry[0]
+```
+## Quick Summary
+
+```
+uploadd                        → Upload process daemon
+diagnose debug uploadd 0       → Debug rolled/failed uploads
+diagnose upload status         → Monitor upload queue
+diagnose upload clear          → Clear stuck/overloaded queue
+```
+
+# Security Automation Content Packs
+
+## What Is It?
+
+A service that delivers the **latest security content** from **FortiGuard** to FortiAnalyzer — similar to how antivirus outbreak packages are automatically updated.
+
+> ⚠️ Requires a **separate license** for the FortiAnalyzer SOC Automation Service
+
+## What Content Is Delivered?
+
+### Package 1 — Detection & Parsing
+
+-  **Log Parsers** — third-party log parsing
+-  **Detection Rules** (handlers)
+-  **Report Templates**
+-  **Compliance Mapping**
+
+### Package 2 — Response & Connectivity
+
+-  **Incident Response Playbooks**
+-  **New Fabric Connectors**
+## Key Benefits
+
+|Feature|Benefit|
+|---|---|
+|**Decoupled from OS release**|Get new security content without upgrading FortiAnalyzer OS|
+|**Automated distribution**|Like outbreak package updates — no manual intervention|
+|**SIEM + SOAR integrated**|Covers detection, analytics, and response in one platform|
+
+## Capabilities Enabled
+
+- Third-party log parsers
+- Advanced correlation rules
+- Automation connectors
+- Incident response playbooks
+- Advanced analytics
+- Premium reports
+
+> These tools empower **SOC teams** to swiftly **detect, investigate, and respond** to security incidents.
+
+# Security Automation Content Packs (Continued)
+
+## Monthly Release Cycle
+
+- New content packs are released **every month**
+- Details available at: **https://www.fortiguard.com**
+- With a valid license, updates are **applied automatically** when available from FortiGuard Distribution Network (FDN)
+## What's Included in Each Pack
+
+|Content Type|Purpose|
+|---|---|
+|**Report Templates**|Prebuilt & customizable, deep insights into security events/trends|
+|**Event Handlers**|Automate incident-handling for faster response|
+|**Playbooks**|Automated security workflows for proactive defense|
+|**SIEM Parsers**|Advanced log parsing for better threat correlation & analysis|
+## Log Parsers from Content Packs
+
+Log parsers are received directly from **FortiGuard Distribution Network (FDN)** and cover a wide range of vendors:
+
+- Zscaler Firewall
+- Cisco Meraki
+- Microsoft Office 365
+- Okta
+- Juniper Firewalls
+- Aruba CX
+- Barracuda Firewall
+- McAfee Anti-Virus
+- CrowdStrike, SentinelOne, Check Point, and more
+
+## How to Identify FortiGuard Content
+
+|Indicator|Meaning|
+|---|---|
+|**Origin = FortiGuard**|Log parser came from a content pack|
+|**"New" tag**|Latest installation from most recent content pack|
+## Key Takeaway
+
+```
+Valid License
+     ↓
+FortiGuard releases pack monthly
+     ↓
+Auto-applied to FortiAnalyzer
+     ↓
+New parsers, handlers, playbooks, reports available immediately
+```
+
+> Content packs are **independent of OS upgrades** — you always get the latest security content without needing to update FortiAnalyzer firmware.
+# Log Parsers
+
+## What Are Log Parsers?
+
+Built-in tools with **SIEM capabilities** that **parse, normalize, and correlate** logs from various sources — no manual configuration needed by administrators.
+## Sources They Parse
+
+|Source Type|Examples|
+|---|---|
+|**Fortinet Products**|FortiGate, FortiSwitch, etc.|
+|**Web Servers**|Apache, Nginx|
+|**OS Security Events**|Windows & Linux hosts (via Fabric Agent)|
+|**Third-party Devices**|Cisco, Juniper, Aruba, Checkpoint, Barracuda, etc.|
+## Three Types of Log Parsers
+
+|Type|Origin|Description|
+|---|---|---|
+|**Predefined**|Built-in|Comes with FortiAnalyzer by default|
+|**FortiGuard**|FDN Content Packs|Received automatically (Origin = FortiGuard)|
+|**Custom/Imported**|Admin|Manually imported by administrator|
+## Key Functions
+
+- **Parse** — Read and decode log formats from different vendors
+- **Normalize** — Standardize log data into a common format
+- **Correlate** — Link related log events for analysis
+- **Integrate** — Bring third-party device logs into FortiAnalyzer for **analysis and storage**
+## Where to Manage Log Parsers
+
+```
+Incident & Events > Log Parsers > Log Parsers
+```
+
+- View all predefined, FortiGuard, and custom parsers
+- Import new or custom parsers
+- SIEM logs viewable at: **Log View > Logs > All**
+## Key Takeaway
+
+```
+Third-party device logs
+        ↓
+   Log Parser
+  (parse + normalize)
+        ↓
+FortiAnalyzer SIEM
+  (correlate + store + report)
+```
+
+> Log parsers are essential for **extending FortiAnalyzer's visibility** beyond Fortinet products into a full multi-vendor SIEM environment.
+# Safeguarding in FortiAnalyzer
+
+## What Is It?
+
+A feature that **identifies harmful content keywords** on the network, used in reports and event handlers to enable timely response to threats like cyberbullying or self-harm content.
+
+> 💡 **Use Case:** In schools, if students browse harmful content, teachers can be immediately alerted to take action.
+
+## Keyword Database
+
+|Detail|Info|
+|---|---|
+|**Total Keywords**|6,553+|
+|**Sources**|FortiGuard + Built-in|
+|**Updates**|Automatic via FortiGuard downloads|
+|**Admin customization**|❌ Cannot add new words manually|
+
+### Keyword Categories
+
+-  Pornography
+-  Cyberbullying
+-  Violence/Terrorism
+-  Self-Harm
+-  Extremism
+
+## Language Support
+
+- Majority (**~99%**) are in **English**
+- Also includes: Japanese, Chinese (Simplified), Korean, German, Spanish, and more
+
+## Visual Insights
+
+Three donut charts display keyword breakdown by:
+
+- **Category** — type of harmful content
+- **Origin** — FortiGuard vs Built-in
+- **Language** — distribution across languages
+
+## Where to Access
+
+```
+Incident & Events > Safeguarding
+```
+## Key Points
+
+- FortiAnalyzer must be **connected to FortiGuard** distribution servers to display all keywords
+- Keywords are **automatically updated** — no manual intervention needed
+- Used in both **reports** and **event handlers** for automated response
+- Administrators **cannot add custom keywords** to FortiGuard categories
+## Summary Flow
+
+```
+Harmful content browsed on network
+        ↓
+FortiAnalyzer detects keyword match
+        ↓
+Event Handler triggers alert
+        ↓
+Admin/Teacher notified immediately
+        ↓
+Timely action taken
+```
 
 ---
 # Monitoring and Troubleshooting

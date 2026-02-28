@@ -513,6 +513,66 @@ Log collection issues often require running commands on the sending FortiGate de
 - **`set faz-disk-buffer-size <integer>`**: 
 	- Configures the size of the disk buffer on FortiGates with SSDs to handle periods when the FortiAnalyzer is unreachable.
 
+### ADOM Migration
+
+When moving devices between Administrative Domains (ADOMs) in FortiAnalyzer, there are several critical factors to consider to ensure data integrity and proper disk management.
+
+The primary considerations include:
+
+- **Necessity of the Move:** The general best practice is to **avoid moving devices between ADOMs unless it is absolutely necessary**.
+- **Disk Quota Readiness:** You must verify the disk quota of the destination ADOM to **ensure there is sufficient allocated space** for the incoming device and its logs.
+- **Log Migration Behavior:** It is important to understand that when a device is moved, **only the archive (compressed) logs are automatically migrated** to the new ADOM. The analytics (indexed) logs stay in the original ADOM database.
+- **Analytics and Reporting in the New ADOM:** If you require the device’s historical analytics logs for reports in the new ADOM, you **must rebuild the destination ADOM's SQL database**.
+```
+execute sql-local rebuild-db
+diag sql status rebuild-db
+```
+- **Analytics Logs in the Old ADOM:** If you prefer that the device’s historical logs no longer appear in the original ADOM, you must **rebuild the old ADOM’s SQL database** to remove them. Otherwise, they will remain in the old database until they are eventually purged according to that ADOM's data policy.
+- **Log Rate Separation:** Moving devices can be beneficial if you need to **separate high-volume log rate devices from low-volume ones**. Placing them in different ADOMs prevents high-volume traffic from triggering quota enforcements that might prematurely delete logs from the low-volume devices.
+- **Firmware Upgrades:** You do **not** need to move a device to a new ADOM specifically because of a FortiGate firmware upgrade, as it is not necessary to separate ADOMs by FortiOS version.
+
+## FortiGate HA Cluster Management in FortiAnalyzer
+
+FortiAnalyzer is designed to **automatically detect** if a registered FortiGate device is part of a High Availability (HA) cluster. If the individual FortiGate devices were registered to FortiAnalyzer before the cluster was formed, you must **manually add them together** within the system settings.
+
+To manage this configuration, you should edit the registered device in the **Device Manager** and enable the **HA Cluster** option. During this process, you have the choice to either **select existing registered devices** to form the cluster or **manually enter the serial numbers** for each secondary node.
+
+Key Characteristics of FortiGate HA Clusters on FortiAnalyzer:
+
+* **Primary Communication:**
+	* In a FortiGate HA cluster, **only the primary device communicates directly** with FortiAnalyzer.
+
+* **Log Forwarding:** 
+	+ The secondary nodes in the cluster do not send logs directly to FortiAnalyzer; instead, they send their logs to the **primary FortiGate**, which then forwards them to the FortiAnalyzer unit.
+
++ **Device Identification:** 
+	+ FortiAnalyzer distinguishes between the different members of the cluster by identifying their **unique serial numbers**, which are included in the headers of every log message it receives.
+
++ **Fault Tolerance:** 
+	+ This setup ensures that logging continues even if a failover occurs, as the new primary device will take over the responsibility of sending the aggregated cluster logs to FortiAnalyzer
+
+## Storage Connector Service
+
+The **Storage Connector Service** in FortiAnalyzer is a specialized feature that enables the system to **send logs to cloud platforms**. This service is essential for organizations looking to leverage cloud storage for log retention or off-site redundancy.
+
+Key details regarding this service include:
+### **Licensing and Constraints**
+
+- **Separate License Required:** To use the Storage Connector Service, you must purchase a separate license, which typically has a **one-year validity**.
+- **Data Transfer Limits:** The license specifies a **quota for the amount of data you can upload** to the cloud platform. It is important to note that this limit applies only to the **data transfer volume**, not to the total storage capacity used on the cloud provider's side.
+- **Renewal:** If you exceed your data upload quota before the license expires, you must renew the license to continue using the service.
+### **Configuration**
+
+- **Activation:** Once the license is uploaded, the feature is enabled by going to the **Device Log Settings** page and toggling on **Upload logs to cloud storage**.
+- **Platform Support:** Administrators can select from various supported cloud storage platforms (such as AWS, Azure, or Google Cloud) to receive the logs.
+- **Permissions:** Configuring the connector requires an account with the appropriate permissions to access the targeted cloud storage.
+### **Monitoring and Diagnostics**
+
+You can monitor the status and usage of the Storage Connector Service using the following CLI commands:
+
+- **`diagnose fmupdate dbcontract fds`**: Used to verify the **validity and expiration date** of the license.
+- **`diagnose test application uploadd 63`**: Provides a detailed usage summary, including the **total gigabytes uploaded**, the **number of files sent**, the remaining quota, and the number of upload requests that were dropped.
+
 ---
 # Monitoring and Troubleshooting
 ```bash

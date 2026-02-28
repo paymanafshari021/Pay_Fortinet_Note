@@ -686,7 +686,94 @@ end
 
 - Default: **high**
 - ⚠️ FortiAnalyzer encryption level must be **equal to or less than** FortiGate's level
+## Preventing Log Modification
 
+To ensure logs are not altered (tampered with) after they are generated, **FortiAnalyzer** provides mechanisms to verify log integrity during storage, archiving, and transmission.
+
+### Enable Log Checksums
+
+You can configure FortiAnalyzer to add a **checksum** to each log file. This allows you to detect if a log has been modified.
+
+### Why use checksums
+
+- Detect tampering in stored logs
+- Verify integrity when logs are rolled/archived
+- Protect logs during upload (for example, to an SFTP server)
+- Help prevent man-in-the-middle (MITM) attacks during transmission
+
+### Configuration Command
+
+```bash
+config system global
+    set log-checksum md5-auth {md5 | md5-auth | none}
+end
+```
+
+### Available Options
+
+|Option|Description|
+|---|---|
+|**md5**|Records only the MD5 hash of the log file.|
+|**md5-auth**|Records the MD5 hash **and** an authentication code (more secure).|
+|**none**|No checksum is recorded.|
+
+**Best Practice:** Use `md5-auth` for stronger integrity verification.
+
+
+## Change the OFTP Certificate (Secure Log Transmission)
+
+If logs are transmitted using OFTP, you can replace the default certificate with a custom one for improved security.
+### Requirements
+
+- PEM-formatted certificate
+- Associated PEM-formatted private key
+### Configuration Command
+
+```bash
+config system certificate oftp
+    set mode custom
+    set certificate <your PEM format certificate>
+    set private-key <your PEM format private key>
+end
+```
+
+### Why change the certificate
+
+- Strengthens trust between systems
+- Secures log uploads
+- Reduces risk of interception or impersonation
+## Rolling & Auto-Deleting Logs
+
+**Location**  
+System Settings > Advanced > Device Log Settings
+
+**Log Rolling** (closes & compresses current log file, starts new one)  
+- **Size-based**: Roll when file > X MB (default example: 200 MB, range 10–1000 MB)  
+- **Time-based**: Roll at scheduled time (e.g., every Sunday 00:00 or daily at specific hour)  
+→ Both can be active; whichever hits first triggers the roll.  
+Optional: Upload rolled files to SFTP/SCP/FTP or cloud storage.
+
+**Automatic Deletion** (global policy – deletes oldest files by age)  
+Applies to:  
+- Device archive logs  
+- Reports  
+- Content archive files  
+- Quarantined files  
+
+Each type:  
+- Enable/disable  
+- Age (e.g., 365 days)  
+- Delete daily at set time (e.g., 00:00)
+
+**Key Warning**  
+Global auto-delete policy **and** per-device log quotas run independently:  
+- If device quota fills first → deletes oldest logs for that device.  
+- If global age limit hits first → deletes oldest files system-wide (ignores device settings).  
+→ Misconfiguration can cause logs to be deleted earlier than expected.
+
+**Quick Recommendation**  
+- Use size + daily rolling for clean organization.  
+- Set global deletion age carefully to match compliance needs and avoid surprises.
 
 
 

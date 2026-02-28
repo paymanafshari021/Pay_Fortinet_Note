@@ -650,13 +650,12 @@ end
 **Optimized Fabric Transfer Protocol (OFTP)** is used over **SSL** to synchronize information between FortiAnalyzer and FortiGate.
 ## Two Communication Streams
 
-|Stream|Encrypted?|Protocol/Port|
-|---|---|---|
-|**OFTP communication**|✅ Yes (SSL)|TCP/514|
-|**Log communication**|❌ No (by default)|UDP/514|
+| Stream                 | Encrypted?        | Protocol/Port |
+| ---------------------- | ----------------- | ------------- |
+| **OFTP communication** | ✅ Yes (SSL)       | TCP/514       |
+| **Log communication**  | ❌ No (by default) | UDP/514       |
 
 > Once **secure log transfer is enabled**, logs also switch to **TCP/514**
-
 ## Enabling Secure Logs on FortiGate
 
 ```bash

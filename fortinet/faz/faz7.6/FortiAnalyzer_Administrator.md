@@ -573,6 +573,124 @@ You can monitor the status and usage of the Storage Connector Service using the 
 - **`diagnose fmupdate dbcontract fds`**: Used to verify the **validity and expiration date** of the license.
 - **`diagnose test application uploadd 63`**: Provides a detailed usage summary, including the **total gigabytes uploaded**, the **number of files sent**, the remaining quota, and the number of upload requests that were dropped.
 
+## Log Redundancy Options
+
+### 1. **FortiAnalyzer High Availability (HA) Cluster**
+
+A FortiAnalyzer HA cluster provides **real-time redundancy** by ensuring continuous operation if the primary device fails.
+
+- **Automatic Failover:** If the primary device fails, another node in the cluster is automatically selected to take over.
+- **Secure Synchronization:** The primary device **securely synchronizes logs, data, and system settings** across multiple devices in the cluster.
+- **Load Balancing:** Secondary devices can reduce the load on the primary by handling tasks like **running reports** or sharing the load for FortiView widgets.
+
+### 2. **Identical Logging to a Second Server**
+
+You can configure a FortiGate to send an **identical set of logs to a second logging server**, such as a secondary FortiAnalyzer or a syslog server.
+
+- **Resource Impact:** This method increases the CPU and RAM load on the FortiGate because the log daemon must manage an additional TCP connection.
+- **Constraint:** This option is **not supported on smaller FortiGate devices** that lack the capability to connect to a second logging device.
+
+### 3. **Log Forwarding in Aggregation Mode**
+
+This mode involves a collector sending only the **"delta" (incremental changes)** of logs, archives, and quarantined files to a central aggregation server.
+
+- **Traffic Reduction:** It reduces the amount of traffic sent over the network by comparing stored data and sending only what the analyzer is missing.
+- **Self-Healing:** If the analyzer device fails, the collector can **automatically repopulate the restored analyzer** with all stored data.
+- **Constraint:** Aggregation mode is supported **only between two FortiAnalyzer devices**.
+
+### 4. **Network and Local Device Redundancy**
+
+Beyond system-level options, you can protect logs through network-path and local-buffering redundancy:
+
+- **Link Aggregation:** You can combine two or more physical interfaces on FortiAnalyzer into an **aggregate link**. This ensures network redundancy, as the link remains active if at least one physical interface is functioning.
+- **FortiGate Local Caching:** If FortiAnalyzer is unreachable, FortiGate uses its **miglogd process** to cache logs locally in memory. On FortiGate devices with an SSD, a **configurable disk log buffer** can be used to protect logs during longer outages until the connection is reestablished.
+- **Secure Log Transfer:** You can enable **OFTP over SSL** (TCP port 514) to encrypt the log communication stream between FortiGate and FortiAnalyzer, protecting data integrity during delivery.
+
+## Log Forwarding in FortiAnalyzer
+
+Log Forwarding allows FortiAnalyzer to **send logs to another destination** — another FortiAnalyzer, a syslog server, or a CEF server (like FortiSIEM).
+
+## Two Forwarding Modes
+
+|Mode|How it works|
+|---|---|
+|**Forwarding**|Real-time or near real-time log delivery as logs are received|
+|**Aggregation**|Logs and content files are stored locally first, then uploaded at a **scheduled time**|
+
+## 3 Configuration Steps
+
+### 1. Set the Log Forwarding Mode
+
+```bash
+config system log-forward
+  edit <log forwarding ID>
+    set mode <aggregation, forwarding, disable>
+  end
+```
+
+### 2. Configure the Server (recipient)
+
+```bash
+config system log-forward-service
+  set accept-aggregation enable
+end
+```
+
+- Only required in **aggregation mode** — the server must be configured to accept client logs.
+- In **forwarding mode**, only the client side needs configuration.
+
+### 3. Configure the Client (the FortiAnalyzer sending logs)
+
+- Done via **System Settings > Log Forwarding**
+- Here you specify:
+    - **Which device logs** to forward
+    - **Log filters** — only send logs that match certain criteria
+## Encrypted Log Communication: OFTPS
+
+**Optimized Fabric Transfer Protocol (OFTP)** is used over **SSL** to synchronize information between FortiAnalyzer and FortiGate.
+## Two Communication Streams
+
+|Stream|Encrypted?|Protocol/Port|
+|---|---|---|
+|**OFTP communication**|✅ Yes (SSL)|TCP/514|
+|**Log communication**|❌ No (by default)|UDP/514|
+
+> Once **secure log transfer is enabled**, logs also switch to **TCP/514**
+
+## Enabling Secure Logs on FortiGate
+
+```bash
+config log fortianalyzer setting
+  set reliable enable
+end
+```
+## Encryption Algorithm Configuration
+
+### On FortiGate:
+
+```bash
+config log fortianalyzer setting
+  set enc-algorithm {high-medium | high* | low}
+end
+```
+
+- Default: **high**
+- Low encryption models can only do **low** level
+
+### On FortiAnalyzer:
+
+```bash
+config system global
+  set enc-algorithm {high* | medium | low | custom}
+end
+```
+
+- Default: **high**
+- ⚠️ FortiAnalyzer encryption level must be **equal to or less than** FortiGate's level
+
+
+
+
 ---
 # Monitoring and Troubleshooting
 ```bash

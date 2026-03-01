@@ -1286,7 +1286,7 @@ Three donut charts display keyword breakdown by:
 ```
 Incident & Events > Safeguarding
 ```
-## Key Points
+ ## Key Points
 
 - FortiAnalyzer must be **connected to FortiGuard** distribution servers to display all keywords
 - Keywords are **automatically updated** — no manual intervention needed

@@ -55,7 +55,7 @@ Your device’s “hardware fingerprint.” It never changes (unless you spoof i
 The “envelope” that carries your data. FortiSwitch is ready for big envelopes (jumbo frames) out of the box.
 
 **Latest Fortinet confirmation:**  
-💥<ins>FortiGate/FortiSwitch interfaces support jumbo frames up to 9216 bytes by default on most models.💥</ins>
+💥<ins>FortiGate/FortiSwitch interfaces support jumbo frames up to 9216 bytes by default on most models.</ins>
 
 ### 6. MAC Learning and Frame Forwarding (PDF Page 12)
 **Key points from the PDF:**

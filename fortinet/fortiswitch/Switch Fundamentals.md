@@ -37,8 +37,8 @@ Your device’s “hardware fingerprint.” It never changes (unless you spoof i
   - **Unicast**: One device only (normal traffic).
   - 💥<ins>**Multicast**: Many devices in a group (I/G bit = 1, e.g., `01:00:5E:xx:xx:xx` for IGMP)</ins>
   - **Broadcast**: All devices (`FF:FF:FF:FF:FF:FF`).
-### 5. Ethernet Frame Format
-
+### 5. Ethernet Frame Format (PDF Page 11)
+**Key points from the PDF:**
 - Standard frame (payload up to 1500 bytes):
   - Destination MAC (6 bytes)
   - Source MAC (6 bytes)
@@ -55,9 +55,9 @@ Your device’s “hardware fingerprint.” It never changes (unless you spoof i
 The “envelope” that carries your data. FortiSwitch is ready for big envelopes (jumbo frames) out of the box.
 
 **Latest Fortinet confirmation:**  
-💥<ins>FortiGate/FortiSwitch interfaces support jumbo frames up to 9216 bytes by default on most models.</ins>
+💥<ins>FortiGate/FortiSwitch interfaces support jumbo frames up to 9216 bytes by default on most models.💥</ins>
 
-### 6. MAC Learning and Frame Forwarding 
+### 6. MAC Learning and Frame Forwarding (PDF Page 12)
 
 - Switch maintains a **MAC address table** (maps MAC → port + VLAN).
 - **Learning**: From **source** MAC of incoming frames → dynamic entries with aging timer.
@@ -65,12 +65,12 @@ The “envelope” that carries your data. FortiSwitch is ready for big envelope
   - Destination MAC **known** → forward only to that port.
   - Destination MAC **unknown** → **flood** to all ports except the ingress port.
 - Static entries possible (manual or system-created).
- 
+
 The switch watches who is talking (source MAC) and remembers the door (port) they came from. Next time someone wants to talk to them, it uses the shortcut instead of shouting.
 
 ### 7. MAC Address Table and MAC Address Aging Timer (PDF Page 13)
 
-- 💥**View the table** (on FortiGate for managed switches):
+- 💥<ins>**View the table** (on FortiGate for managed switches):</ins>
   ```bash
   # diagnose switch-controller switch-info mac-table
   ```
@@ -80,18 +80,17 @@ The switch watches who is talking (source MAC) and remembers the door (port) the
   MAC: 5c:85:7e:32:16:a2  VLAN: 10  Port: port2
   ```
 
-- **Aging timer** (default = **300 seconds** = 5 minutes):
+- 💥<ins>**Aging timer** (default = **300 seconds** = 5 minutes):</ins>
   ```bash
   config switch-controller global
       set mac-aging-interval <seconds>   # 10 to 1,000,000 (0 = disable)
   end
   ```
 
-**Simple explanation:**  
 The table is the switch’s memory. Old entries are automatically deleted after 5 minutes of silence (so the table doesn’t fill up with devices that left the network).
 
 **Latest Fortinet confirmation (7.6.5):**  
-Default still 300 seconds. You can change it globally exactly as shown above.
+💥<ins>Default still 300 seconds. You can change it globally exactly as shown above.</ins>
 
 ---
 

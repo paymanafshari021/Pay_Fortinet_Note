@@ -35,9 +35,7 @@ Your device’s “hardware fingerprint.” It never changes (unless you spoof i
 ### 4. Destination MAC Address
 - Depends on the type of transmission:
   - **Unicast**: One device only (normal traffic).
-  - <ins>This text is underlined</ins>
-  - ![red text|138](https://img.shields.io/badge/warning-red_text_here-red)
-  - **Multicast**: Many devices in a group (I/G bit = 1, e.g., `01:00:5E:xx:xx:xx` for IGMP)
+  - <ins>**Multicast**: Many devices in a group (I/G bit = 1, e.g., `01:00:5E:xx:xx:xx` for IGMP)</ins>
   - **Broadcast**: All devices (`FF:FF:FF:FF:FF:FF`).
 ### 5. Ethernet Frame Format (PDF Page 11)
 **Key points from the PDF:**

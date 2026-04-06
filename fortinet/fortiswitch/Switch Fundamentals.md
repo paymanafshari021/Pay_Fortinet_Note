@@ -21,7 +21,7 @@ Switches stop the crashes but not the announcements (unless you use VLANs).
 
 - A MAC address is a **48-bit (6-byte)** unique identifier assigned to the NIC.
 - Structure:
-  - First 3 bytes = **OUI** (Organizationally Unique Identifier) → identifies the manufacturer (Fortinet OUIs: 04:D5:90 and 00:09:0F).
+  - First 3 bytes = **OUI** (Organizationally Unique Identifier) → identifies the manufacturer 💥<ins>(Fortinet OUIs: 04:D5:90 and 00:09:0F)</ins>.
   - Last 3 bytes = **NIC specific**.
 - Bits in first byte:
   - I/G bit (least significant): 0 = unicast, 1 = multicast.
@@ -35,7 +35,7 @@ Your device’s “hardware fingerprint.” It never changes (unless you spoof i
 ### 4. Destination MAC Address
 - Depends on the type of transmission:
   - **Unicast**: One device only (normal traffic).
-  - <ins>**Multicast**: Many devices in a group (I/G bit = 1, e.g., `01:00:5E:xx:xx:xx` for IGMP)</ins>
+  - 💥<ins>**Multicast**: Many devices in a group (I/G bit = 1, e.g., `01:00:5E:xx:xx:xx` for IGMP)</ins>
   - **Broadcast**: All devices (`FF:FF:FF:FF:FF:FF`).
 ### 5. Ethernet Frame Format (PDF Page 11)
 **Key points from the PDF:**

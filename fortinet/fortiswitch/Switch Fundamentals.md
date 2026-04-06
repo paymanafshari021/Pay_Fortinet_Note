@@ -37,6 +37,10 @@ Your device’s “hardware fingerprint.” It never changes (unless you spoof i
   - **Unicast**: One device only (normal traffic).
   - **Multicast**: Many devices in a group (I/G bit = 1, e.g.,<mark> `01:00:5E:xx:xx:xx` for IGMP</mark>).
   - **Broadcast**: All devices (`FF:FF:FF:FF:FF:FF`).
+```diff
+- This line appears in red
++ This line appears in green
+```
 ### 5. Ethernet Frame Format (PDF Page 11)
 **Key points from the PDF:**
 - Standard frame (payload up to 1500 bytes):

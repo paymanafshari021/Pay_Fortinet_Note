@@ -21,7 +21,7 @@ Switches stop the crashes but not the announcements (unless you use VLANs).
 
 - A MAC address is a **48-bit (6-byte)** unique identifier assigned to the NIC.
 - Structure:
-  - First 3 bytes = **OUI** (Organizationally Unique Identifier) → identifies the manufacturer 💥<ins>(Fortinet OUIs: 04:D5:90 and 00:09:0F)</ins>.
+  - 💥<ins>First 3 bytes = **OUI** (Organizationally Unique Identifier) → identifies the manufacturer (Fortinet OUIs: 04:D5:90 and 00:09:0F)</ins>.
   - Last 3 bytes = **NIC specific**.
 - Bits in first byte:
   - I/G bit (least significant): 0 = unicast, 1 = multicast.

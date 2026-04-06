@@ -37,8 +37,8 @@ Your device’s “hardware fingerprint.” It never changes (unless you spoof i
   - **Unicast**: One device only (normal traffic).
   - 💥<ins>**Multicast**: Many devices in a group (I/G bit = 1, e.g., `01:00:5E:xx:xx:xx` for IGMP)</ins>
   - **Broadcast**: All devices (`FF:FF:FF:FF:FF:FF`).
-### 5. Ethernet Frame Format (PDF Page 11)
-**Key points from the PDF:**
+### 5. Ethernet Frame Format
+
 - Standard frame (payload up to 1500 bytes):
   - Destination MAC (6 bytes)
   - Source MAC (6 bytes)
@@ -57,24 +57,20 @@ The “envelope” that carries your data. FortiSwitch is ready for big envelope
 **Latest Fortinet confirmation:**  
 💥<ins>FortiGate/FortiSwitch interfaces support jumbo frames up to 9216 bytes by default on most models.</ins>
 
-### 6. MAC Learning and Frame Forwarding (PDF Page 12)
-**Key points from the PDF:**
+### 6. MAC Learning and Frame Forwarding 
+
 - Switch maintains a **MAC address table** (maps MAC → port + VLAN).
 - **Learning**: From **source** MAC of incoming frames → dynamic entries with aging timer.
 - **Forwarding**:
   - Destination MAC **known** → forward only to that port.
   - Destination MAC **unknown** → **flood** to all ports except the ingress port.
 - Static entries possible (manual or system-created).
-
-**Example in PDF (two switches + two PCs in VLAN 10):**  
-Frame from PC1 to PC2 is forwarded port9 → port1.
-
-**Simple explanation:**  
+ 
 The switch watches who is talking (source MAC) and remembers the door (port) they came from. Next time someone wants to talk to them, it uses the shortcut instead of shouting.
 
 ### 7. MAC Address Table and MAC Address Aging Timer (PDF Page 13)
-**Key points from the PDF:**
-- **View the table** (on FortiGate for managed switches):
+
+- 💥**View the table** (on FortiGate for managed switches):
   ```bash
   # diagnose switch-controller switch-info mac-table
   ```

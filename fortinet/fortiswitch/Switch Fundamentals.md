@@ -35,7 +35,7 @@ Your device’s “hardware fingerprint.” It never changes (unless you spoof i
 ### 4. Destination MAC Address
 - Depends on the type of transmission:
   - **Unicast**: One device only (normal traffic).
-  - **Multicast**: Many devices in a group (I/G bit = 1, e.g.,<mark> `01:00:5E:xx:xx:xx` for IGMP</mark>).
+  - **Multicast**: Many devices in a group (I/G bit = 1, e.g., ```diff - `01:00:5E:xx:xx:xx` for IGMP)```.
   - **Broadcast**: All devices (`FF:FF:FF:FF:FF:FF`).
 ```diff
 - This line appears in red

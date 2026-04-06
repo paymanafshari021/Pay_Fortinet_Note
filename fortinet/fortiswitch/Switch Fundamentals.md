@@ -36,7 +36,7 @@ Your device’s “hardware fingerprint.” It never changes (unless you spoof i
 - Depends on the type of transmission:
   - **Unicast**: One device only (normal traffic).
   - **Multicast**: Many devices in a group (I/G bit = 1, e.g., `01:00:5E:xx:xx:xx` for IGMP)
-  - <u>text</u>
+  __text__
   - **Broadcast**: All devices (`FF:FF:FF:FF:FF:FF`).
 ### 5. Ethernet Frame Format (PDF Page 11)
 **Key points from the PDF:**

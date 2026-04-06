@@ -52,11 +52,10 @@ Your device’s “hardware fingerprint.” It never changes (unless you spoof i
 - **Jumbo frames**: FortiSwitch supports up to **9216 bytes** (9000-byte payload + 216-byte header).  
   **Default MTU on all FortiSwitch ports = 9216 bytes**.
 
-**Simple explanation:**  
 The “envelope” that carries your data. FortiSwitch is ready for big envelopes (jumbo frames) out of the box.
 
 **Latest Fortinet confirmation:**  
-FortiGate/FortiSwitch interfaces support jumbo frames up to 9216 bytes by default on most models.
+💥<ins>FortiGate/FortiSwitch interfaces support jumbo frames up to 9216 bytes by default on most models.💥</ins>
 
 ### 6. MAC Learning and Frame Forwarding (PDF Page 12)
 **Key points from the PDF:**

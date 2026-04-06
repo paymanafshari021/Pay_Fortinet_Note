@@ -72,7 +72,7 @@ The switch watches who is talking (source MAC) and remembers the door (port) the
 
 - 💥<ins>**View the table** (on FortiGate for managed switches):</ins>
   ```bash
-  # diagnose switch-controller switch-info mac-table
+  diagnose switch-controller switch-info mac-table
   ```
   Example output:
   ```
@@ -91,16 +91,3 @@ The table is the switch’s memory. Old entries are automatically deleted after 
 
 **Latest Fortinet confirmation (7.6.5):**  
 💥<ins>Default still 300 seconds. You can change it globally exactly as shown above.</ins>
-
----
-
-**You’ve now mastered the complete foundation of Ethernet switching on FortiSwitch!**  
-These concepts are used in **every** later topic (VLANs, STP, security, etc.).
-
-**What next?**  
-Just tell me:
-- “Next topics in Lesson 01” (Link Aggregation + Layer 2 Discovery)
-- Or a specific page/topic (e.g., “Page 34” or “Link Aggregation”)
-- Or jump to Lesson 02: Managed Switch (Page 62)
-
-Your turn — what do you want to learn now? 🚀

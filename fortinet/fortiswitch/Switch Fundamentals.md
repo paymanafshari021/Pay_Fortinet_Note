@@ -31,21 +31,12 @@ Switches stop the crashes but not the announcements (unless you use VLANs).
   - Hyphen: `04-D5-90-39-73-30`
   - Period: `04D5.9039.7330`
 
-**Simple explanation:**  
 Your device’s “hardware fingerprint.” It never changes (unless you spoof it). The OUI tells you who made the NIC.
-
-### 4. Destination MAC Address (PDF Page 10)
-**Key points from the PDF:**
+### 4. Destination MAC Address
 - Depends on the type of transmission:
   - **Unicast**: One device only (normal traffic).
-  - **Multicast**: Many devices in a group (I/G bit = 1, e.g., `01:00:5E:xx:xx:xx` for IGMP).
+  - **Multicast**: Many devices in a group (I/G bit = 1, e.g.,<mark> `01:00:5E:xx:xx:xx` for IGMP</mark>).
   - **Broadcast**: All devices (`FF:FF:FF:FF:FF:FF`).
-
-**Simple explanation:**  
-- Unicast = letter to one person.  
-- Multicast = letter to a club.  
-- Broadcast = announcement over loudspeakers.
-
 ### 5. Ethernet Frame Format (PDF Page 11)
 **Key points from the PDF:**
 - Standard frame (payload up to 1500 bytes):

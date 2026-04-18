@@ -156,3 +156,11 @@ MAC: 5c:85:7e:32:16:a2  VLAN: 10  Port: port2(port-id 2)
 | `dynamic` | This is a **dynamically learned** entry (not static — will age out)               |
 | `src-hit` | The MAC was learned from the **source MAC** of an incoming frame                  |
 | `native`  | The MAC was learned on the **native VLAN** of the port (untagged traffic)         |
++ The **default aging timer is 300 seconds (5 minutes)**. To change it globally for all managed FortiSwitches, run this from FortiGate:
+	+ This command is run on the **FortiGate**, not directly on the FortiSwitch, because FortiSwitch is managed centrally by the FortiGate Switch Controller.
+
+```bash
+config switch-controller global
+    set mac-aging-interval <seconds>
+end
+```

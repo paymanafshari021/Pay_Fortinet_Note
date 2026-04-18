@@ -122,22 +122,20 @@ Frame arrives on a port
 - If a matching source MAC entry already exists → the aging timer is **reset** (refreshed), not a new entry created
 - The aging timer is typically **5 minutes** but varies by vendor/configuration
 - When the switch doesn't know where the destination is → it **floods** (not broadcasts!) — flooding is specific to unknown unicast; broadcast frames are always flooded
-# FortiSwitch CLI
-
-On a FortiSwitch, you can view the MAC address table with this CLI command:
++ On a FortiSwitch, you can view the MAC address table with this CLI command: #cli
 
 ```bash
 # View the MAC address table on FortiSwitch
 diagnose switch mac-address list
 ```
 
-Or from FortiGate (managing FortiSwitch via FortiLink):
++ Or from FortiGate (managing FortiSwitch via FortiLink):#cli
 
 ```bash
 diagnose switch-controller mac-cache list
 ```
 
-This command is run **from the FortiGate** that is managing the FortiSwitch (via FortiLink / Switch Controller):
++ This command is run **from the FortiGate** that is managing the FortiSwitch (via FortiLink / Switch Controller): #cli
 
 ```bash
 # diagnose switch-controller switch-info mac-table
@@ -149,3 +147,12 @@ MAC: 00:e0:4c:36:0e:a6  VLAN: 10  Port: port1(port-id 1)
 MAC: 5c:85:7e:32:16:a2  VLAN: 10  Port: port2(port-id 2)
   Flags: 0x00010441 [ hit dynamic src-hit native ]
 ```
+
++ Flags Explained — `[ hit dynamic src-hit native ]`
+
+| Flag      | Meaning                                                                           |
+| --------- | --------------------------------------------------------------------------------- |
+| `hit`     | This entry has been **recently matched/used** — traffic was seen from/to this MAC |
+| `dynamic` | This is a **dynamically learned** entry (not static — will age out)               |
+| `src-hit` | The MAC was learned from the **source MAC** of an incoming frame                  |
+| `native`  | The MAC was learned on the **native VLAN** of the port (untagged traffic)         |

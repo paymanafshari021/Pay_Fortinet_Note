@@ -61,3 +61,34 @@ The same MAC address can be written in three different ways:
 	- The receiving NIC recalculates the FCS and compares it — if they don't match, the frame is **dropped** (corrupted)
 	- ⚠️ The FCS is **checked and stripped by the NIC** before passing to the OS/host
 	- This is why **Wireshark typically does NOT show the FCS** — it's already been removed by the time the capture happens
+-  Frame Size Rules
+	- Standard Ethernet (Non-Jumbo) Frames:
+
+| Condition                     | Maximum Size   |
+| ----------------------------- | -------------- |
+| Without VLAN tag              | **1518 bytes** |
+| With VLAN tag (4 extra bytes) | **1522 bytes** |
++  Minimum Frame Size:
+	- **64 bytes** (including FCS)
+	- Frames smaller than 64 bytes are called **Runts** and are **dropped by NICs**
+	- Runts often indicate a collision or hardware problem
+
++ Jumbo Frames (FortiSwitch specific):
+
+	- FortiSwitch supports jumbo frames up to **9216 bytes**
+	- Jumbo frame breakdown:
+	    - Payload: up to **9000 bytes**
+	    - Header: **216 bytes**
+	    - Total: **9216 bytes**
+	- **All FortiSwitch ports have an MTU of 9216 bytes by default** — jumbo frames are supported out of the box!
+ + ⚠️  Important: Frame MTU vs IP MTU
+
+The slide warns about a common confusion:
+
+|MTU Type|Applies To|Adjusted On|
+|---|---|---|
+|**Frame MTU**|Ethernet frame size|Switch (Layer 2)|
+|**IP MTU**|IP packet size|Router / Layer 3 device|
+> When you change MTU on a **switch** → you're changing the **Ethernet frame size** When you change MTU on a **router** → you're changing the **IP packet size**
+
+These are **different things** — don't confuse them!

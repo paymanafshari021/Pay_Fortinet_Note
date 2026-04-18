@@ -82,13 +82,10 @@ The same MAC address can be written in three different ways:
 	    - Total: **9216 bytes**
 	- **All FortiSwitch ports have an MTU of 9216 bytes by default** — jumbo frames are supported out of the box!
  + ⚠️  Important: Frame MTU vs IP MTU
+	 + The slide warns about a common confusion:
 
-The slide warns about a common confusion:
-
-|MTU Type|Applies To|Adjusted On|
-|---|---|---|
-|**Frame MTU**|Ethernet frame size|Switch (Layer 2)|
-|**IP MTU**|IP packet size|Router / Layer 3 device|
-> When you change MTU on a **switch** → you're changing the **Ethernet frame size** When you change MTU on a **router** → you're changing the **IP packet size**
-
-These are **different things** — don't confuse them!
+| MTU Type      | Applies To          | Adjusted On             |
+| ------------- | ------------------- | ----------------------- |
+| **Frame MTU** | Ethernet frame size | Switch (Layer 2)        |
+| **IP MTU**    | IP packet size      | Router / Layer 3 device |
+> When you change MTU on a **switch** → you're changing the **Ethernet frame size** When you change MTU on a **router** → you're changing the **IP packet size** - These are **different things** — don't confuse them!

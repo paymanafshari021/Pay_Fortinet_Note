@@ -49,3 +49,15 @@ The same MAC address can be written in three different ways:
 | **Ethertype / Length** | 2 bytes            | Identifies the type of payload OR the frame length                                         |
 | **Payload**            | 46–1500 bytes      | The actual data being transported (usually an IP packet)                                   |
 | **FCS**                | 4 bytes            | Frame Check Sequence — used to detect corrupted/errored frames                             |
++ Ethertype / Length
+	- If the value is **≥ 1536 (0x0600)** → it's an **Ethertype** (identifies payload protocol)
+	- If the value is **≤ 1500** → it's a **Length** field
+	- Common Ethertypes:
+	    - `0x0800` = **IPv4**
+	    - `0x86DD` = **IPv6**
+	    - `0x8100` = **802.1Q VLAN tag**
++ FCS (Frame Check Sequence)
+	- A **4-byte checksum** calculated over the entire frame
+	- The receiving NIC recalculates the FCS and compares it — if they don't match, the frame is **dropped** (corrupted)
+	- ⚠️ The FCS is **checked and stripped by the NIC** before passing to the OS/host
+	- This is why **Wireshark typically does NOT show the FCS** — it's already been removed by the time the capture happens

@@ -89,3 +89,63 @@ The same MAC address can be written in three different ways:
 | **Frame MTU** | Ethernet frame size | Switch (Layer 2)        |
 | **IP MTU**    | IP packet size      | Router / Layer 3 device |
 > When you change MTU on a **switch** → you're changing the **Ethernet frame size** When you change MTU on a **router** → you're changing the **IP packet size** - These are **different things** — don't confuse them!
+
++ The **MAC address table** (also known as the CAM table — Content Addressable Memory) is the brain of an Ethernet switch.
++ Two types of entries:
+
+| Type        | How Created                                                                                     | Lifespan                                                                                   |
+| ----------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| **Dynamic** | Learned automatically from incoming traffic                                                     | Removed when aging timer expires (usually **5 minutes**) — resets if traffic is seen again |
+| **Static**  | Manually configured by admin, or auto-created for internal system interfaces (e.g., management) | Permanent — does not age out                                                               |
++ How MAC Learning Works — Step by Step
+	+ When a switch receives a frame, it follows this process:
+
+```
+Frame arrives on a port
+        ↓
+1. Read the SOURCE MAC address
+        ↓
+2. Is it in the MAC table?
+   ├── NO  → Create a new DYNAMIC entry (MAC + port + VLAN) + start aging timer
+   └── YES → Update the entry + RESET the aging timer
+        ↓
+3. Read the DESTINATION MAC address
+        ↓
+4. Is it in the MAC table?
+   ├── YES → Forward the frame to the PORT listed in the table
+   └── NO  → FLOOD the frame to ALL ports EXCEPT the ingress port (the port it came in on)
+```
+
+> 💡 **Flooding** = sending the frame out of every port except where it came from. This is how the switch "discovers" unknown destinations — someone will respond, and that response will teach the switch where the destination is.
+
+- The switch learns MACs from **ingress (incoming) traffic only** — specifically from the **source MAC** of each frame
+- If a matching source MAC entry already exists → the aging timer is **reset** (refreshed), not a new entry created
+- The aging timer is typically **5 minutes** but varies by vendor/configuration
+- When the switch doesn't know where the destination is → it **floods** (not broadcasts!) — flooding is specific to unknown unicast; broadcast frames are always flooded
+# FortiSwitch CLI
+
+On a FortiSwitch, you can view the MAC address table with this CLI command:
+
+```bash
+# View the MAC address table on FortiSwitch
+diagnose switch mac-address list
+```
+
+Or from FortiGate (managing FortiSwitch via FortiLink):
+
+```bash
+diagnose switch-controller mac-cache list
+```
+
+This command is run **from the FortiGate** that is managing the FortiSwitch (via FortiLink / Switch Controller):
+
+```bash
+# diagnose switch-controller switch-info mac-table
+Managed Switch : Access-1 0
+…
+MAC: 00:e0:4c:36:0e:a6  VLAN: 10  Port: port1(port-id 1)
+  Flags: 0x00010441 [ hit dynamic src-hit native ]
+
+MAC: 5c:85:7e:32:16:a2  VLAN: 10  Port: port2(port-id 2)
+  Flags: 0x00010441 [ hit dynamic src-hit native ]
+```

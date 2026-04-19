@@ -164,3 +164,12 @@ config switch-controller global
     set mac-aging-interval <seconds>
 end
 ```
++ Split Port (Breakout) Feature
+	+ High-speed ports (40G and 100G) can be **split into multiple lower-speed ports** using a **breakout cable**:
+
+| Port            | Split Options                                     |
+| --------------- | ------------------------------------------------- |
+| **40G QSFP+**   | → 4× 10G **or** 4× 1G                             |
+| **100G QSFP28** | → 2× 50G **or** 4× 25G **or** 4× 10G **or** 4× 1G |
+	+ **How it works:** A breakout cable has **one QSFP+ or QSFP28 connector** on one end and **4 SFP+ connectors** on the other — physically splitting the single high-speed port into multiple independent lower-speed ports.
+	+ 

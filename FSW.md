@@ -173,3 +173,19 @@ end
 | **100G QSFP28** | → 2× 50G **or** 4× 25G **or** 4× 10G **or** 4× 1G |
 * **How it works:** 
 	* A breakout cable has **one QSFP+ or QSFP28 connector** on one end and **4 SFP+ connectors** on the other — physically splitting the single high-speed port into multiple independent lower-speed ports.
+* SFP ports do **not** support PoE. PoE is exclusive to **RJ45 copper ports**:
+
+| PoE Standard       | Max Power Delivered | Typical Use                                |
+| ------------------ | ------------------- | ------------------------------------------ |
+| **PoE** (802.3af)  | 15.4W per port      | IP phones, basic cameras                   |
+| **PoE+** (802.3at) | 30W per port        | PTZ cameras, dual-band APs                 |
+| **UPoE** (802.3bt) | 60W per port        | High-power APs, video conferencing systems |
+
+> ⚠️ The **2.5G/5G RJ45** ports support UPoE — important for **Wi-Fi 6/6E access points** that need both high bandwidth AND high power.
+
++ DAC = Direct Attach Copper
+	+ It's a **twinax copper cable** with **transceivers factory-attached** at both ends
+	- Used for **short-distance, high-speed connections** (typically up to 7 meters)
+	- **More cost-effective** than fiber + separate transceivers
+	- Common use: connecting a switch directly to a server in the same rack
+

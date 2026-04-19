@@ -1,4 +1,4 @@
-### 1. What is Ethernet Switching? 
+### What is Ethernet Switching? 
 
 - Switches forward **Ethernet frames** based on their **destination MAC address**.
 - MAC addresses identify Network Interface Cards (NICs) in the network.
@@ -7,7 +7,7 @@
   - Learn MAC addresses and record them in **MAC address tables**.
   - Are usually deployed in LANs.
   - Provide **high-performance connectivity** (high bandwidth + low latency).
-### 2. Collision and Broadcast Domains
+### Collision and Broadcast Domains
 
 - A **collision domain** = one or more devices sharing the same network segment. If two devices transmit at the same time → collision → retransmissions → low performance.
 - Hubs extend collision domains (they flood everything).
@@ -17,7 +17,7 @@
 
 Switches stop the crashes but not the announcements (unless you use VLANs).
 
-### 3. MAC Address
+### MAC Address
 
 - A MAC address is a **48-bit (6-byte)** unique identifier assigned to the NIC.
 - Structure:
@@ -32,12 +32,12 @@ Switches stop the crashes but not the announcements (unless you use VLANs).
   - Period: `04D5.9039.7330`
 
 Your device’s “hardware fingerprint.” It never changes (unless you spoof it). The OUI tells you who made the NIC.
-### 4. Destination MAC Address
+### Destination MAC Address
 - Depends on the type of transmission:
   - **Unicast**: One device only (normal traffic).
   - 💥<ins>**Multicast**: Many devices in a group (I/G bit = 1, e.g., `01:00:5E:xx:xx:xx` for IGMP)</ins>
   - **Broadcast**: All devices (`FF:FF:FF:FF:FF:FF`).
-### 5. Ethernet Frame Format (PDF Page 11)
+### Ethernet Frame Format (PDF Page 11)
 **Key points from the PDF:**
 - Standard frame (payload up to 1500 bytes):
   - Destination MAC (6 bytes)
@@ -57,7 +57,7 @@ The “envelope” that carries your data. FortiSwitch is ready for big envelope
 **Latest Fortinet confirmation:**  
 💥<ins>FortiGate/FortiSwitch interfaces support jumbo frames up to 9216 bytes by default on most models.💥</ins>
 
-### 6. MAC Learning and Frame Forwarding (PDF Page 12)
+### MAC Learning and Frame Forwarding (PDF Page 12)
 
 - Switch maintains a **MAC address table** (maps MAC → port + VLAN).
 - **Learning**: From **source** MAC of incoming frames → dynamic entries with aging timer.
@@ -68,7 +68,7 @@ The “envelope” that carries your data. FortiSwitch is ready for big envelope
 
 The switch watches who is talking (source MAC) and remembers the door (port) they came from. Next time someone wants to talk to them, it uses the shortcut instead of shouting.
 
-### 7. MAC Address Table and MAC Address Aging Timer (PDF Page 13)
+### MAC Address Table and MAC Address Aging Timer 
 
 - 💥<ins>**View the table** (on FortiGate for managed switches):</ins>
   ```bash

@@ -1,1 +1,0 @@
-Geh auf`about:config` -> such nach `browser.ml.chat.provider ->`, doppelklick, gib irgendeine URL ein.

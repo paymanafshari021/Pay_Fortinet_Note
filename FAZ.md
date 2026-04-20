@@ -41,12 +41,12 @@ Logs in FortiAnalyzer exist in one of three phases:
 
 ### Data Policy Scope
 
-Logs and files are stored on the FortiAnalyzer hard disks and are also temporarily stored in the SQL database. 
-⚠️When a SIEM license is added, a separate SIEM database is created to store normalized Fabric logs. 
-When ADOMs are enabled, data policy settings can be specified per ADOM and apply only to the devices in it. Both global and per-ADOM log storage settings are always simultaneously active.
++ Logs and files are stored on the FortiAnalyzer hard disks and are also temporarily stored in the SQL database. 
++ ⚠️When a SIEM license is added, a separate SIEM database is created to store normalized Fabric logs. 
++ When ADOMs are enabled, data policy settings can be specified per ADOM and apply only to the devices in it. Both global and per-ADOM log storage settings are always simultaneously active.
 
 ### Archive Logs and Database Rebuilds
 
-FortiAnalyzer's database rebuild is performed using Archive logs — ⚠️ if Archive logs are trimmed before performing a device database rebuild, Analytic logs will not be restored. It is therefore important to review your storage data policy before performing any rebuild.
++ FortiAnalyzer's database rebuild is performed using Archive logs — ⚠️ if Archive logs are trimmed before performing a device database rebuild, Analytic logs will not be restored. It is therefore important to review your storage data policy before performing any rebuild.
 
 # SLIDE 75

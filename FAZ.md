@@ -37,13 +37,14 @@ Logs in FortiAnalyzer exist in one of three phases:
 
 + Analytic logs indexed in the SQL database require significantly more disk space than Archive logs. 
 + An average indexed (analytics) log is approximately 400 bytes, while an average compressed (archive) log is approximately 50 bytes — roughly an 8:1 ratio.
-<mark style="background: css
-yellow;color:#000000;">roughly an 8:1 ratio</mark>
+<u>roughly an 8:1 ratio</u>
 + This difference must be considered when specifying the storage ratio for Analytics and Archive logs in the ADOM disk quota settings.
 
 ### Data Policy Scope
 
-Logs and files are stored on the FortiAnalyzer hard disks and are also temporarily stored in the SQL database. When a SIEM license is added, a separate SIEM database is created to store normalized Fabric logs. When ADOMs are enabled, data policy settings can be specified per ADOM and apply only to the devices in it. Both global and per-ADOM log storage settings are always simultaneously active.
+Logs and files are stored on the FortiAnalyzer hard disks and are also temporarily stored in the SQL database. 
+When a SIEM license is added, a separate SIEM database is created to store normalized Fabric logs. 
+When ADOMs are enabled, data policy settings can be specified per ADOM and apply only to the devices in it. Both global and per-ADOM log storage settings are always simultaneously active.
 
 ### Archive Logs and Database Rebuilds
 

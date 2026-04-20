@@ -189,3 +189,79 @@ end
 	- **More cost-effective** than fiber + separate transceivers
 	- Common use: connecting a switch directly to a server in the same rack
 
++ ### Display Port Status from FortiGate CLI
+```bash
+execute switch-controller get-conn-status Access-1
+```
+
+> ⚠️ **You must include the Switch ID** (e.g., `Access-1`) at the end — without it, port information won't be shown.
+
+```bash
+Get managed-switch Access-1 connection status.
+Admin Status: Authorized # The FortiSwitch is **authorized** to be managed by this FortiGate
+Connection: Connected (capwap) # Switch is **actively connected** via the **CAPWAP** protocol (the same protocol used for managing APs)
+Image Version: FS24VM-v7.6.1-build5996,241205(Interim)
+Remote Address: 10.0.13.2
+Join Time: Tue Jun 3 11:48:30 2025
+interface   status   duplex   speed      fortilink   stacking   poe status
+    port1     up      full    1000Mbps      no          no      Not Supported
+…
+    port3     up      full    1000Mbps      no          yes     Not Supported
+…
+# `fortilink``yes` = this port is a **FortiLink uplink** to FortiGate, `no` = regular port
+Aggregate Interfaces:
+         Interface      Status   Duplex   Speed       Type
+    _FlInKl_MLAG0_(*)    up      full    1000Mbps     ISL
+
+```
+
++ Show the managed switch config:
+```bash
+show switch-controller managed-switch Access-1
+config switch-controller managed-switch
+    edit "Access-1"
+    ...
+        config ports
+            edit <port>
+                set <setting> ...
+            next
+        end
+    next
+end
+```
++ Command — Summarized Transceiver Information
+```bash
+# Syntax: `diagnose switch-controller switch-info modules summary <switch-id> <port>`
+diagnose switch-controller switch-info modules summary Access-1 port25
+Vdom: root
+
+Core-1:
+  Portname   State    Type      DMI   Transceiver   RX    Vendor      Part Number        Serial Number
+  --------   ------   -------   ---   -----------   ---   --------    ----------------   ------------
+  port25     INSERT   SFP/SFP+  N     1000-Base-T   OK    +Fortinet   LCP-1250RJ3SRTFN   233401002279
+  # A transceiver is **physically inserted** in this port (`EMPTY` = no transceiver)
+  # **Digital Monitoring Interface** — `N` = not supported by this transceiver, `Y` = supported (allows real-time monitoring of TX/RX power, temperature, etc.)
+ 
+```
++ Command — Detailed Transceiver Information
+```bash
+# Syntax: diagnose switch-controller switch-info modules detail <switch-id> <port>
+diagnose switch-controller switch-info modules detail Core-1 port25
+Vdom: root
+
+Core-1:
+Port(port25)
+identifier        QSFP+
+connector         LC
+transceiver       Unk(0x00)
+encoding          64B/66B
+Length Decode Common
+  length_smf_1km  N/A
+  length_cable    N/A
+vendor            AVAGO
+vendor_oid        0x00176A
+vendor_pn         AFBR-79EBPZ
+vendor_rev        01
+vendor_sn         AVM2251S1LA
+manuf_date        12/14/2022
+```

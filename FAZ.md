@@ -37,8 +37,8 @@ Logs in FortiAnalyzer exist in one of three phases:
 
 + Analytic logs indexed in the SQL database require significantly more disk space than Archive logs. 
 + An average indexed (analytics) log is approximately 400 bytes, while an average compressed (archive) log is approximately 50 bytes — roughly an 8:1 ratio.
-<u><mark style="background: css
-yellow;color:#000000;">roughly an 8:1 ratio</mark></u>
+<ins><mark style="background: css
+yellow;color:#000000;">roughly an 8:1 ratio</mark></ins>
 + This difference must be considered when specifying the storage ratio for Analytics and Archive logs in the ADOM disk quota settings.
 
 ### Data Policy Scope

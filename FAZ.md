@@ -48,3 +48,5 @@ When ADOMs are enabled, data policy settings can be specified per ADOM and apply
 ### Archive Logs and Database Rebuilds
 
 FortiAnalyzer's database rebuild is performed using Archive logs — ⚠️ if Archive logs are trimmed before performing a device database rebuild, Analytic logs will not be restored. It is therefore important to review your storage data policy before performing any rebuild.
+
+# SLIDE 75

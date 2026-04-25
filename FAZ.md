@@ -53,11 +53,9 @@ Logs in FortiAnalyzer exist in one of three phases:
 + In FortiAnalyzer, an event does not just appear automatically from a raw log — it is produced by a mechanism called an event handler. Without an event handler watching for specific conditions, a log entry will be stored but will not become an event.
 + Every log that arrives at FortiAnalyzer — from FortiGate, FortiClient, FortiMail, etc. — is automatically passed through the event handlers.
 + If logs match the conditions configured in an event handler, FortiAnalyzer generates an event
-+ 🟡 "Subscription to the Security Automation Service provides FortiAnalyzer with real-time event handlers that can help detect zero-day attacks"
-
++ 🟡 "Subscription to the Security Automation Service provides FortiAnalyzer with real-time event handlers that can help detect zero-day attacks"<br>
 This is a critical note highlighted deliberately on the slide:
-
-    + Security Automation Service (SAS) is a Fortinet subscription service.
-    + Subscribing to it gives FortiAnalyzer access to real-time, cloud-updated event handlers.
-    + These handlers are specifically designed to detect zero-day attacks — meaning threats that are brand new and may not yet be in traditional signature databases.
-    + This keeps FortiAnalyzer's event detection capability current and up-to-date against emerging threats without requiring manual reconfiguration by admins.
++ Security Automation Service (SAS) is a Fortinet subscription service.
++ Subscribing to it gives FortiAnalyzer access to real-time, cloud-updated event handlers.
++ These handlers are specifically designed to detect zero-day attacks — meaning threats that are brand new and may not yet be in traditional signature databases.
++ This keeps FortiAnalyzer's event detection capability current and up-to-date against emerging threats without requiring manual reconfiguration by admins.

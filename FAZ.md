@@ -134,3 +134,4 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ Setting threshold to 1 means events fire for every single matching log — this is default but can be noisy.
 - ❌ Unique values threshold (Option 2) counts distinct values in a field, NOT total log count.
 - ❌ Indicators defined here (in the rule) are what gets extracted and enriched — not all log fields automatically become IOCs.
+# Event Handlers: Data Selectors

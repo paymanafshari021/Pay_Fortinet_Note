@@ -109,3 +109,28 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ Automation Stitch does NOT trigger actions in FortiAnalyzer itself — it notifies **FortiGate**, which checks **FortiOS** for the stitch.
 - ❌ **Automatically Create Incident** is a toggle — it doesn't happen by default; it must be **explicitly enabled**.
 - ❌ MITRE Tech IDs are **optional** attributes — they don't affect detection logic, only classification.
+# Event Handlers: Rule Configuration
+- ❌ Don't confuse rule-level logic with handler-level logic:
+    - Handler (Basic) = OR between rules
+    - Rule internal = Both AND ("All Filters") and OR ("Any One of the Filters") supported
+- ❌ Event Severity is set per Rule — NOT per handler. Different rules in the same handler can have different severities.
+- ❌ The Log Device Type selection changes available fields — if you pick the wrong device type, you'll see incorrect/irrelevant fields.
+- ❌ Log Filter by Text is for precise/advanced filtering — it is NOT the same as the GUI dropdown filters.
+- ❌ Log Subtype = "Any" does NOT mean the rule ignores subtypes — it means it matches ALL subtypes.
+
+- Event conditions (thresholds) reduce the number of generated events — preventing alert fatigue.
+- Four threshold types:
+    - Minimum log count (group contains N or more occurrences)
+    - Unique field values (N or more distinct values in a log field)
+    - Sum of a numeric field (bytes, packets — greater than or equal to N)
+    - Safeguard Risk Score (score exceeds N)
+- Duration = the time window (in minutes) within which the threshold must be met.
+- Duration + Expression work together — both must be satisfied for an event to fire.
+- ⚠️ If generating too many events → configure aggregation expression and aggregation duration.
+- Indicators can be extracted per rule (destination IP → IP type, hostname → Domain type).
+- Advanced settings allow customization of event type, message, status, tags, and indicators.
+- ❌ Duration alone does NOT fire events — it only sets the time window for the expression threshold.
+- ❌ Don't confuse aggregation expression (the count/sum condition) with aggregation duration (the time window).
+- ❌ Setting threshold to 1 means events fire for every single matching log — this is default but can be noisy.
+- ❌ Unique values threshold (Option 2) counts distinct values in a field, NOT total log count.
+- ❌ Indicators defined here (in the rule) are what gets extracted and enriched — not all log fields automatically become IOCs.

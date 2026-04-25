@@ -84,4 +84,5 @@ Logs in FortiAnalyzer exist in one of three phases:
 
 # Managing Event Handlers
 + Disabled handlers do NOT generate events — this is absolute. (TCH)
-+ <mark>**Best practice:**</mark> Enable only the handlers you need to avoid noise. (TCH)
+> [!TIP]
+> **Best practice:** Enable only the handlers you need to avoid noise. (TCH)

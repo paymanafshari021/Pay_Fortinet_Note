@@ -56,14 +56,32 @@ Logs in FortiAnalyzer exist in one of three phases:
 
 + 🟡 "Subscription to the Security Automation Service provides FortiAnalyzer with real-time event handlers that can help detect zero-day attacks"
 
-This is a critical note highlighted deliberately on the slide:
-+ Security Automation Service (SAS) is a Fortinet subscription service.
-+ Subscribing to it gives FortiAnalyzer access to real-time, cloud-updated event handlers.
-+ These handlers are specifically designed to detect zero-day attacks — meaning threats that are brand new and may not yet be in traditional signature databases.
-+ This keeps FortiAnalyzer's event detection capability current and up-to-date against emerging threats without requiring manual reconfiguration by admins.
+* This is a critical note highlighted deliberately on the slide:
+    + Security Automation Service (SAS) is a Fortinet subscription service.
+    + Subscribing to it gives FortiAnalyzer access to real-time, cloud-updated event handlers.
+    + These handlers are specifically designed to detect zero-day attacks — meaning threats that are brand new and may not yet be in traditional signature databases.
+    + This keeps FortiAnalyzer's event detection capability current and up-to-date against emerging threats without requiring manual reconfiguration by admins.
 
 + ❌ Don't confuse logs with events — logs are raw data; events are generated from logs by event handlers when conditions match.
 + ❌ Don't assume FortiAnalyzer generates events from ALL logs — only logs that match event handler conditions become events.
 + ❌ The Security Automation Service is a subscription — it is NOT included by default without a license/subscription.
 + ❌ Zero-day detection requires SAS subscription — this will NOT work with default built-in event handlers alone.
 
+# How Are Events Generated?
++ Events are generated when a log matches a rule/condition in an event handler.
++ Event handlers check criteria such as: threat type, device type, log type.
++ Predefined handlers can be used, cloned, or customized; you can also build them from scratch.
++ Events are viewed in the Event Monitor, categorized as endpoint, threat, or system events.
++ Events can be escalated to Incidents for deeper investigation.
++ On escalation, you can: correlate logs, view timeline, assign priority, assign analyst.
++ Playbooks handle high-volume incident creation and resolution automatically.
++ IOCs extracted from events (IPs, domains, URLs) can be enriched via FortiGuard and VirusTotal.
++ ❌ Don't say ALL logs become events — only those that match event handler conditions.
++ ❌ Don't confuse events with incidents — events are generated first; incidents are escalated from events.
++ ❌ Enrichment services are FortiGuard AND VirusTotal — not just FortiGuard alone.
++ ❌ The Event Monitor shows three sub-categories: endpoint, threat, system — not just one combined view.
++ ❌ Playbooks are used for high-volume incident handling — not just for automation in general.
+
+# Managing Event Handlers
++ Disabled handlers do NOT generate events — this is absolute. (TCH)
++ <strong style="color:#d29922;">Best practice:</strong> Enable only the handlers you need to avoid noise. (TCH)

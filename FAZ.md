@@ -88,3 +88,7 @@ Logs in FortiAnalyzer exist in one of three phases:
 > **Best practice:** Enable only the handlers you need to avoid noise. (TCH)
 
 # Event Handlers: Configuration
+Event Handler Type: Basic / Correlation 
++ Two tabs shown — Basic is currently selected (highlighted in blue). Correlation is the other option
+    + An event is generated when a set of rules is met in a correlation sequence"<br>
+    This callout points specifically to the Correlation tab in the Event Handler Type field. It explains that when you select Correlation type (instead of Basic), an event is only fired when a sequence of rules is satisfied in a specific order — not just any single rule match. 

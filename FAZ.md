@@ -88,7 +88,24 @@ Logs in FortiAnalyzer exist in one of three phases:
 > **Best practice:** Enable only the handlers you need to avoid noise. (TCH)
 
 # Event Handlers: Configuration
-Event Handler Type: Basic / Correlation 
-+ Two tabs shown — Basic is currently selected (highlighted in blue). Correlation is the other option
-    + An event is generated when a set of rules is met in a correlation sequence"<br>
-    This callout points specifically to the Correlation tab in the Event Handler Type field. It explains that when you select Correlation type (instead of Basic), an event is only fired when a sequence of rules is satisfied in a specific order — not just any single rule match. 
+🔸 Event Handler Type: Basic or Correlation
++ Two types of event handlers exist:
+    + Basic:
+        + Uses OR logic across its rules. This means if any one rule in the handler matches a log, an event is generated. Simpler to configure — ideal for detecting individual, standalone conditions.
+    + Correlation:
+        + Uses sequence-based logic — a set of rules must be met in a specific order/sequence. More powerful and complex — ideal for detecting multi-step attack patterns. Has many more operator logic options than Basic type. Example: Rule 1 must fire, then Rule 2, then Rule 3 — only then is an event generated.
+- Two event handler types: **Basic** (OR logic) and **Correlation** (sequence logic).
+- **Basic** = ANY rule match → event generated.
+- **Correlation** = set of rules must be met **in sequence** → event generated.
+- **Data Selectors** = pre-filters applied **before rules** = also called **exclusion filters**.
+- **Automation Stitch** = FortiAnalyzer notifies **FortiGate** → checks for stitch in **FortiOS** → triggers action.
+- **Automatically Create Incident** toggle → every event auto-escalates to incident.
+- **Notification profile** = sends alerts when handler fires.
+- **MITRE attributes** can be configured per handler; many predefined handlers already have these set.
+- MITRE ATT&CK matrices are viewable under **Incidents & Events** in FortiAnalyzer.
+- A handler can have **one or more rules**.
+- ❌ Don't confuse **Basic (OR)** with **Correlation (sequence)** — this is a very common exam question.
+- ❌ **Data Selector** is NOT a rule — it is a **pre-filter/exclusion filter** that runs BEFORE the rules.
+- ❌ Automation Stitch does NOT trigger actions in FortiAnalyzer itself — it notifies **FortiGate**, which checks **FortiOS** for the stitch.
+- ❌ **Automatically Create Incident** is a toggle — it doesn't happen by default; it must be **explicitly enabled**.
+- ❌ MITRE Tech IDs are **optional** attributes — they don't affect detection logic, only classification.

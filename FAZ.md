@@ -61,3 +61,9 @@ This is a critical note highlighted deliberately on the slide:
 + Subscribing to it gives FortiAnalyzer access to real-time, cloud-updated event handlers.
 + These handlers are specifically designed to detect zero-day attacks — meaning threats that are brand new and may not yet be in traditional signature databases.
 + This keeps FortiAnalyzer's event detection capability current and up-to-date against emerging threats without requiring manual reconfiguration by admins.
+
++ ❌ Don't confuse logs with events — logs are raw data; events are generated from logs by event handlers when conditions match.
++ ❌ Don't assume FortiAnalyzer generates events from ALL logs — only logs that match event handler conditions become events.
++ ❌ The Security Automation Service is a subscription — it is NOT included by default without a license/subscription.
++ ❌ Zero-day detection requires SAS subscription — this will NOT work with default built-in event handlers alone.
+

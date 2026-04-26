@@ -212,3 +212,56 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ Don't assume predefined handlers are always enabled by default — they must be **explicitly enabled** (disabled handlers don't generate events).
 - ❌ **MS Exchange–Multiple Failed Deliveries** is NOT about login failures — it's about **email delivery failures** (NDRs, bounces).
 - ❌ Predefined handlers can be used, cloned, OR customized — they are **not locked/read-only**.
+# Use Case: Sensitive Keyword Detection for Safeguarding
+- The predefined handler is called "Sensitive Keyword Detection for Safeguarding".
+- It monitors three traffic channels: Web traffic, Application traffic (social media), and Email.
+- It has three separate rules — one per log type: web filter, application control, email filter.
+- Trigger type used: Safeguard Risk Score is more than [threshold] — NOT log count or sum.
+- Default threshold: Safeguard Risk Score > 0.8.
+- Duration window: 1440 minutes = 24 hours.
+- Keywords and risk scores are viewed at Incidents & Events > Safeguarding.
+- Keywords are provided and maintained by FortiGuard (origin = FortiGuard).
+- Example category: Cyber Bullying — with 2,163 keywords.
+- Each keyword has a Risk Score between 0.0 and 1.0.
+- Keywords with score 0.6 (as shown) would NOT trigger an event (threshold is > 0.8).
+- Warning: When Safeguard trigger is used, log categorization options may be more limited.
+- ❌ Don't confuse the Risk Score threshold (> 0.8) with individual keyword scores — a keyword scoring 0.6 does NOT trigger an event.
+- ❌ The handler has three rules, not one — each rule targets a different log type.
+- ❌ The duration is 1440 minutes (24 hours) — not the default 30 minutes.
+- ❌ Keywords are maintained by FortiGuard — not manually entered by the analyst.
+- ❌ "App traffic" refers specifically to social media and application control logs — not general application logs.
+- ❌ The Safeguarding page (Incidents & Events > Safeguarding) is SEPARATE from the Event Handlers page — it's where you VIEW keywords and scores.
+# Exporting and Importing Event Handlers
+- Event handlers are **scoped per ADOM** — they are NOT shared across ADOMs automatically.
+- To reuse handlers in a different ADOM → **Export from source ADOM, Import into destination ADOM**.
+- **Export options:**
+  - Include **Data Selectors** (toggle)
+  - Include **Notification Profiles** (toggle)
+  - Format: **Zipped / Text / CLI**
+- Export is accessed via: **Select handler(s) → Right-click (or More ▾) → Export**.
+- Import is accessed via: **Right-click (or More ▾) → Import → Drag & Drop or Browse**.
+- **Multiple handlers** can be selected and exported at once.
+- On name conflict during import: **Rename / Replace / Skip**.
+- **Factory Reset** option (in More ▾ menu) resets all handlers to factory defaults.
+- **Show Predefined / Show Custom** toggles control which handlers are visible in the list.
+- Subnets from **Fabric view** can be used as filters in both event handlers and reports.
+- ❌ Event handlers are **per ADOM** — do NOT assume they are global or shared across all ADOMs automatically.
+- ❌ If you export a handler **without including its Data Selector**, the imported handler may not work correctly in the new ADOM — the referenced data selector won't exist there.
+- ❌ **Factory Reset** is in the **More ▾** menu — be careful; it resets ALL handlers to defaults.
+- ❌ **CLI** export format is NOT just for viewing — it can be used to **recreate the handler via command line**.
+- ❌ On name conflict, you have **three choices**: Rename, Replace, OR Skip — NOT just overwrite.
+- ❌ **Show Predefined / Show Custom** are **view filters only** — they don't enable or disable handlers.
+# Managing Events
+- ❌ Don't confuse First Occurrence (when the event first fired) with Last Update (most recent log added to the event) — they can be the same or different.
+- ❌ Count in the event table = number of log occurrences grouped into the event — NOT the number of separate events.
+- ❌ An event with Mitigated status doesn't necessarily need analyst action — but Unhandled Critical always does.
+- ❌ Unexpected events = handler configuration problem — not a FortiAnalyzer bug.
+- ❌ The Handler column shows the handler NAME — use this to trace back which handler fired and why.
+- ❌ "Traffic to C&C detected" with status Unhandled means the traffic was NOT blocked — it passed through. This is a critical finding.
+# Available Management Actions for Events
+- ❌ Acknowledging does NOT delete the event — it's still there, just hidden from default view. Use "Show Acknowledged" to see it.
+- ❌ Don't assume Mitigated = safe to ignore always — excessive mitigated events from one host can indicate compromise.
+- ❌ "Add to Existing Incident" ≠ "Create New Incident" — one adds to existing, one creates new.
+- ❌ Acknowledged events are hidden by default — always check this if events seem to be "missing".
+- ❌ Assign To can be to yourself — it's not only for delegating to others.
+- ❌ The right-click filter panel offers Replace as well as Add — Replace will remove all current filters and apply the new one.

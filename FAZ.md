@@ -206,10 +206,9 @@ Logs in FortiAnalyzer exist in one of three phases:
   2. **MS Exchange–Multiple Failed Deliveries** → detects delivery failures (email harvesting/DHA risk)
   3. **MS Exchange–Suspicious Email Activity** → detects anomalous email behavior (account compromise risk)
 - You can **examine predefined handler filters/conditions** to learn how to build your own.
-- The diagram shows **global users (USA, Canada, France, UK)** connecting to Exchange — illustrating cross-geography suspicious activity detection.
 - Logs flow from endpoints → MS Exchange → Windows Server → FortiClient → **FortiAnalyzer**.
 - ❌ Don't say predefined handlers require configuration before use — they are **ready to enable immediately**.
 - ❌ Predefined handlers are NOT just for MS Exchange — they cover many technologies; MS Exchange is just the example used on this slide.
-- ❌ Don't assume predefined handlers are always enabled by default — they must be **explicitly enabled** (recall from slide 77: disabled handlers don't generate events).
+- ❌ Don't assume predefined handlers are always enabled by default — they must be **explicitly enabled** (disabled handlers don't generate events).
 - ❌ **MS Exchange–Multiple Failed Deliveries** is NOT about login failures — it's about **email delivery failures** (NDRs, bounces).
 - ❌ Predefined handlers can be used, cloned, OR customized — they are **not locked/read-only**.

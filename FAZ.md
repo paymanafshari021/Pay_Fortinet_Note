@@ -135,3 +135,81 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ Unique values threshold (Option 2) counts distinct values in a field, NOT total log count.
 - ❌ Indicators defined here (in the rule) are what gets extracted and enriched — not all log fields automatically become IOCs.
 # Event Handlers: Data Selectors
+- ❌ Data selectors use OR logic across filters — NOT AND logic. A log matching ANY filter passes.
+- ❌ Within a filter, conditions can be AND or OR — this is configurable (don't assume one or the other).
+- ❌ Log fields available in a filter depend on the device type — selecting FortiGate vs FortiMail gives different field options.
+- ❌ You cannot apply a data selector to an event handler without creating it first — it must exist independently.
+- ❌ Data selectors are not the same as Rules — they are pre-filters applied before rules in the event handler pipeline.
+- ❌ Subnets in data selectors come from Fabric view — not manually typed IP ranges.
+# Event Status
+- UNHANDLED
+    - **Meaning:** The threat was **detected** but was **not stopped** — it passed through without being blocked, quarantined, or isolated.
+    - The event is **"open"** — meaning it requires **analyst attention and action**.
+- CONTAINED
+    - **Meaning:** The **source of the threat** has been **isolated** from the network — it can no longer spread or communicate.
+    - This typically means the device or user was **quarantined**.
+    - **Real-world log example from study guide:**
+        - An **antivirus log** with `action=quarantine` → FortiAnalyzer assigns **Contained** status.
+        - The malicious file was quarantined — the threat is isolated but exists.
+    - **Key difference from Mitigated:** Contained means the **source is isolated** (device quarantined); Mitigated means the **traffic was blocked** (the threat attempt itself was stopped).
+- BLANK
+    - **Meaning:** The event doesn't clearly fall into any of the three defined categories.
+    - This typically occurs when **mixed actions** are observed in the logs associated with the event.
+    - Blank signals the analyst that **manual review is needed** to determine the actual risk state.
+- Events have **exactly four possible statuses:** Unhandled, Contained, Mitigated, Blank.
+- **Unhandled** = risk NOT mitigated or contained = **open** = needs analyst action.
+- **Contained** = risk source **isolated** (quarantined).
+- **Mitigated** = traffic **blocked or dropped**.
+- **Blank** = mixed actions / other scenarios — doesn't fit the other three.
+- **Log action examples:**
+  - `action=pass` → **Unhandled**
+  - `action=quarantine` → **Contained**
+  - `action=block` or `action=drop` → **Mitigated**
+  - Both allow + block → **Blank**
+- **Botnet and IoC events** are always **Unhandled**.
+- Status can be **set manually in handler settings** OR **assigned automatically** by FortiAnalyzer.
+- Event status is viewed in **Incidents & Events > Event Monitor**.
+- ❌ Don't confuse **Contained** and **Mitigated**:
+  - **Contained** = the **SOURCE** is isolated (quarantine).
+  - **Mitigated** = the **TRAFFIC** was blocked/dropped.
+- ❌ **Blank** does NOT mean "no status set yet" — it means the risk state is **ambiguous** (mixed actions).
+- ❌ **Unhandled ≠ undetected** — the threat WAS detected; it just wasn't stopped (action=pass).
+- ❌ Botnet and IoC events are always **Unhandled** — even if related traffic was later blocked.
+- ❌ FortiAnalyzer assigns status **automatically** based on log action — you don't always need to set it manually.
+# Event Handlers: Log Filter by Text
+- Generic Text Filters provide **more precise and flexible** log filtering than GUI dropdowns.
+- Filters are based on **regex and POSIX** standard.
+- **Eight comparison operators:** `==`, `!=`, `<`, `<=`, `>`, `>=`, `~`, `!~`
+- `~` = **Contains** (included somewhere in the string) — supports regex.
+- `!~` = **Not contained** (not included).
+- **Logical tokens:** `and` / `&`, `or` / `|`, `not`, `(` `)`.
+- Parentheses `( )` control **evaluation precedence** — use them to group `or` conditions.
+- Use **escape character `\`** for reserved characters in filter values.
+- **Best practice:** Copy field names/values from **raw logs** to avoid syntax errors.
+- Syntax help/examples are available **directly in the GUI** via the ℹ️ icon.
+- ❌ Don't confuse `==` (exact match) with `~` (contains) — they behave very differently:
+  - `hostname == "facebook"` → hostname must be **exactly and only** "facebook"
+  - `hostname ~ "facebook"` → hostname just needs to **contain** the word "facebook"
+- ❌ `&` and `'and'` are **the same** — both are valid AND operators.
+- ❌ `|` and `'or'` are **the same** — both are valid OR operators.
+- ❌ **Parentheses matter** — without them, operator precedence may cause unexpected behavior.
+- ❌ The `~` operator is **not just a simple substring match** — it supports **regex patterns**.
+- ❌ Reserved characters must be **escaped with `\`** — forgetting this causes filter errors.
+- ❌ Generic text filter is based on **POSIX** — not standard SQL or Python regex syntax.
+# Predefined Event Handlers
+- FortiAnalyzer includes **predefined event handlers** for immediate deployment — no configuration required to start using them.
+- Predefined handlers are especially useful for **new deployments** as they provide essential monitoring right away.
+- Predefined handlers follow **Fortinet's recommended best practices** — they are reliable and well-designed.
+- Predefined handlers serve **two purposes:** operational detection AND learning tool.
+- Three specific **MS Exchange predefined handlers:**
+  1. **MS Exchange–Large Email** → detects abnormally large emails (data exfiltration risk)
+  2. **MS Exchange–Multiple Failed Deliveries** → detects delivery failures (email harvesting/DHA risk)
+  3. **MS Exchange–Suspicious Email Activity** → detects anomalous email behavior (account compromise risk)
+- You can **examine predefined handler filters/conditions** to learn how to build your own.
+- The diagram shows **global users (USA, Canada, France, UK)** connecting to Exchange — illustrating cross-geography suspicious activity detection.
+- Logs flow from endpoints → MS Exchange → Windows Server → FortiClient → **FortiAnalyzer**.
+- ❌ Don't say predefined handlers require configuration before use — they are **ready to enable immediately**.
+- ❌ Predefined handlers are NOT just for MS Exchange — they cover many technologies; MS Exchange is just the example used on this slide.
+- ❌ Don't assume predefined handlers are always enabled by default — they must be **explicitly enabled** (recall from slide 77: disabled handlers don't generate events).
+- ❌ **MS Exchange–Multiple Failed Deliveries** is NOT about login failures — it's about **email delivery failures** (NDRs, bounces).
+- ❌ Predefined handlers can be used, cloned, OR customized — they are **not locked/read-only**.

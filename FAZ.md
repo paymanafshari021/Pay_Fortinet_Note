@@ -344,3 +344,40 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ **Firmware mismatch** between FortiAnalyzer and FortiManager = blocklist **cannot be pushed** to FortiGate.
 - ❌ **TBD** = "To Be Determined" — indicator is identified but blocking not yet executed.
 - ❌ There are **three separate External Resource files** in FortiManager — one per indicator type (IP, URL, Domain) — not one combined file.
+
+# Incidents
+- The **Incidents page** is the **central command center** for SOC analysts.
+- An **incident** = a **container for related security events**.
+- **Three interactive donut charts:** Severity / Status / Category — clicking filters the table.
+- **Incident Number format:** IN + 7 digits (e.g., IN0000001).
+- **"Auto-Raised"** in Incident Reporter = automatically created by the system.
+- **Promote** = escalate an event directly to an incident from this page.
+- ❌ Don't confuse **Event** (single detected occurrence) with **Incident** (container for related events requiring investigation).
+- ❌ **"Auto-Raised"** does NOT mean a human analyst created it — it was automatically escalated by the system (via "Automatically Create Incident" toggle in event handler).
+- ❌ The three charts show **Severity / Status / Category** — not the same as Event status
+- ❌ Incident **Status** (New/Analysis/Response/Closed...) is DIFFERENT from Event **Status** (Unhandled/Mitigated/Contained/Blank).
+- ❌ Clicking a chart segment **filters the table** — the charts are interactive, not just decorative.
+- ❌ **MITRE ATT&CK ICS** tab = specifically for **Industrial Control Systems** — not general IT incidents.
+- ❌ **"not implemented"** as affected endpoint (IN0000001) = the endpoint detection feature wasn't configured for that incident.
+# Creating an Incident
+- Create an incident when an event **needs further analysis** or has **potential negative operational consequences**.
+- **Two methods:** Manual (right-click in Event Monitor) OR Automatic (playbooks) — **preferred method is automatic/playbooks**.
+- Manual method: **Event Monitor → right-click event → Create New Incident**.
+- **Required fields:** Category / Severity / Status / Affected Endpoint.
+- **Optional fields:** Description / MITRE Domain + Tech ID / Assigned To.
+- **Status always starts as "New"** when an incident is first created.
+- **MITRE Domain options:** N/A / Enterprise / ICS.
+- **Analyst accounts must be pre-created** in FortiAnalyzer before they can be assigned to incidents.
+- Created incident appears immediately in **Incidents & Events > Incidents**.
+- **Incident Reporter** = who created the incident: "admin" (manual) or "Auto-Raised" (automatic).
+- **Affected Endpoint** is auto-populated from the source event.
+- **Description** is auto-populated from the event handler name (can be customized).
+- ❌ **Automatic creation via playbooks is PREFERRED** over manual — don't say both methods are equally recommended.
+- ❌ **Status always starts as "New"** — never starts as Analysis or any other status.
+- ❌ MITRE attributes (Domain + Tech ID) are **optional** — not required to create an incident.
+- ❌ **Assigned To is optional** — you can create an incident without assigning it immediately.
+- ❌ You cannot assign an incident to someone who doesn't have a **FortiAnalyzer account** — accounts must be pre-created.
+- ❌ Don't confuse incident **Category** (Unauthorized Access, Malicious Code, etc.) with event **Type** (Traffic, Web Filter, etc.) — these are different classifications.
+- ❌ **MITRE ICS domain** = Industrial Control Systems — not general enterprise IT.
+
+# 📘 Slide 104

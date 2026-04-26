@@ -265,3 +265,82 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ Acknowledged events are hidden by default — always check this if events seem to be "missing".
 - ❌ Assign To can be to yourself — it's not only for delegating to others.
 - ❌ The right-click filter panel offers Replace as well as Add — Replace will remove all current filters and apply the new one.
+# What Are Indicators?
+- **Indicators** = data extracted from events that could be **harmful or malicious** = **IOCs**.
+- **Three indicator types:** IP address / URL / Domain — **only these three**.
+- Indicators are configured in **event handler rule → Advanced Settings → Indicators section**.
+- You can also **manually create indicators** on the **Indicator page**.
+- **Four reputation types** (assigned after enrichment): **Malicious / Suspicious / Harmless / Undetected**.
+- Reputation is determined by **enrichment** via FortiGuard and/or VirusTotal.
+- **Undetected ≠ Safe** — the indicator may be a new/unknown threat.
+- **Malicious** = confirmed threat → immediate action required.
+- **Suspicious** = warrants investigation but not confirmed.
+- **Harmless** = confirmed clean — no action needed.
+- In the GUI example: `dstip` → **IP** type, `hostname` → **Domain** type.
+- ❌ Indicators are **NOT automatically extracted from all log fields** — you must **configure which fields** to extract in the event handler rule.
+- ❌ There are **exactly THREE indicator types** — IP, URL, Domain. Not MAC address, not port, not hash.
+- ❌ **Undetected** does NOT mean safe — it means **no intelligence data found** for this indicator.
+- ❌ Reputation is assigned **after enrichment** — an un-enriched indicator has no reputation yet.
+- ❌ **Harmless** indicators can still exist in logs — harmless reputation means the threat intel confirms it's clean, not that it's irrelevant to investigate.
+- ❌ Indicators can be created **both automatically (via event handler rules) AND manually (via Indicator page)**.
+# Enriching Indicators
+- **Indicators page path:** `Incidents & Events > Indicators`
+- **Enrich button** in the toolbar triggers enrichment for selected indicators.
+- FortiAnalyzer enriches indicators using **two sources:**
+  1. **FortiGuard CTS** (Cyber Threat Service)
+  2. **VirusTotal**
+- **FortiGuard CTS provides:** Confidence level, IOC Category, IOC Tags, Web Filter Category, AV Category.
+- **VirusTotal provides:** Number of engines detecting as malicious out of total (e.g., **1/94**), per-vendor verdicts.
+- **WHOIS Lookup** provides domain registration context (registrar, creation date, name servers, etc.).
+- Enrichment history: **updates existing entry** if results unchanged; **creates new entry only if results change**.
+- Example: `99.goodyouxi.com` → FortiGuard: **Malware C&C, High confidence** / VirusTotal: **1/94 malicious**.
+- Even **1/94 VirusTotal detection + FortiGuard Malware C&C** = treat as malicious — FortiGuard's high confidence overrides.
+- **ELF Malware** tag = **Linux-based malware** — important context for identifying targeted systems.
+- **Web Filter Category: Meaningless Content** = common disguise used by C&C domains.
+- ❌ **VirusTotal alone may not be sufficient** — FortiGuard CTS provides independent, specialized intelligence. A "1/94" VirusTotal score combined with FortiGuard's "High confidence Malware C&C" is still highly significant.
+- ❌ **Low VirusTotal detection count does NOT mean safe** — new/targeted malware may only be detected by 1-2 engines.
+- ❌ Enrichment **saves history** — it does NOT create a new record every time you re-enrich.
+- ❌ A **new history entry** is only created when enrichment results **change** — not on every enrichment.
+- ❌ **WHOIS data** is context/registration info — it is NOT a threat verdict. A GoDaddy-registered domain can still be malicious.
+- ❌ **Harmless** from most VirusTotal vendors doesn't override **Malicious** from FortiGuard CTS — use all sources together.
+- ❌ Don't confuse **IOC Category** (FortiGuard's classification like "Malware C&C") with **Reputation type** (Malicious/Suspicious/Harmless/Undetected)
+# Connectors for Indicator Enrichment
+- Two enrichment services: **FortiGuard CTS** and **VirusTotal**.
+- **FortiGuard** = **built-in, ready to use, no API key needed**.
+- **VirusTotal** = requires **API key configuration** in **Incidents & Events > Automation > Active Connectors**.
+- VirusTotal connector configuration path: **Incidents & Events > Automation > Active Connectors**.
+- The **Indicator Enrichment playbook** is the automation engine behind all indicator enrichment.
+- The playbook is: **Predefined / Read-only / Enabled by default**.
+- The playbook runs **every time an indicator is enriched**.
+- Playbook flow: **ON_DEMAND STARTER → ENRICH_START → [VirusTotal + FortiGuard in parallel] → ENRICH_AGGREGATE**.
+- VirusTotal and FortiGuard enrichment run **simultaneously (in parallel)**.
+- **ENRICH_AGGREGATE** node combines results from both sources.
+- The playbook is found at: **Incidents & Events > Automation > Playbooks**.
+- ❌ **FortiGuard does NOT require an API key** — it is built-in. Only **VirusTotal requires an API key**.
+- ❌ The Indicator Enrichment playbook is **read-only** — you CANNOT edit or delete it.
+- ❌ The playbook is **enabled by default** — unlike event handlers which are disabled until you enable them.
+- ❌ VirusTotal connector is configured under **Automation > Active Connectors** — NOT under Event Handlers or the Indicators page directly.
+- ❌ The two enrichment sources run **in parallel** — NOT sequentially one after the other.
+- ❌ **ENRICH_AGGREGATE** is a separate node — it's not part of either the VirusTotal or FortiGuard node; it combines their outputs.
+- ❌ VirusTotal is counted as a **Third Party Connector** — FortiGuard is not counted in that category since it is native/built-in.
+# Blocking Indicators
+- **Blocking indicators** requires an **authorized FortiManager connector** configured on FortiAnalyzer's **Fabric Connector** page.
+- The **⊘ Block** button in the Indicators toolbar initiates blocking.
+- The **Block_indicator playbook** runs every **5 minutes** in the background to push blocked indicators to FortiManager.
+- After the playbook runs → indicator status changes from **TBD** to **Blocked** on FortiAnalyzer.
+- **"Blocked" status = updated on FortiManager ONLY — NOT yet synced to FortiGate.**
+- Blocked indicators are stored in **FortiManager: FortiGuard > External Resource** as three files:
+  - **root_BLKIP** — blocked IPs
+  - **root_BLKURL** — blocked URLs
+  - **root_BLKDOM** — blocked Domains
+- FortiManager External Resources can be used to create: **threat feeds, security profiles, policy blocks**.
+- Can push blocklist to **specific FortiGate** OR **all FortiGate devices**.
+- **Firmware version of FortiManager must match FortiAnalyzer** for blocklist to be pushed to FortiGate.
+- Initial block status before pushing = **TBD (To Be Determined)**.
+- ❌ **"Blocked" status does NOT mean FortiGate is blocking** — it only means FortiManager has the updated list. FortiGate is not synced yet!
+- ❌ Block_indicator playbook runs every **5 minutes** — **NOT instantly**. There is a delay.
+- ❌ FortiAnalyzer cannot push blocks **directly to FortiGate** — it always goes through **FortiManager** first.
+- ❌ The required connector is a **FortiManager connector** — NOT a FortiGuard or VirusTotal connector.
+- ❌ **Firmware mismatch** between FortiAnalyzer and FortiManager = blocklist **cannot be pushed** to FortiGate.
+- ❌ **TBD** = "To Be Determined" — indicator is identified but blocking not yet executed.
+- ❌ There are **three separate External Resource files** in FortiManager — one per indicator type (IP, URL, Domain) — not one combined file.

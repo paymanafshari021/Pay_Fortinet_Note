@@ -4,9 +4,9 @@
 
 |#|Log Phase|FortiAnalyzer Location|Immediate Analytic Support?|
 |---|---|---|---|
-|①|Logs received from registered device|Active log file saved with **`.log`** extension|❌ **No**|
-|②|Indexed (analytics logs)|Added to **ClickHouse** database and indexed|✅ **Yes — considered _online_**|
-|③|Logs rolled over and compressed (archive logs)|Compressed log file saved with **`.gz`** extension|❌ **No — considered _offline_**|
+|1|Logs received from registered device|Active log file saved with **`.log`** extension|❌ **No**|
+|2|Indexed (analytics logs)|Added to **ClickHouse** database and indexed|✅ **Yes — considered _online_**|
+|3|Logs rolled over and compressed (archive logs)|Compressed log file saved with **`.gz`** extension|❌ **No — considered _offline_**|
 ### Key Terminology from the Slide
 
 |Term|Meaning|

@@ -379,5 +379,8 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ You cannot assign an incident to someone who doesn't have a **FortiAnalyzer account** — accounts must be pre-created.
 - ❌ Don't confuse incident **Category** (Unauthorized Access, Malicious Code, etc.) with event **Type** (Traffic, Web Filter, etc.) — these are different classifications.
 - ❌ **MITRE ICS domain** = Industrial Control Systems — not general enterprise IT.
-
-# 📘 Slide 104
+# Editing an Incident
+- Every incident MUST reach Closed status — mandatory requirement.
+- Two Closed states: Closed: Remediated / Closed: False Positive.
+- ❌ "Closed: False Positive" ≠ doing nothing — it means the incident was investigated and determined to be false. You still need to investigate first.
+- ❌ "Closed: Remediated" ≠ just blocking something — it means the full threat was contained and eliminated.

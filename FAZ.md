@@ -384,3 +384,4 @@ Logs in FortiAnalyzer exist in one of three phases:
 - Two Closed states: Closed: Remediated / Closed: False Positive.
 - ❌ "Closed: False Positive" ≠ doing nothing — it means the incident was investigated and determined to be false. You still need to investigate first.
 - ❌ "Closed: Remediated" ≠ just blocking something — it means the full threat was contained and eliminated.
+# FortiAI: How Does It Work?

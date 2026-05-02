@@ -385,3 +385,250 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ "Closed: False Positive" ≠ doing nothing — it means the incident was investigated and determined to be false. You still need to investigate first.
 - ❌ "Closed: Remediated" ≠ just blocking something — it means the full threat was contained and eliminated.
 # FortiAI: How Does It Work?
++ The LLM is the external GenAI engine (e.g., cloud-based AI) that FortiAI calls for language understanding and generation
+- FortiAI is NOT a direct call to public GenAI — it adds a proprietary knowledge layer.
+- FortiAI integrates with: FortiManager, FortiAnalyzer, FortiSIEM, FortiSOAR.
+- RAG = Retrieval-Augmented Generation — the process of supplementing GenAI with proprietary data.
+- Security & Privacy guarantees:
+  - Only explicit interaction content shared with cloud AI
+  - Sensitive data can be automatically masked
+  - FortiAI does NOT share or provide access to customer data
+- FortiAI communicates bidirectionally with an external LLM (Large Language Model).
+- ❌ The curated database is maintained by Fortinet specialists — it is NOT generated automatically by AI alone.
+# FortiAI Data Protection for FortiAnalyzer
++ Images of network topology diagrams (IP addresses in a diagram can't be masked programmatically)
+- The FortiAI assistant operates within explicitly defined boundaries. If an unsupported query is made (for instance, asking about weather, stock prices, or recipes), the AI will respond with 'I'm not sure' or 'I don't know'.
+- RAG ensures the accuracy and relevance of the responses. This technology allows the AI to retrieve relevant information and provide references to support its answers.
+- Four data protection mechanisms:
+  - Function callback — LLM generates query structure; results processed locally on premises
+  - Data masking — masks IP addresses, MAC addresses, usernames before LLM; unmasks locally after
+  - Secure proxy — ALL AI interactions pass through Fortinet proxies for additional security checks
+  - Data privacy warnings — warns user when data cannot be masked (e.g., images); requires user confirmation before uploading
+- Two AI guardrails:
+  - Defined boundaries — unsupported queries return "I'm not sure" or "I don't know"
+  - RAG — improves accuracy by retrieving relevant info; provides references to support answers
+- Three types of masked data: IP addresses / MAC addresses / Usernames
+- Data processing happens LOCALLY — the cloud LLM never sees real results
+- Images/visual content may trigger data privacy warnings — cannot be auto-masked
+- RAG also serves as a guardrail against hallucination
+- ❌ Function callback = LLM generates the query structure — NOT the results. Results are processed locally.
+- ❌ Data is unmasked LOCALLY after function callback — not in the cloud.
+- ❌ Secure proxy provides additional checks — it doesn't replace masking; both work together.
+- ❌ Privacy warnings trigger when data cannot be masked — NOT for all data. Normal queries with maskable data don't trigger warnings.
+- ❌ "I'm not sure" / "I don't know" are the specific FortiAI responses to unsupported queries — not error messages.
+- ❌ RAG is listed as BOTH a processing step (slide 114) AND an AI guardrail (this slide) — it serves dual purposes.
+- ❌ FortiAI masks three specific types: IP addresses, MAC addresses, usernames — NOT all data fields.
+# FortiAI Data Protection Flow Visualized
+- The FortiAI proxy is hosted by Fortinet — not a third-party cloud service.
+- Data is masked BEFORE reaching the proxy — the proxy itself sees masked data.
+- Protected data categories (examples — NOT full list):
+  - IoT devices (MAC, vendors, hostnames)
+  - FortiGate device name
+  - The "root" keyword
+  - VDOM names
+  - IPv4 and IPv6 addresses
+  - Hostnames
+  - User (usernames)
+  - MAC addresses
+- Masking uses GDPR features — GDPR-compliant anonymization.
+- Visual masking representation: Real data 123-456 → masked as XXX-XXX to LLM → unmasked back to 123-456 locally.
+- RAG is implemented between the proxy and the LLM — not at the user interface.
+- RAG knowledge sources: Administrator guides / Supporting documentation / Fortinet knowledge base / others.
+- RAG ensures responses come from approved sources only — prevents hallucination.
+- ❌ The FortiAI proxy is Fortinet-hosted — NOT a generic third-party proxy.
+- ❌ Data is masked before the proxy — the proxy doesn't do the masking; masking happens before the request reaches the proxy.
+- ❌ The protected data list is NOT complete — "These are examples and do not constitute the full list."
+- ❌ "Root" keyword is protected — this refers to the ADOM name "root", not a Linux root user.
+- ❌ Both IPv4 AND IPv6 addresses are masked — not just IPv4.
+- ❌ RAG is positioned between proxy and LLM — not between the user and the proxy.
+- ❌ RAG knowledge sources are approved Fortinet documentation — not general internet content.
+- ❌ GDPR features are used for masking — this is a compliance-oriented implementation.
+# Example of Data Protection
+- ❌ The LLM does NOT see actual log data — it only generates query structure (function calls).
+- ❌ Results are displayed locally — they are NOT processed by or returned through the LLM.
+- ❌ The function call is what gets sent back (Call back step) — not actual data.
+- ❌ FortiAI determines what's needed first — not all queries require sending sensitive data to the LLM at all.
+# Token Usage
+- FortiAI license = monthly token entitlement shared by ALL FortiAI users.
+- Tokens measure BOTH input (prompt) AND output (response) — both count against the budget.
+- Three token usage guidelines:
+  - Both prompt and response are counted as tokens
+  - More text = more tokens (general rule — not strictly 1:1 with words)
+  - Long sessions consume more tokens — session history is included in context
+- Long sessions use more tokens because FortiAI includes session history in each query's context.
+- Monthly token budget is shared — heavy use by one analyst reduces availability for others.
+- Longer queries generate larger outputs — scope limitation reduces both input AND output tokens.
+- ❌ Tokens are NOT the same as words or characters — "no strict one-to-one link" between them.
+- ❌ The token budget is shared across all users — not per-user individual allocations.
+- ❌ Both input AND output consume tokens — don't think only the query costs tokens.
+- ❌ Long sessions cost MORE than new sessions for the same query — session history adds to context size.
+- ❌❌ Unused tokens do NOT carry over — the entitlement is monthly and resets.
+- ❌ Query 1 is more expensive than Query 2 for two reasons — longer input AND larger output (not just one reason).
+# Managing Monthly Tokens: Best Practices
+### 🔸 Best Practice 1: Make Prompts Concise and Specific
+- FortiAI is **not a chatbot** — you don't need to be polite or conversational. Direct, structured prompts are both more token-efficient AND more likely to produce accurate results.
+### 🔸 Best Practice 2: Use Filters in Prompts
+**Types of filters to include:**
+| Filter Type | Example |
+|---|---|
+| **Time range** | "past week", "last 24 hours", "today", "between Jan 1 and Jan 7" |
+| **Result count limit** | "top 10", "first 5 results", "maximum 20 entries" |
+| **Severity filter** | "only critical events", "high severity only" |
+| **Device filter** | "from FortiGate HQ only" |
+| **Action filter** | "blocked traffic only" |
+- Filters reduce **output tokens** dramatically — the response only contains what you actually need.
+### 🔸 Best Practice 3: Use FortiAnalyzer Function Words
+**Function keywords and their effects:**
+| Keyword | What it directs FortiAI to do |
+|---|---|
+| **"Apply filter"** | Apply a specific filter to the log view or event monitor |
+| **"Generate report"** | Create a formal report based on specified parameters |
+| **"Generate script"** | Produce a CLI script or configuration script |
+| **"Show logs"** | Retrieve and display log entries |
+| **"Create event handler"** | Build a new event handler configuration |
+- **Why this conserves tokens:** Function keywords produce **targeted, precise responses** rather than broad explanations — fewer output tokens consumed.
+
+---
+
+### 🔸 Best Practice 4: Leverage Predefined Assets
+
+> **"Leverage predefined datasets, charts, reports, and event handlers whenever possible"**
+
+**Why this matters:**
+- FortiAnalyzer comes with **predefined assets** (event handlers, report templates, chart templates, datasets) that are already configured and optimized.
+- Asking FortiAI to work WITH existing predefined assets is **more token-efficient** than asking it to build everything from scratch.
+- Examples:
+  - Instead of: "Create a new report showing all IPS events" → Reference an existing IPS report template
+  - Instead of: "Build an event handler for malware detection" → Leverage a predefined malware detection handler
+- Using predefined assets also produces **more accurate results** since FortiAI doesn't have to generate complex configurations from nothing.
+
+---
+
+### 🔸 Best Practice 5: Include Details in the Existing Thread
+
+> **"Include details in the existing thread whenever possible"**
+> **Sub-point:** *"Note that FortiAI does not retain previous threads"*
+
+**Two parts to understand here:**
+
+**Part A — Use the existing thread:**
+- If you have follow-up questions or need to add context to an ongoing investigation, **continue in the same conversation thread** rather than starting a new one.
+- Keeping related queries in one thread means FortiAI has the **accumulated context** from previous exchanges — it doesn't need to re-establish context from scratch.
+- This is more token-efficient for closely related queries because FortiAI already "knows" what you've been discussing.
+
+**Part B — FortiAI does NOT retain previous threads:**
+- When you **start a new session/thread**, FortiAI has **zero memory** of previous conversations.
+- Unlike a human analyst who remembers previous cases, FortiAI starts completely fresh each time.
+- This means if you close a session and come back, you must **re-provide relevant context**.
+- **Implication:** For ongoing investigations, keeping everything in one thread avoids re-establishing context (which costs tokens).
+
+---
+
+### 🔸 Best Practice 6: Restart After 10 Conversations
+
+> **"Restart the FortiAI assistant after 10 conversations if you don't need to keep the historical context"**
+
+**Why this is the most specific and exam-important best practice:**
+
+- As established in slide 118, **long sessions consume more tokens** because session history is included in each query's context.
+- After **10 conversation exchanges**, the accumulated history becomes large enough to significantly impact token consumption.
+- **The specific number: 10 conversations** — this is the Fortinet-recommended threshold for restarting.
+
+**Two scenarios:**
+
+| Scenario | Action |
+|---|---|
+| **You need the historical context** (continuing the same investigation) | Keep the session open — accept the higher token cost for continuity |
+| **You DON'T need historical context** (moving to a new topic) | **Restart the FortiAI assistant** to reset the context and save tokens |
+
+**Study guide explains:**
+> *"Restarting the FortiAI assistant and eliminating the historical context is important for conserving tokens, so you should do this unless you really need to reference the chat's historical context to continue processing."*
+
+---
+
+## 📖 Study Guide Body Text — Valid vs Invalid Prompts
+
+### What is a Valid Prompt?
+
+> *"A valid prompt is a clear, well-defined question that the FortiAI assistant can easily interpret and process. It should be specific and relevant to the data or queries the FortiAI assistant is designed to handle. A valid prompt can be translated into precise SQL queries to retrieve accurate results on FortiAnalyzer."*
+
+**Three characteristics of a valid prompt:**
+1. **Clear and well-defined** — FortiAI can understand exactly what is being asked
+2. **Specific and relevant** — directly related to FortiAnalyzer's capabilities and data
+3. **Translatable to SQL** — can be converted into a precise database query
+
+The **SQL translation** point is important — it confirms that FortiAI ultimately retrieves data from FortiAnalyzer's database using SQL-like queries. Valid prompts are those that can be cleanly mapped to database query parameters (log type, time range, source/destination, action, etc.).
+
+---
+
+### What is an Invalid Prompt?
+
+> *"An invalid prompt is one that cannot be easily interpreted or processed by the FortiAI assistant. This typically includes prompts that are ambiguous, lack sufficient detail, or are outside the scope of the FortiAI assistant's capabilities."*
+
+**Three types of invalid prompts:**
+
+| Type | Description | Example |
+|---|---|---|
+| **Ambiguous** | Multiple possible interpretations — FortiAI doesn't know what you mean | "Show me the problem" — what problem? |
+| **Lacking detail** | Too vague to generate a specific query | "Show me some logs" — which logs? |
+| **Out of scope** | Outside FortiAI's designed capabilities | "What's the weather?" / "Write me a poem" |
+
+Invalid prompts waste tokens by generating **clarifying exchanges** (FortiAI asking follow-up questions) or **"I'm not sure"** responses without useful results.
+
+---
+
+### The Restart Recommendation
+
+> *"Restarting the FortiAI assistant and eliminating the historical context is important for conserving tokens, so you should do this unless you really need to reference the chat's historical context to continue processing."*
+
+This final paragraph emphasizes that restarting is a **token conservation strategy** — the default recommendation is to restart unless there's a specific reason to maintain context. The token savings from clearing a long session history can be significant.
+
+---
+
+## 🎯 FCX Exam Key Points
+
+### ✅ Important Facts
+- **Six best practices** for managing monthly tokens:
+  1. **Concise and specific prompts** — avoid wordy/conversational language
+  2. **Use filters** — include time ranges, result limits
+  3. **Use FortiAnalyzer function words** — "Apply filter", "Generate report", "Generate script"
+  4. **Leverage predefined assets** — datasets, charts, reports, event handlers
+  5. **Include details in existing thread** — FortiAI does **NOT retain previous threads**
+  6. **Restart after 10 conversations** — if historical context not needed
+- **FortiAI does NOT retain previous threads** — fresh start each new session.
+- **Restart threshold: 10 conversations** — Fortinet's recommended point to restart.
+- **Valid prompt** = clear, well-defined, specific, relevant, translatable to SQL queries.
+- **Invalid prompt** = ambiguous, lacking detail, or outside FortiAI's scope.
+- Valid prompts → translate to **precise SQL queries** on FortiAnalyzer.
+- Function keywords: **"Apply filter"**, **"Generate report"**, **"Generate script"**.
+- Prompts should be directly related to what FortiAI is **programmed to access**.
+
+### ⚠️ Exam Traps
+- ❌ **FortiAI does NOT retain previous threads** — every new session starts completely fresh.
+- ❌ The restart threshold is specifically **10 conversations** — not 5, not 20.
+- ❌ Restart is recommended **only if** you don't need historical context — if you do need it, keep the session.
+- ❌ **"Generate script"** is a valid FortiAI function keyword — FortiAI can generate CLI scripts.
+- ❌ Valid prompts translate to **SQL queries** specifically — not API calls or CLI commands directly.
+- ❌ Invalid prompts include those that are **out of scope** (like weather questions) — consistent with the "I'm not sure" defined boundaries from slide 115.
+- ❌ Best practice 5 has TWO components: use existing thread AND note that previous threads are not retained — don't forget either part.
+
+### 🧠 Things to Memorize
+
+| Best Practice | Key Detail |
+|---|---|
+| **1. Concise prompts** | Wordy = more tokens; be direct and specific |
+| **2. Use filters** | Time ranges / result count limits |
+| **3. Function keywords** | "Apply filter" / "Generate report" / "Generate script" |
+| **4. Use predefined assets** | Datasets / charts / reports / event handlers |
+| **5. Use existing thread** | FortiAI **does NOT retain** previous threads |
+| **6. Restart after 10** | Restart if **no need for historical context** |
+
+| Prompt Type | Definition |
+|---|---|
+| **Valid** | Clear, specific, relevant, **translatable to SQL** |
+| **Invalid** | Ambiguous / lacks detail / **outside scope** |
+
+| Key Number | Meaning |
+|---|---|
+| **10** | Conversations after which to **restart FortiAI** |
+| **0** | Previous thread memory — FortiAI retains **nothing** from old sessions |

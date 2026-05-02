@@ -466,8 +466,31 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ Query 1 is more expensive than Query 2 for two reasons — longer input AND larger output (not just one reason).
 # Managing Monthly Tokens: Best Practices
 ### 🔸 Best Practice 1: Make Prompts Concise and Specific
-- FortiAI is **not a chatbot** — you don't need to be polite or conversational. Direct, structured prompts are both more token-efficient AND more likely to produce accurate results.
+
+> **"Make your prompts concise and specific — wordy queries use more text and therefore more tokens"**
+> **Example:** *"Show recent logs for `10.10.10.10` (past week)"* rather than *"Can you show me all the log entries from endpoint `10.10.10.10` from the past week?"*
+
+**Why this matters:**
+- As established in slide 118, **more text = more tokens**.
+- Wordy, conversational prompts waste input tokens on filler words and unnecessary phrasing.
+- The two example queries in the slide ask for the **exact same information** — but one is significantly more concise.
+
+**Comparison:**
+| Version | Word Count | Token Efficiency |
+|---|---|---|
+| *"Can you show me all the log entries from endpoint 10.10.10.10 from the past week?"* | 18 words | ❌ Inefficient — filler words |
+| *"Show recent logs for 10.10.10.10 (past week)"* | 7 words | ✅ Efficient — direct and precise |
+
+**Key principle:** FortiAI is **not a chatbot** — you don't need to be polite or conversational. Direct, structured prompts are both more token-efficient AND more likely to produce accurate results.
 ### 🔸 Best Practice 2: Use Filters in Prompts
+
+> **"Use filters in your prompts to receive concise and specific responses"**
+> **Sub-point:** *"Include time ranges or specify limits for the number of results"*
+
+**Why this matters:**
+- Unfiltered queries (e.g., "show all logs for this endpoint") can generate **enormous responses** — consuming massive output tokens.
+- Adding **filters** limits what FortiAI retrieves, making the response smaller and more focused.
+
 **Types of filters to include:**
 | Filter Type | Example |
 |---|---|
@@ -476,8 +499,17 @@ Logs in FortiAnalyzer exist in one of three phases:
 | **Severity filter** | "only critical events", "high severity only" |
 | **Device filter** | "from FortiGate HQ only" |
 | **Action filter** | "blocked traffic only" |
-- Filters reduce **output tokens** dramatically — the response only contains what you actually need.
+
+**Benefit:** Filters reduce **output tokens** dramatically — the response only contains what you actually need.
 ### 🔸 Best Practice 3: Use FortiAnalyzer Function Words
+
+> **"Use words that relate to FortiAnalyzer functions to specifically direct FortiAI"**
+> **Examples:** *"Apply filter"*, *"Generate report"*, or *"Generate script"*
+
+**Why this matters:**
+- FortiAI is designed to perform **specific FortiAnalyzer functions**.
+- Using **function-specific keywords** tells FortiAI exactly what type of action to perform — eliminating ambiguity and reducing the need for clarifying exchanges (which waste tokens).
+
 **Function keywords and their effects:**
 | Keyword | What it directs FortiAI to do |
 |---|---|
@@ -486,10 +518,8 @@ Logs in FortiAnalyzer exist in one of three phases:
 | **"Generate script"** | Produce a CLI script or configuration script |
 | **"Show logs"** | Retrieve and display log entries |
 | **"Create event handler"** | Build a new event handler configuration |
-- **Why this conserves tokens:** Function keywords produce **targeted, precise responses** rather than broad explanations — fewer output tokens consumed.
 
----
-
+**Why this conserves tokens:** Function keywords produce **targeted, precise responses** rather than broad explanations — fewer output tokens consumed.
 ### 🔸 Best Practice 4: Leverage Predefined Assets
 
 > **"Leverage predefined datasets, charts, reports, and event handlers whenever possible"**
@@ -501,9 +531,6 @@ Logs in FortiAnalyzer exist in one of three phases:
   - Instead of: "Create a new report showing all IPS events" → Reference an existing IPS report template
   - Instead of: "Build an event handler for malware detection" → Leverage a predefined malware detection handler
 - Using predefined assets also produces **more accurate results** since FortiAI doesn't have to generate complex configurations from nothing.
-
----
-
 ### 🔸 Best Practice 5: Include Details in the Existing Thread
 
 > **"Include details in the existing thread whenever possible"**
@@ -521,9 +548,6 @@ Logs in FortiAnalyzer exist in one of three phases:
 - Unlike a human analyst who remembers previous cases, FortiAI starts completely fresh each time.
 - This means if you close a session and come back, you must **re-provide relevant context**.
 - **Implication:** For ongoing investigations, keeping everything in one thread avoids re-establishing context (which costs tokens).
-
----
-
 ### 🔸 Best Practice 6: Restart After 10 Conversations
 
 > **"Restart the FortiAI assistant after 10 conversations if you don't need to keep the historical context"**

@@ -568,21 +568,6 @@ Logs in FortiAnalyzer exist in one of three phases:
 **Study guide explains:**
 > *"Restarting the FortiAI assistant and eliminating the historical context is important for conserving tokens, so you should do this unless you really need to reference the chat's historical context to continue processing."*
 
----
-
-## 📖 Study Guide Body Text — Valid vs Invalid Prompts
-
-### What is a Valid Prompt?
-
-> *"A valid prompt is a clear, well-defined question that the FortiAI assistant can easily interpret and process. It should be specific and relevant to the data or queries the FortiAI assistant is designed to handle. A valid prompt can be translated into precise SQL queries to retrieve accurate results on FortiAnalyzer."*
-
-**Three characteristics of a valid prompt:**
-1. **Clear and well-defined** — FortiAI can understand exactly what is being asked
-2. **Specific and relevant** — directly related to FortiAnalyzer's capabilities and data
-3. **Translatable to SQL** — can be converted into a precise database query
-
-The **SQL translation** point is important — it confirms that FortiAI ultimately retrieves data from FortiAnalyzer's database using SQL-like queries. Valid prompts are those that can be cleanly mapped to database query parameters (log type, time range, source/destination, action, etc.).
-
 - **Six best practices** for managing monthly tokens:
   1. **Concise and specific prompts** — avoid wordy/conversational language
   2. **Use filters** — include time ranges, result limits

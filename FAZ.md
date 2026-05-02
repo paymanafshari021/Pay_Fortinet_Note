@@ -583,35 +583,6 @@ Logs in FortiAnalyzer exist in one of three phases:
 
 The **SQL translation** point is important — it confirms that FortiAI ultimately retrieves data from FortiAnalyzer's database using SQL-like queries. Valid prompts are those that can be cleanly mapped to database query parameters (log type, time range, source/destination, action, etc.).
 
----
-
-### What is an Invalid Prompt?
-
-> *"An invalid prompt is one that cannot be easily interpreted or processed by the FortiAI assistant. This typically includes prompts that are ambiguous, lack sufficient detail, or are outside the scope of the FortiAI assistant's capabilities."*
-
-**Three types of invalid prompts:**
-
-| Type | Description | Example |
-|---|---|---|
-| **Ambiguous** | Multiple possible interpretations — FortiAI doesn't know what you mean | "Show me the problem" — what problem? |
-| **Lacking detail** | Too vague to generate a specific query | "Show me some logs" — which logs? |
-| **Out of scope** | Outside FortiAI's designed capabilities | "What's the weather?" / "Write me a poem" |
-
-Invalid prompts waste tokens by generating **clarifying exchanges** (FortiAI asking follow-up questions) or **"I'm not sure"** responses without useful results.
-
----
-
-### The Restart Recommendation
-
-> *"Restarting the FortiAI assistant and eliminating the historical context is important for conserving tokens, so you should do this unless you really need to reference the chat's historical context to continue processing."*
-
-This final paragraph emphasizes that restarting is a **token conservation strategy** — the default recommendation is to restart unless there's a specific reason to maintain context. The token savings from clearing a long session history can be significant.
-
----
-
-## 🎯 FCX Exam Key Points
-
-### ✅ Important Facts
 - **Six best practices** for managing monthly tokens:
   1. **Concise and specific prompts** — avoid wordy/conversational language
   2. **Use filters** — include time ranges, result limits
@@ -626,8 +597,6 @@ This final paragraph emphasizes that restarting is a **token conservation strate
 - Valid prompts → translate to **precise SQL queries** on FortiAnalyzer.
 - Function keywords: **"Apply filter"**, **"Generate report"**, **"Generate script"**.
 - Prompts should be directly related to what FortiAI is **programmed to access**.
-
-### ⚠️ Exam Traps
 - ❌ **FortiAI does NOT retain previous threads** — every new session starts completely fresh.
 - ❌ The restart threshold is specifically **10 conversations** — not 5, not 20.
 - ❌ Restart is recommended **only if** you don't need historical context — if you do need it, keep the session.
@@ -635,24 +604,4 @@ This final paragraph emphasizes that restarting is a **token conservation strate
 - ❌ Valid prompts translate to **SQL queries** specifically — not API calls or CLI commands directly.
 - ❌ Invalid prompts include those that are **out of scope** (like weather questions) — consistent with the "I'm not sure" defined boundaries from slide 115.
 - ❌ Best practice 5 has TWO components: use existing thread AND note that previous threads are not retained — don't forget either part.
-
-### 🧠 Things to Memorize
-
-| Best Practice | Key Detail |
-|---|---|
-| **1. Concise prompts** | Wordy = more tokens; be direct and specific |
-| **2. Use filters** | Time ranges / result count limits |
-| **3. Function keywords** | "Apply filter" / "Generate report" / "Generate script" |
-| **4. Use predefined assets** | Datasets / charts / reports / event handlers |
-| **5. Use existing thread** | FortiAI **does NOT retain** previous threads |
-| **6. Restart after 10** | Restart if **no need for historical context** |
-
-| Prompt Type | Definition |
-|---|---|
-| **Valid** | Clear, specific, relevant, **translatable to SQL** |
-| **Invalid** | Ambiguous / lacks detail / **outside scope** |
-
-| Key Number | Meaning |
-|---|---|
-| **10** | Conversations after which to **restart FortiAI** |
-| **0** | Previous thread memory — FortiAI retains **nothing** from old sessions |
+# 

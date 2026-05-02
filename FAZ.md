@@ -589,4 +589,5 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ Valid prompts translate to **SQL queries** specifically — not API calls or CLI commands directly.
 - ❌ Invalid prompts include those that are **out of scope** (like weather questions) — consistent with the "I'm not sure" defined boundaries from slide 115.
 - ❌ Best practice 5 has TWO components: use existing thread AND note that previous threads are not retained — don't forget either part.
-# 
+- ❌ The dashboard uses cached data — NOT live real-time data queries
+# 130

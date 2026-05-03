@@ -706,3 +706,32 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ Dates in output are **most recent FIRST** — not oldest first
 - ❌ Volumes are in **MB** — not GB or logs-per-second
 - ❌ **MSSP** = Managed Security Service Provider — the primary stated use case for these commands
+# Insert Rate vs. Receive Rate and Log Insert Lag
+- Receive Rate — the rate at which raw logs arrive at FortiAnalyzer (handled by fortilogd)
+- Insert Rate — the rate at which logs are indexed/inserted into the SQL database (handled by sqlplugind)
+- If insert rate < receive rate for a sustained period → logs queue up → potential lag → potential data loss under extreme conditions
+- Log Insert Lag Time - Amount of time between the log received and the log inserted in the database
+- Healthy state: Insert rate ≈ Receive rate (lines track closely together)
+- Problem state: Sustained gap where receive rate > insert rate
+- Log Insert Lag Time = time between log received → log inserted in database
+# FortiAnalyzer and FortiGate Automation Stitch
+- FortiAnalyzer can activate automation stitches on authorized FortiGate devices
+- The event handler must have the Automation Stitch toggle ENABLED for this to work
+- When enabled → the handler appears in FortiGate's automation trigger dropdown
+- Complete flow: FAZ handler fires event → FAZ notifies FortiGate → FortiGate triggers configured stitch → Action executes
+- FortiGate actions examples: Custom email / Execute CLI script / System action
+- Two default handlers with automation stitch enabled by default:
+
+  - Default-Botnet-Communication-Detection
+  - Default-FFW-Botnet-Communication-Detection
+
+- Custom event handlers can also have automation stitch enabled
+- FortiGate can filter the trigger by: Event handler name / Event severity / Event tag
+- The FortiGate must be authorized to receive notifications from FortiAnalyzer
+- This feature bridges FortiAnalyzer detection with FortiGate active response — enabling automated incident response
+- ❌ The Automation Stitch toggle must be ON in FortiAnalyzer event handler — FortiGate alone cannot initiate this
+- ❌ Two default handlers have automation stitch enabled — NOT one, NOT all handlers
+- ❌ The action (email, CLI, system) is configured on FortiGate — NOT in FortiAnalyzer
+- ❌ FortiGate must be authorized — not all FortiGate devices automatically receive notifications
+- ❌ Custom handlers CAN have automation stitch — it's not exclusive to predefined handlers
+- ❌ FFW in the second handler name = FortiGate Firewall — a specific variant of botnet detection

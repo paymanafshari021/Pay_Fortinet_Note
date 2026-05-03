@@ -590,4 +590,72 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ Invalid prompts include those that are **out of scope** (like weather questions) — consistent with the "I'm not sure" defined boundaries from slide 115.
 - ❌ Best practice 5 has TWO components: use existing thread AND note that previous threads are not retained — don't forget either part.
 - ❌ The dashboard uses cached data — NOT live real-time data queries
-# 130
+# IOCs (Compromised Hosts)
+- IOC engine detects compromised end users by checking new AND historical logs against IOC signatures.
+- Requires a FortiGuard subscription — not available without it.
+- Updated daily — IOC database refreshed every 24 hours.
+- Three log types analyzed: Web filtering / DNS / Traffic logs.
+- Excluded log types: Antivirus logs / IPS logs (threats already caught by these services).
+- Detection process: Log match → threat score assigned → scores aggregated per user → verdict delivered.
+- Two verdicts:
+  - Infected = confirmed breach (blacklisted IPs or DGA matches in web logs)
+  - Suspicious = possible breach with varying degrees of confidence
+- DGA = Domain Generation Algorithm — malware technique for generating random C&C domain names.
+- FortiAnalyzer receives daily threat database updates from FortiGuard.
+- The IOC engine finds threats that AV and IPS missed — focuses on subtle, stealthy compromise indicators.
+- FortiGate sends web filtering, DNS, and traffic logs to FortiAnalyzer for IOC analysis.
+- ❌ AV and IPS logs are NOT analyzed by the IOC engine — those threats are already handled.
+- ❌ IOC engine requires a FortiGuard subscription — it's not a default feature.
+- ❌ Infected ≠ Suspicious — Infected is confirmed, Suspicious is possible with varying confidence.
+- ❌ Historical logs are also checked — not just new logs. New IOC signatures are applied retroactively.
+- ❌ DGA = Domain Generation Algorithm — a malware technique, not a Fortinet feature.
+- ❌ Updates are daily — not real-time or weekly.
+- ❌ Suspicious has varying degrees of confidence — it's not a binary state like Infected.
+- ❌ The IOC engine focuses on end users — not just devices or IP addresses.
+# IOC Log Type and Data
+- The IOC engine checks **different data fields** depending on the **log type**.
+- **Six log types** are checked by the IOC engine with their corresponding data:
+| Log Type | Data Checked |
+|---|---|
+| **Attack logs** | URLs, domains, **and** IP addresses |
+| **DNS** | IP addresses **only** |
+| **Email filter logs** | URLs, domains, **and** IP addresses |
+| **Event logs** | **Threat type** only |
+| **Traffic logs** | IP addresses **only** |
+| **Web filter** | URLs, domains, **and** IP addresses |
+- **Three log types check URLs + domains + IPs:** Attack / Email filter / Web filter
+- **Two log types check IPs only:** DNS / Traffic
+- **One log type checks threat type only:** Event logs
+- IOC results are displayed **per end user** — not per device or IP
+- **Three-level drill-down:** IOC summary → Host detail (detection pattern + method) → Raw log entries
+- **Detection pattern** = the specific IOC signature that matched
+- **Detection method** = which log type and data field triggered the match
+- ❌ **DNS logs check IP addresses ONLY** — NOT domains. The resolved IP is what's checked, not the queried domain name.
+- ❌ **Traffic logs check IP addresses ONLY** — NOT URLs or domains (those are in web filter/DNS logs).
+- ❌ **Event logs check THREAT TYPE** — not IPs, URLs, or domains. This is the unique one.
+- ❌ There are **exactly six log types** — don't add or omit any.
+- ❌ The **three-level drill-down** goes: IOC summary → detection pattern/method → **raw logs** (not incidents or events).
+- ❌ IOC results are per **end user** — not per device or network segment.
+
+### 🧠 Things to Memorize
+
+**The complete table — must memorize exactly:**
+
+| Log Type | Data Checked |
+|---|---|
+| Attack logs | **URLs + Domains + IP addresses** |
+| DNS | **IP addresses only** |
+| Email filter logs | **URLs + Domains + IP addresses** |
+| Event logs | **Threat type** |
+| Traffic logs | **IP addresses only** |
+| Web filter | **URLs + Domains + IP addresses** |
+
+**Groupings to memorize:**
+- **Full trio (URLs + Domains + IPs):** Attack / Email filter / Web filter — **3 log types**
+- **IPs only:** DNS / Traffic — **2 log types**
+- **Unique — Threat type:** Event logs — **1 log type**
+
+**Drill-down levels:**
+1. **IOC summary** — who is compromised?
+2. **Host detail** — detection **pattern** + detection **method**
+3. **Raw logs** — actual log evidence

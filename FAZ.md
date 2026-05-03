@@ -615,6 +615,7 @@ Logs in FortiAnalyzer exist in one of three phases:
 # IOC Log Type and Data
 - The IOC engine checks **different data fields** depending on the **log type**.
 - **Six log types** are checked by the IOC engine with their corresponding data:
+
 | Log Type | Data Checked |
 |---|---|
 | **Attack logs** | URLs, domains, **and** IP addresses |
@@ -623,6 +624,7 @@ Logs in FortiAnalyzer exist in one of three phases:
 | **Event logs** | **Threat type** only |
 | **Traffic logs** | IP addresses **only** |
 | **Web filter** | URLs, domains, **and** IP addresses |
+
 - **Three log types check URLs + domains + IPs:** Attack / Email filter / Web filter
 - **Two log types check IPs only:** DNS / Traffic
 - **One log type checks threat type only:** Event logs

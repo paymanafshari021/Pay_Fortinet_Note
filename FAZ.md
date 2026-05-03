@@ -693,3 +693,16 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ `diagnose log device` shows **device log usage** (disk consumption) — NOT just log rates
 - ❌ **Three time windows** are shown — 5, 30, AND 60 seconds — all three are always displayed
 - ❌ High log volume impact is on **retention** — logs deleted before the configured retention period
+
+# Gathering Log Rate and Log Volume per ADOM
+
+| What to Investigate | CLI Command to Use |
+|---|---|
+| **Log receive rate for all ADOMs or a specific ADOM?** | `# diagnose fortilogd lograte-adom {all \| adom-name}` |
+| **Log volume for all ADOMs or a specific ADOM?** | `# diagnose fortilogd logvol-adom {all \| adom-name}` |
+
+- ❌ `lograte-adom` shows **rate per second** / `logvol-adom` shows **daily volume** — don't confuse them
+- ❌ `logvol-adom` shows **7 days** of data + average — NOT 5/30/60 seconds like `lograte`
+- ❌ Dates in output are **most recent FIRST** — not oldest first
+- ❌ Volumes are in **MB** — not GB or logs-per-second
+- ❌ **MSSP** = Managed Security Service Provider — the primary stated use case for these commands

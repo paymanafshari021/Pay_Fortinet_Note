@@ -638,3 +638,58 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ There are **exactly six log types** — don't add or omit any.
 - ❌ The **three-level drill-down** goes: IOC summary → detection pattern/method → **raw logs** (not incidents or events).
 - ❌ IOC results are per **end user** — not per device or network segment.
+#  Outbreak Detection Service Overview
+- Outbreak Detection Service = licensed feature — requires separate license.
+- Three core capabilities:
+  - Receive and view outbreak alerts
+  - Automatically download event handlers for the outbreak
+  - Automatically download reports for the outbreak
+- Event handlers and reports created in real time by Fortinet.
+- Outbreak alerts are available on ALL ADOMs.
+- Alerts come from FortiGuard — Fortinet's threat intelligence service.
+- ❌ Licensed feature — NOT available by default without a subscription/license.
+- ❌ Event handlers and reports are automatically downloaded — no manual configuration needed.
+- ❌ Alerts are available on ALL ADOMs — not restricted or per-ADOM.
+- ❌ The service provides both event handlers AND reports — don't say only one.
+- ❌ Created in real time by Fortinet — not scheduled or periodic updates.
+- ❌ Outbreak handlers are enabled by default after download — they don't need to be manually enabled
+- ❌ Outbreak reports go to Report Definitions — NOT Generated Reports (Generated Reports shows reports that have been run)
+# Gathering Log Rate and Device Usage Statistics
+
+| What to Investigate | CLI Command to Use |
+|---|---|
+| What is the log receive rate for each second? | `# diagnose fortilogd lograte` |
+| What are the log receive rate totals? | `# diagnose fortilogd lograte-total` |
+| What is the device log rate? | `# diagnose fortilogd lograte-device` |
+| What is the log rate for each log type? | `# diagnose fortilogd lograte-type` |
+| What is the message receive rate for each second? | `# diagnose fortilogd msgrate` |
+| What is the SQL insertion status? | `# diagnose sql status sqlplugind` |
+| What is the device log usage for all logging devices? | `# diagnose log device` |
+
+- If you only look at message rate, you'll **underestimate** the actual log volume
+- If you're troubleshooting log ingestion issues, you need to know whether the bottleneck is at the **message level** (network transport) or the **log level** (decompression/parsing)
+- **Log rate = actual security event volume** / **Message rate = network transport efficiency**
+
+- **Seven CLI troubleshooting commands** for log rate and device usage:
+
+| Command | Purpose |
+|---|---|
+| `diagnose fortilogd lograte` | Log receive **rate per second** (5/30/60 sec windows) |
+| `diagnose fortilogd lograte-total` | Log receive **rate totals** |
+| `diagnose fortilogd lograte-device` | Log rate **per device** |
+| `diagnose fortilogd lograte-type` | Log rate **per log type** |
+| `diagnose fortilogd msgrate` | **Message** receive rate per second |
+| `diagnose sql status sqlplugind` | **SQL insertion status** |
+| `diagnose log device` | **Device log usage** for all devices |
+
+- **Three time windows** in lograte/msgrate output: **last 5 seconds / last 30 seconds / last 60 seconds**
+- **Log rate ≠ message rate** — one **LZ4 message** can contain **multiple logs**
+- **LZ4** = compression format used to bundle multiple logs into one message
+- High log volume → logs deleted **before** configured retention period → compliance risk
+- These commands used to verify **log volume** and **disk quota** appropriateness
+- ❌ **Log rate ≠ message rate** — don't confuse them. Log rate is always ≥ message rate when LZ4 is used
+- ❌ The command is `diagnose fortilogd` (not `diagnose fortilogs` or other variations)
+- ❌ `diagnose sql status sqlplugind` checks **SQL insertion** — NOT log receipt or storage
+- ❌ `diagnose log device` shows **device log usage** (disk consumption) — NOT just log rates
+- ❌ **Three time windows** are shown — 5, 30, AND 60 seconds — all three are always displayed
+- ❌ High log volume impact is on **retention** — logs deleted before the configured retention period

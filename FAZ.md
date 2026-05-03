@@ -735,3 +735,116 @@ Logs in FortiAnalyzer exist in one of three phases:
 - ❌ FortiGate must be authorized — not all FortiGate devices automatically receive notifications
 - ❌ Custom handlers CAN have automation stitch — it's not exclusive to predefined handlers
 - ❌ FFW in the second handler name = FortiGate Firewall — a specific variant of botnet detection
+# Accessing the SQL Schema
+- Schema discovery query: `SELECT * FROM $log`
+- Running `SELECT * FROM $log` → column headers = all available schema fields
+- Hover over `$log` hyperlink in the Query field → popup shows all available fields
+- After validating a dataset query → add to chart → add chart to report
+- ❌ $log is NOT a standard SQL keyword — it's a FortiAnalyzer-specific variable
+- ❌ $filter is also FortiAnalyzer-specific — applies Time Period + Devices automatically
+- ❌ Column headers from SELECT * reveal the schema — not a separate menu
+- ❌ The schema popup appears by hovering over the $log hyperlink — not clicking
+- ❌ Best approach = Clone predefined dataset — not build from scratch (schema is too complex)
+# Reports and ADOMS
+- each ADOM has its own reports, libraries, and advanced settings.
+# SQL Hard Cache (hcache)
+
+- **hcache** = SQL Hard Cache — proprietary FortiAnalyzer precompiled data stored on disk
+- **Persistent** — not removed on a set schedule (unlike RAM cache)
+- hcache must build BEFORE a report can run → if not precompiled, **adds to generation time**
+- **No new logs** = hcache doesn't rebuild (reused) → **fast**
+- **New logs arrive** = hcache must rebuild
+- **Auto-cache** = hcache auto-updates when new logs arrive → always ready → faster reports
+- **Scheduled reports** have auto-cache **enabled automatically**
+- hcache uses **system resources** — monitor for resource-intensive reports
+- **Extended Log Filtering** = cache specific log fields for faster filtering
+- **Path:** `Reports > Report Definitions > All Reports > Settings tab`
+
+# Grouping Reports to Improve Report Generation Time
+
+- **Report grouping** reduces the number of hcache tables → improves auto-cache and report completion time
+- Use case: **same report run against many FortiGate devices**
+- CLI command to configure: **`configure system report group`**
+- `set report-like` applies grouping to reports containing a **case-sensitive string** in their name
+- `edit <SQL-column>` — the SQL column added to shared hcache creation queries
+- After configuring grouping → must **rebuild hcache tables**
+- Rebuild command: **`execute sql-report hcache-build <ADOM> <schedule> "<start>" "<end>"`**
+- View grouping info: **`execute sql-report list-schedule <ADOM-name>`**
+- Benefits: **fewer hcache tables** + **faster auto-cache** + **faster report generation**
+
+# Troubleshooting Report Generation Run Time
+
+- **Retrieve Diagnostic** = right-click a generated report → view Report Summary
+- **Report Summary contains:** Number of charts / tables / hcaches requested / **HCACHE building time** / Rendering time / **Total time**
+- **High HCACHE building time** = hcache not precompiled → enable auto-cache
+- **Four troubleshooting steps:** Retrieve Diagnostics → Check log rates → Check insert/receive rate + lag → Enable auto-cache
+- **Scheduled reports** already have auto-cache enabled
+- **Path:** `Reports > Generated Reports` → right-click → Retrieve Diagnostic
+
+# Report Troubleshooting CLI Commands
+
+**Eight report troubleshooting CLI commands:**
+
+| Command | Purpose |
+|---|---|
+| `diagnose sql status sqlplugind` | SQL **insertion** status |
+| `diagnose sql status sqlreportd` | SQL **query connections + hcache** status |
+| `diagnose test application logfiled 2` | Log **file activities** (rolled/deleted/uploaded) — hcache catch-up indicator |
+| `diagnose sql process list` | Current **SQL processes** running |
+| `execute sql-report list-schedule <ADOM>` | **Report configuration** status |
+| `diagnose test application sqlrptcached 2` | Is **hcache creation** catching up? |
+| `diagnose sql hcache status` | **State of hcache** |
+| `diagnose sql show hcache-size` | **Hcache size** on file system |
+
+# Log Message Layout
+
+- Every log has **two sections: header + body**
+- **Header** = common to ALL log types (date, time, logid, **type**, **subtype**, **level**, vd)
+- **Body** = varies by log type
+- `type` + `subtype` = determines the **log file category** and which body fields appear
+- **Key body fields:**
+  - `policyid` = firewall policy applied
+  - `srcip` / `dstip` = source/destination IP
+  - `hostname` = URL or IP of host
+  - `action` = what FortiGate did
+  - `msg` = reason for the action
+- `action=blocked` = FortiGate prevented the packet
+- `catdesc="Games"` — the web filter category description field
+- For third-party syslog integration → knowing log structure is crucial
+
+# Upload Option
+
+- **Four upload options:** store-and-upload / Real Time / Every Minute / **Every 5 Minutes (default)**
+- **store-and-upload:** Only on FortiGates **with internal hard drive** / **CLI only**
+- **Default:** Every 5 Minutes
+- **Full disk default behavior:** Oldest logs **overwritten**
+- Can configure FortiAnalyzer to **stop logging** instead of overwriting
+- CLI command: `configure log fortianalyzer setting` → `set upload-option [...]`
+
+# VDOMs and Remote Logging
+
+- FortiGate with VDOMs supports **up to 3 FortiAnalyzer devices** globally
+- FortiGate with VDOMs supports **up to 4 syslog servers** globally
+- Global log settings apply to **all VDOMs by default**
+- To override for a specific VDOM: `set faz-override enable` / `set syslog-override enable`
+- Override configured at: `config vdom` → `edit <vdom-name>` → `config log setting`
+- Multiple FAZ configuration: `config log fortianalyzer setting` / `config log fortianalyzer2 setting`
+
+# OFTPS
+
+- **OFTPS** = **SSL-secured Optimized Fabric Transfer Protocol** — encrypts FortiGate-to-FortiAnalyzer log traffic
+- **OFTP** = the base protocol (unencrypted) / **OFTPS** = SSL-encrypted version
+- **Prerequisite:** `set reliable enable` must be configured BEFORE OFTPS
+- **Reliable logging must be enabled** to use OFTPS
+- **CLI command:** `set enc-algorithm [high-medium | high | low]`
+- **Three enc-algorithm options:** high / high-medium / low
+- Encrypts log transmission over **unsecured networks**
+- Path: `config log fortianalyzer setting`
+- ❌ **hcache** is persistent — not time-based expiry (unlike RAM caches)
+- ❌ **Scheduled reports** have auto-cache enabled **automatically** — no manual action
+- ❌ **store-and-upload** = CLI only + requires **internal hard drive**
+- ❌ **Default upload option** = **Every 5 Minutes** (not Real Time)
+- ❌ VDOM global logging = **3 FAZ + 4 syslog** — memorize these numbers
+- ❌ **OFTPS requires reliable logging** (`set reliable enable`) — you cannot use OFTPS with UDP
+- ❌ `logfiled` monitors **file operations** (roll/delete/upload) — not SQL queries
+- ❌ `sqlrptcached` is specifically the **hcache daemon** — different from `sqlplugind` (insertion)

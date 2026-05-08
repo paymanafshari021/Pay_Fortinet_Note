@@ -138,3 +138,101 @@ The "g" prefix is a **system-reserved namespace**. Admins trying to create an ob
 - ❌ Global policies do **not replace** local ADOM policies — they are applied **in addition to** local policies (as header or footer policies around the local policy package).
 - ❌ FortiGuard updates go to the **Global Database first**, not directly to each individual ADOM — the Global DB then serves all ADOMs below it.
 
+# Navigating Per-Device Mapping Challenges
+
+### ✅ AVAILABLE Per-Device Mapping Objects
+These object types **support** per-device mapping — you can assign different values per FortiGate.
+
+#### ■ Firewall Objects
+- **Addresses** — e.g., one address object called "internal_subnet" can map to 192.168.1.0/24 on Site1 and 10.10.1.0/24 on Site2
+- **Virtual IPs & Virtual IP Group** — VIPs for NAT/port forwarding can be mapped per device
+- **IPv4 Pool and IPv6 Pool** — NAT IP pools can differ per device
+- **Virtual Server & IPv6 Virtual Server** — Load balancing virtual servers
+- **ZTNA Server & IPv6 ZTNA Server** — Zero Trust Network Access server entries
+
+#### ■ Security Profiles
+- **N/A** — No security profiles support per-device mapping
+
+#### ■ User & Authentication
+- **User Groups** — Different devices can reference the same group name but map to different local group membership
+- **LDAP Servers** — Each site may point to a local LDAP/AD server
+- **Radius Servers** — Site-specific RADIUS servers
+- **TACACS+** — Site-specific TACACS+ servers
+
+#### ■ Security Fabric
+- **FortiNAC** — Per-device FortiNAC integration
+- **Fortinet Single Sign-On Agent** — Per-device FSSO agent pointing to local AD
+
+#### ■ Advanced
+- **Metadata Variables** — Variables (like $variable) that resolve to different values per device
+- **Dynamic Local Certificate** — Per-device certificate mapping
+- **Dynamic VPN Tunnel** — Per-device VPN tunnel references
+
+---
+
+### ❌ UNAVAILABLE Per-Device Mapping Objects
+These object types **do NOT support** per-device mapping. They are shared as-is across all devices in the ADOM.
+
+#### ■ Firewall Objects (Unavailable)
+- Internet Service, Services & Service Group, Schedules, Network Service, IP Pool Group, Shared Traffic Shapers & Per-IP Traffic Shapers
+- Shaping Profile, Health Check, Web Proxy Forwarding Server, Authentication Scheme, Security Posture Tag
+
+#### ■ Security Profiles (Unavailable — the largest list)
+- **Antivirus** — Same AV profile applies to all devices
+- **Web Filter** — Shared web filtering policy
+- **Video Filter**
+- **DNS Filter**
+- **Application Control**
+- **Inline CASB** — Cloud Access Security Broker
+- **Intrusion Prevention (IPS)**
+- **Email Filter**
+- **File Filter Profile**
+- **VoIP**
+- **ICAP**
+- **Web Application Firewall**
+- **Data Loss Prevention**
+- **Virtual Patching**
+- Protocol Options, SSL/SSH Inspection, Profile Group, Application Signatures, Application Group, IPS Signatures, Email List, Web Rating Overrides, Web URL Filter, Web Content Filter, Web Filter Local Category, ICAP Servers, File Filter, Video YouTube Channel Filter
+
+#### ■ User & Authentication (Unavailable)
+- User Definitions, POP3 User
+- PKI User and Groups, SMS Server, FortiTokens
+
+#### ■ Security Fabric (Unavailable)
+- Public SDN Connector, Private SDN Connector, Poll Active Directory Server, RADIUS Single Sign-On Agent, pxGrid Connector, ClearPass Connector, NSX-T Connector, FortiFlex Connector, vCenter Connector, Symantec Endpoint Protection, Exchange Server Connector, JSON API Connector, Threat Feeds
+
+#### ■ Advanced (Unavailable)
+- **Replacement Message Group** — Shared across all devices
+
+### Supporting Text Explanations
+
+**"Why is it important to recognize object configurations that are eligible for per-device mapping?"**
+If you **import a configuration from the device layer** that the policy layer doesn't support (i.e., it's an unavailable object type), it creates a **conflict**. FortiManager then has to choose between the FortiGate's own value and the FortiManager policy layer value — this causes inconsistency and unpredictable behavior.
+
+**"It's beneficial to memorize or identify objects eligible for per-device mapping so that you don't import objects with duplicate names into the FortiManager policy layer database."**
+If the same object name exists in both the device layer AND the policy layer, and the object type doesn't support per-device mapping, you end up with a **duplicate name conflict**. FortiManager cannot resolve which value to use cleanly.
+
+**"If a conflict occurs, the solution is to create a uniquely named object on FortiGate and import it again to the policy."**
+The recommended fix when a conflict arises is:
+1. Go to the FortiGate directly
+2. Rename the conflicting object to something unique
+3. Re-import it into the FortiManager policy layer
+
+This avoids the naming collision entirely.
+
+**Important Facts:**
+- **Per-device mapping** allows one shared policy-layer object to have **different values on different FortiGates** within the same ADOM.
+- **Addresses, VIPs, IP Pools, ZTNA Servers, LDAP/RADIUS/TACACS+ servers, FSSO agents, Metadata Variables** → all **support** per-device mapping.
+- **Security Profiles (Antivirus, IPS, Web Filter, App Control, etc.)** → **do NOT support** per-device mapping — they are always shared as-is.
+- **Security Fabric connectors** (SDN, ClearPass, NSX-T, etc.) → **do NOT support** per-device mapping.
+- **User Definitions** are unavailable, but **User Groups** ARE available for per-device mapping.
+- If an unsupported object type is imported with a duplicate name, it causes a **conflict** in FortiManager.
+- The resolution to a conflict is: **rename the object on FortiGate → re-import into policy layer**.
+
+**Exam Traps:**
+- ❌ Security Profiles **cannot** be per-device mapped — this is a very common trap. Many candidates assume AV or IPS profiles can vary per device through mapping, but they cannot.
+- ❌ **User Definitions** are unavailable, but **User Groups** ARE available — don't confuse the two.
+- ❌ **FortiNAC and FSSO Agent** ARE available for per-device mapping (Security Fabric section, left column) — but most other Security Fabric connectors are NOT.
+- ❌ A conflict does NOT mean the object is automatically deleted or overwritten — FortiManager forces a **choice** between the device value and the policy layer value, which causes inconsistency.
+- ❌ The fix for a conflict is **not** to delete the object in FortiManager — it is to **rename it on the FortiGate** and re-import.
+- ❌ **Metadata Variables** (under Advanced) are specifically designed to hold per-device values — they are the cleanest way to handle device-specific data in shared templates and policies.

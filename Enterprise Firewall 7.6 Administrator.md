@@ -3,7 +3,6 @@
 ![lifeofapacket](images/lifeofapacket.png)
 
 ### INGRESS SIDE (Left Column — Incoming Packet Path)
-
 Packets enter from the left and flow **top to bottom** through these mandatory and optional steps:
 
 #### 1. **Network Interface (Ingress)**
@@ -30,7 +29,6 @@ The packet arrives on a physical or logical interface. This is the entry point i
 - This is shown as **optional** because it only applies to IPsec VPN traffic.
 
 ### MIDDLE PROCESSING (Center — Kernel + UTM/NGFW)
-
 After ingress processing, the packet moves to the center for deep inspection.
 
 #### Kernel Processing (Blue box — 8 steps):
@@ -54,7 +52,6 @@ This is the **content inspection layer**, handled partly by the **CP (Content Pr
 4. **Botnet check** — Checks source/destination IPs and domains against Fortinet's botnet database.
 
 ### EGRESS SIDE (Right Column — Outgoing Packet Path)
-
 After processing, the packet exits top to bottom:
 
 1. **Kernel: Forwarding + Source NAT** — The packet is forwarded toward its destination. If an outbound NAT policy (SNAT) applies, the source IP is translated here.
@@ -73,7 +70,6 @@ After processing, the packet exits top to bottom:
 - **CPU label** = Handled by the main FortiGate CPU (software path — slower, more flexible).
 
 ## Supporting Explanations
-
 **On NP (Network Processor):**
 The NP handles early-stage security tasks like ACL, HPE, and IP integrity checking. Once a session is fully established and the session key is installed in the NP, **subsequent packets in that session are offloaded** entirely to the NP, bypassing the CPU completely. The NP also handles IPsec encryption/decryption when the configured algorithms are hardware-supported.
 

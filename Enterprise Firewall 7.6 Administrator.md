@@ -236,3 +236,87 @@ This avoids the naming collision entirely.
 - ❌ A conflict does NOT mean the object is automatically deleted or overwritten — FortiManager forces a **choice** between the device value and the policy layer value, which causes inconsistency.
 - ❌ The fix for a conflict is **not** to delete the object in FortiManager — it is to **rename it on the FortiGate** and re-import.
 - ❌ **Metadata Variables** (under Advanced) are specifically designed to hold per-device values — they are the cleanest way to handle device-specific data in shared templates and policies.
+
+# Use Case 1 — Running Remote Scripts for CA Certificates
+
+## 📌 Three Bullet Points Explained
+
+### • Remote FortiGate Directly (via CLI)
+This is the **script run location** selected for this use case. When you choose this option, FortiManager acts as a proxy and pushes the CLI commands directly to the managed FortiGate — the commands execute on the device in real time. The FortiManager database is **not** modified first; the change goes straight to the FortiGate.
+
+This is the correct choice when you want to:
+- Push certificates (which live in the device layer, not the policy layer)
+- Make device-level changes that don't need to go through the install workflow
+- Apply changes that are not easily modeled in FortiManager's object database
+
+### • FortiManager retrieves database update
+After the remote script executes successfully on the FortiGate, FortiManager automatically **retrieves** the updated configuration from the FortiGate. This pulls the new certificate (and any other changes made by the script) back into the **FortiManager device database**, keeping both in sync.
+
+This retrieval is visible in the **Configuration Revision History** — a new revision entry is created showing who ran it and when.
+
+### • Device database synchronized
+After the retrieval completes, the **Config Status** of the managed FortiGate in FortiManager changes to **✓ Synchronized**. This confirms that the FortiManager device database now matches what is actually running on the FortiGate.
+
+## Create New Script Dialog
+
+**Navigation path:** `Device Manager > Scripts > Create new`
+
+The **Create New Script** dialog is open with these fields:
+
+| Field | Value |
+|---|---|
+| **Script Name** | CA Certificate |
+| **Comments** | *(blank)* |
+| **Type** | CLI Script |
+| **Run script on** | **Remote FortiGate Directly (via CLI)** ← highlighted in blue |
+| **Validate on change** | ☑ (checked) |
+| **Validation device platform** | FortiGate-VM64 |
+| **Script details** | CLI commands (partially visible) |
+
+**Key field — "Run script on: Remote FortiGate Directly (via CLI)":**
+This is the critical setting for this use case. The dropdown options for "Run script on" are:
+- **Remote FortiGate Directly (via CLI)** ← selected here
+- Device Database
+- Policy Package/ADOM Database
+
+By selecting "Remote FortiGate Directly", the script executes live on the device, not in FortiManager's local database first.
+
+**Script details (partially visible CLI commands):**
+```
+config vpn certificate ca
+  edit "CA Name"
+    set ca <certificate_data>
+  end
+```
+These commands navigate into the CA certificate configuration tree on the FortiGate and create/import the CA certificate entry. The actual certificate content (base64 PEM data) would be embedded in the script.
+
+**"Validate on change" checkbox is ticked:**
+This tells FortiManager to validate the script syntax against the specified device platform (FortiGate-VM64) before running it — a safety check to catch CLI errors before pushing to live devices.
+
+## Configuration Revision History
+
+**Navigation path:** `Device Manager > Device & Groups > Managed FortiGate > FortiGate > Dashboard: Summary > Configuration and Installation > Revision > Total Revision`
+
+The **Configuration Revision History** table is shown with columns:
+- **ID**, **Date & Time**, **Name**, **Created by**, **Installation**
+
+**Visible revision entry:**
+| ID | Date & Time | Name | Created by | Installation |
+|---|---|---|---|---|
+| ✓ 3 | 2025-01-28 12:27:01 | *(name)* | **script_manager** | **Retrieved** |
+
+**Key observations:**
+- **Created by: script_manager** — This tells you the revision was created automatically by FortiManager's script engine, not by a human admin manually retrieving the config. This is the automated retrieval that happens after a remote script runs.
+- **Installation: Retrieved** — This confirms the revision was created via a **retrieve** operation (FortiManager pulling config from FortiGate), not via an install (FortiManager pushing config to FortiGate). This is exactly what happens after a Remote FortiGate Directly script executes — FortiManager retrieves to sync.
+- **ID: 3** with a ✓ checkmark — indicates this is the current/latest confirmed revision.
+
+## Managed FortiGate Config Status
+
+**Navigation path:** `Device Manager > Device & Groups > Managed FortiGate`
+
+| Device Name | Config Status |
+|---|---|
+| ✦ HQ-NGFW-1 | **✓ Synchronized** |
+
+**What this means:** After the remote script ran and FortiManager retrieved the updated config, the Config Status is now **Synchronized** — the FortiManager device database matches the live FortiGate configuration exactly. No install is needed.
+

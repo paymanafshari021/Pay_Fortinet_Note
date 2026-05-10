@@ -392,37 +392,12 @@ The original Ethernet frame (1500 bytes) becomes a 1550-byte VXLAN frame, meanin
 | Transport | Layer 2 | UDP/IP (Layer 3) |
 | Use case | Enterprise LAN | Data center / cloud |
 
----
-
-## 🖥️ Slide 61 — VLANs on FortiGate Interfaces
-
-### Key Concepts
-VLANs are not limited to physical interfaces on FortiGate. You can apply VLANs to:
-
-- **Aggregate interfaces** (802.3ad LACP bonded)
-- **FortiLink interfaces** (connection to FortiSwitch)
-- **Hardware switches** (built-in switch fabric)
-- **Virtual VLAN switches**
-- **Software switches**
-- **Wireless SSID interfaces**
+## VLANs on FortiGate Interfaces
 
 ### Critical Point
 You can configure the **same VLAN ID** on different interfaces with different names — and they will be **completely separate broadcast domains**. The VLAN ID alone does not make two VLANs the same; the parent interface also matters.
 
-### GUI Screenshot Breakdown
-The Network > Interfaces panel shows four interface groups, each with a VLAN 5 (ID: 5) sub-interface:
-- **802.3ad Aggregate** → VLAN 5 under the aggregate
-- **FortiLink** → VLAN 5 under the FortiLink
-- **Hardware Switch** → VLAN 5 under the hardware switch
-- **Software Switch** → VLAN 5 under the software switch
-
-The **WiFi & Switch Controller > SSIDs** panel shows a Wireless_VLAN5 SSID mapped to VLAN ID 5.
-
----
-
-## 🖥️ Slide 62 — Use Case 1: Diverse Connectivity with LACPs (Aggregate Interfaces)
-
-### Key Concepts
+## Use Case 1: Diverse Connectivity with LACPs (Aggregate Interfaces)
 
 **802.3ad ≠ 802.1ad** — These are completely different standards:
 - **802.3ad** = Link Aggregation Control Protocol (LACP) — bonds multiple physical ports for **bandwidth and redundancy**
@@ -432,72 +407,15 @@ The **WiFi & Switch Controller > SSIDs** panel shows a Wireless_VLAN5 SSID mappe
 - Bundles 2, 4, or 8 physical ports into one logical interface
 - Traffic is distributed across all member ports → increased bandwidth
 - If one port fails, traffic continues on remaining ports → redundancy
-- FortiGate connects via aggregate to switches, servers, other FortiGates
 
-### Diagram Explanation
-The left diagram shows: internal4 + internal5 (two physical ports) combined into one **Aggregate (dot1q trunk)** connecting to a generic switch. VLANs 5 and 15 are sub-interfaces on this aggregate.
-
-The right diagram shows a second scenario: a FortiGate aggregate (dot1q trunk) connecting to servers and other FortiGate devices.
-
-### GUI Panel
-Shows the aggregate parent interface with VLAN sub-interfaces underneath:
-- Aggregate → 802.3ad Aggregate type, members: internal4, internal5
-- Vlan_5 → 10.5.0.254/255.255.255.0, VLAN ID 5
-- Vlan_10 → 10.10.0.254/255.255.255.0, VLAN ID 10
-- Vlan_15 → 10.15.0.254/255.255.255.0, VLAN ID 15
-
----
-
-## 🖥️ Slide 63 — Use Case 2: FortiSwitch Devices (FortiLink)
-
-### Key Concepts
+## Use Case 2: FortiSwitch Devices (FortiLink)
 
 **FortiLink** is the dedicated management and data protocol between FortiGate and FortiSwitch. It uses **802.3ad (LACP)** as the underlying connection type.
 
 **MCLAG (Multi-Chassis Link Aggregation)** — Connects two FortiSwitch devices to FortiGate as if they were one unit. This enhances **Layer 2 redundancy**; if one FortiSwitch fails, the other continues forwarding.
 
-### VLAN Management via FortiSwitch
-The recommended way to create VLANs for FortiSwitch is via:
-**WiFi & Switch Controller > FortiSwitch VLANs**
+## Use Case 3: Hardware Switch
 
-Once created there, the VLANs also appear under **Network > Interfaces** as sub-interfaces of the FortiLink interface.
-
-### GUI Panels Shown
-
-**FortiSwitch VLANs table:**
-| Name | IP | VLAN ID |
-|---|---|---|
-| VLAN5 | 10.5.254/255.255.255.0 | 5 |
-| VLAN10 | 10.0.254/255.255.255.0 | 10 |
-| VLAN15 | 10.15.254/255.255.255.0 | 15 |
-
-**Network > Interfaces:**
-- fortilink → 802.3ad Aggregate, "Dedicated to FortiSwitch", members a and b
-
-**FortiLink Interface Edit panel:**
-- Type: FortiLink (802.3ad Aggregate)
-- Interface members: a, b
-
----
-
-## 🖥️ Slide 64 — Use Case 3: Hardware Switch
-
-### Key Concepts
-A **hardware switch** on FortiGate allows multiple physical ports to share the **same broadcast domain**. FortiGate normally allows only one broadcast domain per interface, but a hardware switch overcomes this.
-
-Traffic between ports on the same hardware switch (**intraswitch traffic**) is allowed by default and is handled by the hardware switching ASIC — not the CPU.
-
-Hardware switches are only available on **specific FortiGate models** that have a built-in switch fabric.
-
-### Diagram Explanation
-Three ports (port1, port2, port3) are grouped into one Hardware Switch interface with IP 10.10.10.254/24. Devices connected:
-- Server: 10.10.10.1/24 (port1)
-- Laptop: 10.10.10.2/24 (port2)
-- Printer: 10.10.10.3/24 (port3)
-
-All three share the same /24 subnet and broadcast domain.
-
-### CLI Code — Left Block (Hardware Switch Definition)
 ```
 config system virtual-switch        ← Enter the virtual-switch configuration
   edit "Hardware Switch"            ← Create/edit a virtual switch named "Hardware Switch"
@@ -512,8 +430,6 @@ config system virtual-switch        ← Enter the virtual-switch configuration
   end
 end
 ```
-
-### CLI Code — Right Block (Interface IP/Access)
 ```
 config system interface             ← Enter interface configuration
   edit "Hardware Switch"            ← Reference the hardware switch interface
@@ -523,12 +439,8 @@ config system interface             ← Enter interface configuration
   next
 end
 ```
+## Use Case 4: Software Switch
 
----
-
-## 🖥️ Slide 65 — Use Case 4: Software Switch
-
-### Key Concepts
 A **software switch** is similar to a hardware switch — multiple ports (and SSIDs) share the same broadcast domain. Key differences:
 
 - Uses the **CPU** for packet processing (not hardware ASIC)
@@ -539,16 +451,6 @@ A **software switch** is similar to a hardware switch — multiple ports (and SS
 ### Intraswitch Policy
 - `intra-switch-policy implicit` → intraswitch traffic is **allowed** (default behavior)
 - `intra-switch-policy explicit` → intraswitch traffic is **blocked**; firewall policies must explicitly permit traffic between member interfaces
-
-### Diagram Explanation
-The software switch (IP: 10.10.10.254/24) has three members:
-- port1 → Server (10.10.10.1/24)
-- SSID (wireless) → Laptop (10.10.10.2/24) and Laptop (10.10.10.3/24)
-- port3 → Printer (10.10.10.4/24)
-
-All share the same broadcast domain including the wireless SSID — impossible with a hardware switch.
-
-### CLI Code — Block 1 (Software Switch Definition)
 ```
 config system switch-interface       ← Enter software switch config (different command vs. hardware!)
   edit "Software Switch"             ← Create/edit named software switch
@@ -558,8 +460,6 @@ config system switch-interface       ← Enter software switch config (different
   next
 end
 ```
-
-### CLI Code — Block 2 (Interface IP/Access)
 ```
 config system interface
   edit "Software Switch"
@@ -569,10 +469,7 @@ config system interface
   next
 end
 ```
-
----
-
-## 🖥️ Slide 66 — Hardware vs. Software Switches (Comparison Table)
+## Hardware vs. Software Switches (Comparison Table)
 
 This is the most exam-critical slide in the section. The table compares the two switch types across 5 features:
 
@@ -591,13 +488,7 @@ This is the most exam-critical slide in the section. The table compares the two 
 - Hardware/VLAN switches support **STP**; software switches do not
 - Only use switch options (hardware or software) if acquiring dedicated FortiSwitch/FortiAP devices is not feasible
 
----
-
----
-
-# 🎯 FCX Exam Key Points — Slides 57–66
-
-## ✅ Important Facts
+## Important Facts
 
 1. **VLAN Protocol Options in FortiGate GUI**: 802.1Q (EtherType 0x8100) and 802.1AD (EtherType 0x88A8 outer tag). Only these two appear in the GUI.
 2. **FortiGate does NOT add VLAN tags on ingress** — the upstream switch does. FortiGate removes ingress tags and adds egress tags as part of routing.
@@ -613,8 +504,6 @@ This is the most exam-critical slide in the section. The table compares the two 
 12. **MCLAG** with FortiSwitch = two FortiSwitch units acting as one for Layer 2 redundancy.
 13. **FortiSwitch VLANs are best managed via WiFi & Switch Controller > FortiSwitch VLANs** — they then appear automatically under Network > Interfaces.
 14. **LACP (802.3ad) recommended port counts**: 2, 4, or 8 physical ports per aggregate.
-
----
 
 ## ⚠️ Exam Traps
 
@@ -637,3 +526,53 @@ This is the most exam-critical slide in the section. The table compares the two 
 9. **FortiSwitch VLAN creation path**: The recommended path is **WiFi & Switch Controller > FortiSwitch VLANs**, NOT directly under Network > Interfaces. VLANs created there appear in both places.
 
 10. **802.1Q tag size is 4 bytes** — knowing the exact byte sizes of each header element (Ethernet 14B, IP 20B, UDP 8B, VXLAN 8B) is testable in VXLAN questions.
+
+# VDOM Type 3: LAN Extension VDOM
+What it is: A LAN Extension VDOM extends a remote LAN segment back to a central FortiGate using a combination of VPN IPsec tunnels and VXLAN encapsulation. It effectively stretches a Layer 2 broadcast domain across a WAN or internet connection.
+
+Use case: Remote sites or branch offices that need to appear as if they are directly connected to the corporate LAN — same subnet, same broadcast domain — without being physically on-site. The remote device (FortiGate at branch) connects back to the central FortiGate acting as a LAN Extension hub.
+
+Technologies used:
+ - IPsec VPN — encrypts the tunnel
+ - VXLAN — carries the Layer 2 frames over the IPsec tunnel, enabling broadcast domain extension
+
+### Summary of All Three VDOM Types
+
+| VDOM Type | CLI keyword | Purpose | Layer | Notes |
+|---|---|---|---|---|
+| **Admin** | `vdom-type admin` | FortiGate management only | N/A | No user traffic at all |
+| **Traffic (NAT)** | `vdom-type traffic` + `opmode nat` | User traffic, routing, NAT | Layer 3 | Most common type |
+| **Traffic (Transparent)** | `vdom-type traffic` + `opmode transparent` | Security inspection, no routing | Layer 2 | Requires `set manageip` |
+| **LAN Extension** | `vdom-type lan-extension` | Extend LAN over IPsec+VXLAN | Layer 2 over WAN | Remote branch use case |
+
+## Important Facts
+
+1. **Three VDOM types exist:** Admin, Traffic, and LAN Extension. Know all three.
+2. **Admin VDOM handles zero user traffic** — it is solely for managing the FortiGate device itself.
+3. **Traffic VDOM has two operating modes:** NAT (Layer 3) and Transparent (Layer 2). NAT is the default and most common.
+4. **Transparent mode requires a management IP** (`set manageip`) because there are no routed interface IPs for administration.
+5. **NAT mode is Layer 3; Transparent mode is Layer 2.** Transparent mode has no routing or NAT capability.
+6. **LAN Extension VDOM uses both IPsec and VXLAN** together — IPsec for encryption, VXLAN for Layer 2 frame transport.
+7. **GUI path for all VDOM creation:** System > VDOM > Create new. The Type tab determines which type.
+8. **NAT vs Transparent mode cannot be set from the GUI alone** — you must use CLI `config system settings` → `set opmode nat/transparent` to change the mode of a Traffic VDOM.
+9. **NGFW mode (Profile-based vs Policy-based) and Central SNAT** only appear in the GUI when the Traffic type is selected — not for Admin VDOMs.
+10. The **LAN Extension VDOM CLI keyword** is `lan-extension` (hyphenated) — `set vdom-type lan-extension`.
+
+---
+
+## Exam Traps
+
+1. **"Traffic VDOM" does not mean NAT mode by default in the exam context** — you must know both NAT and Transparent are sub-options of Traffic VDOMs. Don't assume Traffic = NAT only.
+
+2. **Transparent mode is still a Traffic VDOM** — it is NOT a separate VDOM type. The type is `traffic`; the opmode is `transparent`. A common trap is thinking Transparent mode is its own type.
+
+3. **Admin VDOM ≠ management access to root VDOM** — an Admin VDOM is a specifically typed VDOM. It does not simply mean "the VDOM where the admin logs in." Don't confuse Admin VDOM type with administrator management rights.
+
+4. **`set manageip` is only needed in Transparent mode** — if an exam question asks what is required when configuring a transparent VDOM, the management IP is essential. In NAT mode, each interface has its own IP, so no `manageip` is needed.
+
+5. **LAN Extension ≠ just VPN** — it specifically uses VXLAN over IPsec to extend a Layer 2 segment. A question describing "Layer 2 extension across WAN using VPN and VXLAN" is describing the LAN Extension VDOM, not a plain traffic VDOM with a VPN policy.
+
+6. **You cannot select NAT vs Transparent from the GUI** when creating a new VDOM — the GUI only lets you pick Traffic/Admin/LAN Extension. Switching between NAT and Transparent modes requires **CLI only** (`set opmode`). This is a classic exam trick.
+
+7. **NGFW mode and Central SNAT fields** appear in the Traffic VDOM creation panel — don't be confused if an exam question asks which VDOM type shows these options. The answer is Traffic, not Admin or LAN Extension.
+

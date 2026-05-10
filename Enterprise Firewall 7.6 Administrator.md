@@ -320,3 +320,323 @@ The **Configuration Revision History** table is shown with columns:
 
 **What this means:** After the remote script ran and FortiManager retrieved the updated config, the Config Status is now **Synchronized** — the FortiManager device database matches the live FortiGate configuration exactly. No install is needed.
 
+## Ethernet Frames and VLAN Tagging
+![alt text](image.png)
+### EtherType Reference Table
+| EtherType | Protocol |
+|---|---|
+| 0x0800 | IPv4 |
+| 0x0806 | ARP |
+| 0x0842 | Wake-on-LAN |
+| 0x86DD | IPv6 |
+| **0x8100** | **802.1Q (VLAN tagging)** |
+| **0x88A8** | **802.1ad (Q-in-Q / Provider Bridging)** |
+| 0x88CC | LLDP |
+| 0x88E5 | MACsec |
+| 0x8906 | FCoE |
+| 0x8914 | TTE |
+
+### Four Frame Formats Explained
+
+**1. Standard IPv4 Frame (no VLAN)**
+`Dest MAC | Source MAC | 0x0800 | IP Packet | FCS`
+Plain Ethernet. No VLAN awareness. Payload ≥ 46, ≤ 1500 bytes.
+
+**2. 802.1Q (Single VLAN Tag)**
+`Dest MAC | Source MAC | 0x8100 (4 bytes) | 0x0800 | IP Packet | FCS`
+- Inserts a 4-byte 802.1Q tag with EtherType 0x8100 between Source MAC and the IP payload
+- Supports up to **4,094 VLANs** (12-bit VLAN ID field)
+- Frame is now ≥ 42, ≤ 1500 bytes after the tag
+
+**3. 802.1ad (Double VLAN Tag — S-tag + C-tag)**
+`Dest MAC | Source MAC | 0x88A8 S-tag (4 bytes) | 0x8100 C-tag (4 bytes) | 0x0800 | IP Packet | FCS`
+- Two tags: outer S-tag (Provider/Service tag, EtherType 0x88A8) + inner C-tag (Customer tag, EtherType 0x8100)
+- 4,094 S-VLANs × 4,094 C-VLANs = **~16 million combinations**
+- Used by **service providers** to segregate multiple customer VLANs over the same infrastructure
+
+**4. 802.1Q-in-802.1Q (QinQ)**
+`Dest MAC | Source MAC | 0x8100 Outer (4 bytes) | 0x8100 Inner (4 bytes) | 0x0800 | IP Packet | FCS`
+- Both tags use EtherType 0x8100 (unlike 802.1ad which uses 0x88A8 for the outer)
+- Also supports up to **16 million VLAN combinations**
+- Common in large enterprise networks and service provider environments
+
+---
+
+## 🖥️ Slide 60 — VXLAN: Network Virtualization and Scalability
+
+### Key Concepts
+
+**VXLAN (Virtual Extensible LAN)** is fundamentally different from 802.1Q/802.1ad VLAN tagging. Instead of inserting a tag into the Ethernet frame, VXLAN **encapsulates the entire original Ethernet frame inside a UDP packet**.
+
+- **UDP Port:** 4789 (default)
+- **VNI (VXLAN Network Identifier):** 24-bit field → supports **16 million virtual networks**
+- **Use Cases:** Data centers, cloud environments, anywhere 4,094 VLAN limit is insufficient
+
+### Diagram Explanation — VXLAN Encapsulated Frame (1550 bytes total)
+
+The encapsulated frame has two sections: **Outer headers** and **Inner headers (original data)**:
+
+| Component | Size | Purpose |
+|---|---|---|
+| Outer Ethernet header | 14 bytes | Gets the packet to the VTEP (tunnel endpoint) |
+| Outer IP header | 20 bytes | IP source/dest of the tunnel endpoints |
+| Outer UDP header | 8 bytes | UDP port 4789 |
+| VXLAN header | 8 bytes | Contains the 24-bit VNI |
+| Inner Ethernet frame | original | The original Ethernet frame |
+| Payload | up to 1500 bytes | Original data |
+| FCS | 4 bytes | Frame Check Sequence |
+
+The original Ethernet frame (1500 bytes) becomes a 1550-byte VXLAN frame, meaning the physical network MTU needs to be 1550+ to avoid fragmentation.
+
+### Why VXLAN vs. 802.1Q?
+| Feature | 802.1Q | VXLAN |
+|---|---|---|
+| VLAN limit | 4,094 | 16 million |
+| Transport | Layer 2 | UDP/IP (Layer 3) |
+| Use case | Enterprise LAN | Data center / cloud |
+
+---
+
+## 🖥️ Slide 61 — VLANs on FortiGate Interfaces
+
+### Key Concepts
+VLANs are not limited to physical interfaces on FortiGate. You can apply VLANs to:
+
+- **Aggregate interfaces** (802.3ad LACP bonded)
+- **FortiLink interfaces** (connection to FortiSwitch)
+- **Hardware switches** (built-in switch fabric)
+- **Virtual VLAN switches**
+- **Software switches**
+- **Wireless SSID interfaces**
+
+### Critical Point
+You can configure the **same VLAN ID** on different interfaces with different names — and they will be **completely separate broadcast domains**. The VLAN ID alone does not make two VLANs the same; the parent interface also matters.
+
+### GUI Screenshot Breakdown
+The Network > Interfaces panel shows four interface groups, each with a VLAN 5 (ID: 5) sub-interface:
+- **802.3ad Aggregate** → VLAN 5 under the aggregate
+- **FortiLink** → VLAN 5 under the FortiLink
+- **Hardware Switch** → VLAN 5 under the hardware switch
+- **Software Switch** → VLAN 5 under the software switch
+
+The **WiFi & Switch Controller > SSIDs** panel shows a Wireless_VLAN5 SSID mapped to VLAN ID 5.
+
+---
+
+## 🖥️ Slide 62 — Use Case 1: Diverse Connectivity with LACPs (Aggregate Interfaces)
+
+### Key Concepts
+
+**802.3ad ≠ 802.1ad** — These are completely different standards:
+- **802.3ad** = Link Aggregation Control Protocol (LACP) — bonds multiple physical ports for **bandwidth and redundancy**
+- **802.1ad** = Double VLAN tagging (provider bridging)
+
+### LACP / Aggregate Interface
+- Bundles 2, 4, or 8 physical ports into one logical interface
+- Traffic is distributed across all member ports → increased bandwidth
+- If one port fails, traffic continues on remaining ports → redundancy
+- FortiGate connects via aggregate to switches, servers, other FortiGates
+
+### Diagram Explanation
+The left diagram shows: internal4 + internal5 (two physical ports) combined into one **Aggregate (dot1q trunk)** connecting to a generic switch. VLANs 5 and 15 are sub-interfaces on this aggregate.
+
+The right diagram shows a second scenario: a FortiGate aggregate (dot1q trunk) connecting to servers and other FortiGate devices.
+
+### GUI Panel
+Shows the aggregate parent interface with VLAN sub-interfaces underneath:
+- Aggregate → 802.3ad Aggregate type, members: internal4, internal5
+- Vlan_5 → 10.5.0.254/255.255.255.0, VLAN ID 5
+- Vlan_10 → 10.10.0.254/255.255.255.0, VLAN ID 10
+- Vlan_15 → 10.15.0.254/255.255.255.0, VLAN ID 15
+
+---
+
+## 🖥️ Slide 63 — Use Case 2: FortiSwitch Devices (FortiLink)
+
+### Key Concepts
+
+**FortiLink** is the dedicated management and data protocol between FortiGate and FortiSwitch. It uses **802.3ad (LACP)** as the underlying connection type.
+
+**MCLAG (Multi-Chassis Link Aggregation)** — Connects two FortiSwitch devices to FortiGate as if they were one unit. This enhances **Layer 2 redundancy**; if one FortiSwitch fails, the other continues forwarding.
+
+### VLAN Management via FortiSwitch
+The recommended way to create VLANs for FortiSwitch is via:
+**WiFi & Switch Controller > FortiSwitch VLANs**
+
+Once created there, the VLANs also appear under **Network > Interfaces** as sub-interfaces of the FortiLink interface.
+
+### GUI Panels Shown
+
+**FortiSwitch VLANs table:**
+| Name | IP | VLAN ID |
+|---|---|---|
+| VLAN5 | 10.5.254/255.255.255.0 | 5 |
+| VLAN10 | 10.0.254/255.255.255.0 | 10 |
+| VLAN15 | 10.15.254/255.255.255.0 | 15 |
+
+**Network > Interfaces:**
+- fortilink → 802.3ad Aggregate, "Dedicated to FortiSwitch", members a and b
+
+**FortiLink Interface Edit panel:**
+- Type: FortiLink (802.3ad Aggregate)
+- Interface members: a, b
+
+---
+
+## 🖥️ Slide 64 — Use Case 3: Hardware Switch
+
+### Key Concepts
+A **hardware switch** on FortiGate allows multiple physical ports to share the **same broadcast domain**. FortiGate normally allows only one broadcast domain per interface, but a hardware switch overcomes this.
+
+Traffic between ports on the same hardware switch (**intraswitch traffic**) is allowed by default and is handled by the hardware switching ASIC — not the CPU.
+
+Hardware switches are only available on **specific FortiGate models** that have a built-in switch fabric.
+
+### Diagram Explanation
+Three ports (port1, port2, port3) are grouped into one Hardware Switch interface with IP 10.10.10.254/24. Devices connected:
+- Server: 10.10.10.1/24 (port1)
+- Laptop: 10.10.10.2/24 (port2)
+- Printer: 10.10.10.3/24 (port3)
+
+All three share the same /24 subnet and broadcast domain.
+
+### CLI Code — Left Block (Hardware Switch Definition)
+```
+config system virtual-switch        ← Enter the virtual-switch configuration
+  edit "Hardware Switch"            ← Create/edit a virtual switch named "Hardware Switch"
+  set physical-switch "sw0"         ← Bind it to the physical switch chip (sw0)
+  config port                       ← Enter port configuration sub-mode
+    edit port1                      ← Add port1 as a member
+    next
+    edit port2                      ← Add port2 as a member
+    next
+    edit port3                      ← Add port3 as a member
+    next
+  end
+end
+```
+
+### CLI Code — Right Block (Interface IP/Access)
+```
+config system interface             ← Enter interface configuration
+  edit "Hardware Switch"            ← Reference the hardware switch interface
+  set vdom "root"                   ← Assign to root VDOM
+  set ip 10.10.10.254 255.255.255.0 ← Set the gateway IP for attached devices
+  set allowaccess ping https        ← Allow ping and HTTPS management access
+  next
+end
+```
+
+---
+
+## 🖥️ Slide 65 — Use Case 4: Software Switch
+
+### Key Concepts
+A **software switch** is similar to a hardware switch — multiple ports (and SSIDs) share the same broadcast domain. Key differences:
+
+- Uses the **CPU** for packet processing (not hardware ASIC)
+- Supports **wireless SSID interfaces** as members (hardware switch does not)
+- Available on **all FortiGate models** (not model-specific)
+- **Intraswitch traffic can be disabled** (hardware switch cannot disable it)
+
+### Intraswitch Policy
+- `intra-switch-policy implicit` → intraswitch traffic is **allowed** (default behavior)
+- `intra-switch-policy explicit` → intraswitch traffic is **blocked**; firewall policies must explicitly permit traffic between member interfaces
+
+### Diagram Explanation
+The software switch (IP: 10.10.10.254/24) has three members:
+- port1 → Server (10.10.10.1/24)
+- SSID (wireless) → Laptop (10.10.10.2/24) and Laptop (10.10.10.3/24)
+- port3 → Printer (10.10.10.4/24)
+
+All share the same broadcast domain including the wireless SSID — impossible with a hardware switch.
+
+### CLI Code — Block 1 (Software Switch Definition)
+```
+config system switch-interface       ← Enter software switch config (different command vs. hardware!)
+  edit "Software Switch"             ← Create/edit named software switch
+  set vdom "root"                    ← Assign to root VDOM
+  set member "port1" "SSID" "port3"  ← Add members (interfaces AND SSIDs together — key advantage)
+  set intra-switch-policy <implicit or explicit>  ← Control intraswitch traffic behavior
+  next
+end
+```
+
+### CLI Code — Block 2 (Interface IP/Access)
+```
+config system interface
+  edit "Software Switch"
+  set vdom "root"
+  set ip 10.10.10.254 255.255.255.0
+  set allowaccess ping https
+  next
+end
+```
+
+---
+
+## 🖥️ Slide 66 — Hardware vs. Software Switches (Comparison Table)
+
+This is the most exam-critical slide in the section. The table compares the two switch types across 5 features:
+
+| Feature | Hardware Switch | Software Switch |
+|---|---|---|
+| **CLI configuration command** | `config system virtual-switch` (with sub-config port) | `config system switch-interface` (members at same level) |
+| **Intraswitch traffic** | ✅ Yes (always on) | ✅ Yes (but can be blocked with explicit policy) |
+| **Wireless SSIDs** | ❌ No | ✅ Yes |
+| **STP (Spanning Tree Protocol)** | ✅ Yes | ❌ No |
+| **Supported models** | Specific models only | All models |
+| **Processing** | Offloaded to hardware ASIC | Processed in software by CPU |
+
+### Key Takeaways from the Notes
+- Hardware switch uses a **sub-configuration** (`config port`); software switch adds members **at the same level** (`set member`)
+- Software switch CPU processing can **impact performance** in resource-intensive deployments
+- Hardware/VLAN switches support **STP**; software switches do not
+- Only use switch options (hardware or software) if acquiring dedicated FortiSwitch/FortiAP devices is not feasible
+
+---
+
+---
+
+# 🎯 FCX Exam Key Points — Slides 57–66
+
+## ✅ Important Facts
+
+1. **VLAN Protocol Options in FortiGate GUI**: 802.1Q (EtherType 0x8100) and 802.1AD (EtherType 0x88A8 outer tag). Only these two appear in the GUI.
+2. **FortiGate does NOT add VLAN tags on ingress** — the upstream switch does. FortiGate removes ingress tags and adds egress tags as part of routing.
+3. **802.1Q = 4,094 VLANs** (12-bit VLAN ID). **802.1ad and QinQ = ~16 million** combinations.
+4. **VXLAN uses UDP port 4789** and a **24-bit VNI** supporting 16 million virtual networks.
+5. **VXLAN encapsulates the full original Ethernet frame** inside outer Ethernet/IP/UDP headers — it is not just a tag insertion.
+6. **Same VLAN ID on different interfaces = different broadcast domains.** They are independent.
+7. **Hardware switch CLI**: `config system virtual-switch` → ports are sub-configured with `config port`
+8. **Software switch CLI**: `config system switch-interface` → members are set inline with `set member`
+9. **Software switches support wireless SSIDs** as members; hardware switches do not.
+10. **Hardware switches support STP**; software switches do not.
+11. **Hardware switch processing is offloaded to ASIC**; software switch uses the CPU.
+12. **MCLAG** with FortiSwitch = two FortiSwitch units acting as one for Layer 2 redundancy.
+13. **FortiSwitch VLANs are best managed via WiFi & Switch Controller > FortiSwitch VLANs** — they then appear automatically under Network > Interfaces.
+14. **LACP (802.3ad) recommended port counts**: 2, 4, or 8 physical ports per aggregate.
+
+---
+
+## ⚠️ Exam Traps
+
+1. **802.1ad ≠ 802.3ad** — These are completely different! 802.1ad = provider bridging (double VLAN tags). 802.3ad = LACP link aggregation. Exam questions may deliberately mix these.
+
+2. **QinQ vs. 802.1ad**: Both support 16M VLANs, but the outer tag EtherType differs — 802.1ad uses **0x88A8** for the outer S-tag; QinQ uses **0x8100** for both outer and inner tags. Don't confuse them.
+
+3. **VXLAN is NOT a VLAN tagging standard** — it is a full UDP encapsulation tunnel protocol. The original frame is completely encapsulated, not just tagged.
+
+4. **Hardware switch is model-specific** — you cannot assume it's available on all FortiGate units. Software switch is available on ALL models.
+
+5. **Intraswitch traffic default**: Both hardware and software switches allow intraswitch traffic by default. The key difference is that **only software switches can disable it** using `intra-switch-policy explicit`.
+
+6. **Software switch with explicit policy**: When you set `intra-switch-policy explicit`, you **must create firewall policies** to allow traffic between member ports — it does not flow automatically.
+
+7. **FortiGate GUI VLAN sub-interfaces**: The VLAN ID column is not shown by default — you must add it via column customization. Don't be tripped up by screenshot questions where it's missing.
+
+8. **VXLAN MTU trap**: VXLAN adds 50 bytes of overhead to the original 1500-byte frame, making the total 1550 bytes. The physical network MTU must accommodate this, or fragmentation occurs.
+
+9. **FortiSwitch VLAN creation path**: The recommended path is **WiFi & Switch Controller > FortiSwitch VLANs**, NOT directly under Network > Interfaces. VLANs created there appear in both places.
+
+10. **802.1Q tag size is 4 bytes** — knowing the exact byte sizes of each header element (Ethernet 14B, IP 20B, UDP 8B, VXLAN 8B) is testable in VXLAN questions.

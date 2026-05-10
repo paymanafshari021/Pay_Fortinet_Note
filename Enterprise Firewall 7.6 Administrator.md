@@ -588,3 +588,33 @@ FortiGuard subscription licenses (AV, IPS, Web Filtering, etc.)
 > Critical Rule: If licensing levels differ between members, the cluster does not fail to form — instead, it degrades to the lowest common license level across all members.
 
 If you buy FortiGuard Web Filtering for only one member of a two-member cluster, neither member will have Web Filtering once they form the cluster. The higher license is effectively wasted until all members match.
+#  Ethernet Types and Synchronization Optimization
+- FGCP travels over the heartbeat interfaces that you designate with set hbdev. It does not use the IP protocol — it uses its own custom Ethernet types (EtherTypes), which is why it can operate even before IP addresses are fully configured on interfaces.
+- Ethernet Type 0x8890 and 0x8891 — The Heartbeat and Control Traffic
+- Ethernet Type 0x8893 — Configuration Synchronization
+
+**Summary of EtherType roles:**
+
+| EtherType | Function |
+|---|---|
+| **0x8890** | FGCP heartbeat and control (primary direction) |
+| **0x8891** | FGCP heartbeat and control (secondary direction) |
+| **0x8893** | Configuration synchronization between cluster members |
+
+### Sniffing HA Heartbeat Packets — CLI Diagnostic Command
+
+```
+# diagnose sniff packet any "ether proto 0x8890" 4
+```
+
+This is a **packet capture / sniffer command** used for troubleshooting HA heartbeat traffic. Let's break it down word by word:
+
+| `"ether proto 0x8890"` | Filter: only capture packets using EtherType 0x8890 (FGCP heartbeat) |
+
+**Why this command matters:** Because FGCP uses its own EtherType (not IP), you cannot use standard IP-based filters like `host x.x.x.x` or `port 80`. You must filter by Ethernet protocol type directly. This command lets you verify that heartbeat packets are actually being sent and received between cluster members.
+
+**Example use case:** If an HA cluster is not forming or a member keeps dropping out, running this command helps you confirm whether heartbeat packets are physically arriving on the interface.
+### Dedicated Session Synchronization Interfaces
+- Multiple session sync interfaces = load balanced session synchronization traffic.
+- If all session sync interfaces fail, session synchronization automatically falls back to the heartbeat link — the cluster does not lose sync capability.
+- Mixing session sync with heartbeat traffic is risky in high-volume environments — it can cause false failovers due to missed heartbeats.

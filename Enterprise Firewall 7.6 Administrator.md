@@ -576,3 +576,15 @@ Technologies used:
 
 7. **NGFW mode and Central SNAT fields** appear in the Traffic VDOM creation panel — don't be confused if an exam question asks which VDOM type shows these options. The answer is Traffic, not Admin or LAN Extension.
 
+# HA Requirments
+### Licensing 
+All members must have the same license level across all license types:
+
+FortiGuard subscription licenses (AV, IPS, Web Filtering, etc.)
+- VDOM licenses
+- FortiClient licenses
+- And any other add-on licenses
+
+> Critical Rule: If licensing levels differ between members, the cluster does not fail to form — instead, it degrades to the lowest common license level across all members.
+
+If you buy FortiGuard Web Filtering for only one member of a two-member cluster, neither member will have Web Filtering once they form the cluster. The higher license is effectively wasted until all members match.

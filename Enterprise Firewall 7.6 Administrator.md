@@ -321,7 +321,7 @@ The **Configuration Revision History** table is shown with columns:
 **What this means:** After the remote script ran and FortiManager retrieved the updated config, the Config Status is now **Synchronized** — the FortiManager device database matches the live FortiGate configuration exactly. No install is needed.
 
 ## Ethernet Frames and VLAN Tagging
-![alt text](image.png)
+![EthernetFrames](images/EthernetFrames.png)
 ### EtherType Reference Table
 | EtherType | Protocol |
 |---|---|
@@ -360,11 +360,7 @@ Plain Ethernet. No VLAN awareness. Payload ≥ 46, ≤ 1500 bytes.
 - Also supports up to **16 million VLAN combinations**
 - Common in large enterprise networks and service provider environments
 
----
-
-## 🖥️ Slide 60 — VXLAN: Network Virtualization and Scalability
-
-### Key Concepts
+## VXLAN: Network Virtualization and Scalability
 
 **VXLAN (Virtual Extensible LAN)** is fundamentally different from 802.1Q/802.1ad VLAN tagging. Instead of inserting a tag into the Ethernet frame, VXLAN **encapsulates the entire original Ethernet frame inside a UDP packet**.
 
@@ -373,6 +369,7 @@ Plain Ethernet. No VLAN awareness. Payload ≥ 46, ≤ 1500 bytes.
 - **Use Cases:** Data centers, cloud environments, anywhere 4,094 VLAN limit is insufficient
 
 ### Diagram Explanation — VXLAN Encapsulated Frame (1550 bytes total)
+![VXLAN](images/VXLAN.png)
 
 The encapsulated frame has two sections: **Outer headers** and **Inner headers (original data)**:
 
